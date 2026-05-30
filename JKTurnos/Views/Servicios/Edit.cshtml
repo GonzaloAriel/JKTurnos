@@ -1,0 +1,44 @@
+@model JKTurnos.Models.Entities.Servicio
+
+<h2>Editar Servicio</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.CreatedAt)
+    @Html.HiddenFor(x => x.TenantId)
+    @Html.HiddenFor(x => x.IsActive)
+
+    <div class="form-group">
+        <label>Nombre</label>
+        @Html.TextBoxFor(x => x.Nombre,
+            new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Descripcion</label>
+        @Html.TextAreaFor(x => x.Descripcion,
+            new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Duracion (minutos)</label>
+        @Html.TextBoxFor(x => x.DuracionMinutos,
+            new { @class = "form-control", type = "number" })
+    </div>
+
+    <div class="form-group">
+        <label>Precio</label>
+        @Html.TextBoxFor(x => x.Precio,
+            new { @class = "form-control", type = "number", step = "0.01" })
+    </div>
+
+    <br />
+
+    <button type="submit"
+            class="btn btn-success">
+        Guardar
+    </button>
+}

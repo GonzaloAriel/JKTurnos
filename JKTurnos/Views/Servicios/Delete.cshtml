@@ -1,0 +1,32 @@
+@model JKTurnos.Models.Entities.Servicio
+
+<h2>Eliminar Servicio</h2>
+
+<h4>
+    ¿Estas seguro que deseas eliminar este servicio?
+</h4>
+
+<div>
+    <strong>@Model.Nombre</strong>
+</div>
+
+<br />
+
+@using (Html.BeginForm("DeleteConfirmed",
+                       "Servicios",
+                       FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(x => x.Id)
+
+    <button type="submit"
+            class="btn btn-danger">
+        Si, eliminar
+    </button>
+
+    <a href="@Url.Action("Index")"
+       class="btn btn-secondary">
+        Cancelar
+    </a>
+}

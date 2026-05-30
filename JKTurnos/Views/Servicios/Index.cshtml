@@ -1,0 +1,42 @@
+@model List<JKTurnos.Models.Entities.Servicio>
+
+<h2>Servicios</h2>
+
+<p>
+    <a href="@Url.Action("Create")" class="btn btn-primary">
+        Nuevo Servicio
+    </a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Duracion</th>
+            <th>Precio</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.DuracionMinutos min</td>
+                <td>$ @item.Precio</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = item.Id })"
+                       class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+
+                    <a href="@Url.Action("Delete", new { id = item.Id })"
+                       class="btn btn-danger btn-sm">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

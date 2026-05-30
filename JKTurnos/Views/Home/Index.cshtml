@@ -1,11 +1,6 @@
-﻿<h2>Bienvenido a JKTurnos</h2>
+﻿@using System.Security.Claims
 
-<hr />
-
-<p>Usuario autenticado: @User.Identity.IsAuthenticated</p>
-
-<p>UserId: @ViewBag.CurrentUser</p>
-
-<p>TenantId: @ViewBag.CurrentTenant</p>
-
-<p>Nombre: @ViewBag.UserName</p>
+@foreach (var c in ((ClaimsIdentity)User.Identity).Claims)
+{
+    <p>@c.Type = @c.Value</p>
+}

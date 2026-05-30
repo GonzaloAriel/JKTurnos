@@ -163,6 +163,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ServiciosController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
     <Compile Include="Global.asax.cs">
@@ -183,17 +184,23 @@
     <Compile Include="Migrations\202605292319276_AddClientes.Designer.cs">
       <DependentUpon>202605292319276_AddClientes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202605301502375_AddServicio.cs" />
+    <Compile Include="Migrations\202605301502375_AddServicio.Designer.cs">
+      <DependentUpon>202605301502375_AddServicio.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\ITenantEntity.cs" />
+    <Compile Include="Models\Entities\Servicio.cs" />
     <Compile Include="Models\Entities\Tenant.cs" />
     <Compile Include="Models\Entities\User.cs" />
     <Compile Include="Models\ViewModels\LoginVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\ClienteService.cs" />
+    <Compile Include="Services\ServicioService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -252,6 +259,10 @@
     <Content Include="Views\Clientes\Create.cshtml" />
     <Content Include="Views\Clientes\Edit.cshtml" />
     <Content Include="Views\Clientes\Delete.cshtml" />
+    <Content Include="Views\Servicios\Index.cshtml" />
+    <Content Include="Views\Servicios\Create.cshtml" />
+    <Content Include="Views\Servicios\Edit.cshtml" />
+    <Content Include="Views\Servicios\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -292,6 +303,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605292319276_AddClientes.resx">
       <DependentUpon>202605292319276_AddClientes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605301502375_AddServicio.resx">
+      <DependentUpon>202605301502375_AddServicio.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

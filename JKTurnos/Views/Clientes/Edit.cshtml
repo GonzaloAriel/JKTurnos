@@ -9,7 +9,11 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
+
     @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.CreatedAt)
+    @Html.HiddenFor(m => m.TenantId)
+    @Html.HiddenFor(m => m.IsActive)
 
     <div class="form-group">
         <label>Nombre</label>
@@ -27,7 +31,7 @@
     </div>
 
     <div class="form-group">
-        <label>Dirección</label>
+        <label>Direccion</label>
         @Html.TextBoxFor(m => m.Direccion, new { @class = "form-control" })
     </div>
 
