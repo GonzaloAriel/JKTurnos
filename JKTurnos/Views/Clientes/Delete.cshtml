@@ -1,0 +1,27 @@
+@model JKTurnos.Models.Entities.Cliente
+
+@{
+    ViewBag.Title = "Eliminar Cliente";
+}
+
+<h2>Eliminar Cliente</h2>
+
+<h4>¿Estás seguro que deseas eliminar este cliente?</h4>
+
+<div>
+    <strong>@Model.Nombre</strong>
+</div>
+
+@using (Html.BeginForm("DeleteConfirmed", "Clientes", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <button type="submit" class="btn btn-danger">
+        Sí, eliminar
+    </button>
+
+    <a class="btn btn-secondary" href="@Url.Action("Index")">
+        Cancelar
+    </a>
+}

@@ -17,9 +17,12 @@ namespace JKTurnos.Migrations
 
         protected override void Seed(JKContext context)
         {
-            if (!context.Tenants.Any())
+            // 1. TENANT
+            var tenant = context.Tenants.FirstOrDefault(x => x.Subdominio == "local");
+
+            if (tenant == null)
             {
-                var tenant = new Tenant
+                tenant = new Tenant
                 {
                     Nombre = "JK Demo",
                     Subdominio = "local",
@@ -28,24 +31,42 @@ namespace JKTurnos.Migrations
                 };
 
                 context.Tenants.Add(tenant);
-
                 context.SaveChanges();
+            }
 
-                var user = new User
+            // 2. USER
+            var adminEmail = "admin@jkturnos.com";
+
+            if (!context.Users.Any(x => x.Email == adminEmail && x.TenantId == tenant.Id))
+            {
+                context.Users.Add(new User
                 {
                     Nombre = "Administrador",
-                    Email = "admin@jkturnos.com",
+                    Email = adminEmail,
                     PasswordHash = PasswordHasher.Hash("admin123"),
                     Role = "Admin",
                     TenantId = tenant.Id,
                     CreatedAt = DateTime.Now,
                     IsActive = true
-                };
-
-                context.Users.Add(user);
-
-                context.SaveChanges();
+                });
             }
+
+            // 3. CONFIGURACION TENANT
+            if (!context.ConfiguracionesTenant.Any(x => x.TenantId == tenant.Id))
+            {
+                context.ConfiguracionesTenant.Add(new ConfiguracionTenant
+                {
+                    TenantId = tenant.Id,
+                    NombreComercial = "JKTurnos Demo",
+                    Telefono = "",
+                    Email = adminEmail,
+                    Direccion = "",
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            context.SaveChanges();
         }
     }
 }

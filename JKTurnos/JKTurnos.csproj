@@ -159,24 +159,41 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\ITenantProvider.cs" />
     <Compile Include="Infrastructure\PasswordHasher.cs" />
+    <Compile Include="Infrastructure\TenantProvider.cs" />
     <Compile Include="Migrations\202605280254136_Initial.cs" />
     <Compile Include="Migrations\202605280254136_Initial.Designer.cs">
       <DependentUpon>202605280254136_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202605292256516_AddConfiguracionTenant.cs" />
+    <Compile Include="Migrations\202605292256516_AddConfiguracionTenant.Designer.cs">
+      <DependentUpon>202605292256516_AddConfiguracionTenant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202605292319276_AddClientes.cs" />
+    <Compile Include="Migrations\202605292319276_AddClientes.Designer.cs">
+      <DependentUpon>202605292319276_AddClientes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
+    <Compile Include="Models\Entities\Cliente.cs" />
+    <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\ITenantEntity.cs" />
     <Compile Include="Models\Entities\Tenant.cs" />
     <Compile Include="Models\Entities\User.cs" />
     <Compile Include="Models\ViewModels\LoginVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
+    <Compile Include="Services\ClienteService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +247,11 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Clientes\Index.cshtml" />
+    <Content Include="Views\Clientes\Create.cshtml" />
+    <Content Include="Views\Clientes\Edit.cshtml" />
+    <Content Include="Views\Clientes\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -264,6 +286,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202605280254136_Initial.resx">
       <DependentUpon>202605280254136_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605292256516_AddConfiguracionTenant.resx">
+      <DependentUpon>202605292256516_AddConfiguracionTenant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605292319276_AddClientes.resx">
+      <DependentUpon>202605292319276_AddClientes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

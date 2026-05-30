@@ -1,0 +1,37 @@
+@model JKTurnos.Models.Entities.Cliente
+
+@{
+    ViewBag.Title = "Editar Cliente";
+}
+
+<h2>Editar Cliente</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="form-group">
+        <label>Nombre</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Teléfono</label>
+        @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Dirección</label>
+        @Html.TextBoxFor(m => m.Direccion, new { @class = "form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Actualizar
+    </button>
+}
