@@ -1,6 +1,105 @@
-﻿@using System.Security.Claims
+@{
+    ViewBag.Title = "Command Center";
+    var hour = DateTime.Now.Hour;
+    string greeting = "Buenos dias";
 
-@foreach (var c in ((ClaimsIdentity)User.Identity).Claims)
-{
-    <p>@c.Type = @c.Value</p>
+    if (hour >= 12 && hour < 20)
+    {
+        greeting = "Buenas tardes";
+    }
+    else if (hour >= 20 || hour < 5)
+    {
+        greeting = "Buenas noches";
+    }
 }
+
+<div class="fade-in">
+    <!-- Cabecera Contextual (Intelligent Assistant) -->
+    <div class="welcome-section">
+        <h1 class="jk-h1 contextual-greeting">@greeting, @User.Identity.Name.</h1>
+        <p class="jk-body-lg contextual-status">
+            <i class="bi bi-stars text-warning me-1"></i>
+            Todo listo para comenzar tu jornada. Tienes <span class="fw-600">0 turnos</span> para hoy.
+        </p>
+    </div>
+
+    <!-- Acciones de Alta Intencion (Linear Style) -->
+    <div class="d-flex flex-wrap gap-3 mb-5">
+        <button class="jk-btn jk-btn-primary py-3 px-4">
+            <i class="bi bi-plus-lg fs-5"></i>
+            <span class="fs-6">Nuevo Turno</span>
+        </button>
+        <button class="jk-btn jk-btn-secondary py-3 px-4">
+            <i class="bi bi-person-plus fs-5"></i>
+            <span class="fs-6">Nuevo Cliente</span>
+        </button>
+        <button class="jk-btn jk-btn-ghost py-3 px-4">
+            <i class="bi bi-search fs-5"></i>
+            <span class="fs-6">Buscar</span>
+        </button>
+    </div>
+
+    <!-- KPIs Minimalistas (Lugar secundario) -->
+    <div class="jk-small fw-600 text-uppercase mb-3" style="letter-spacing: 0.05em; opacity: 0.6;">Resumen de soporte</div>
+    <div class="kpi-row">
+        <div class="kpi-mini-card">
+            <div class="kpi-label">Ingresos Hoy</div>
+            <div class="kpi-value">$0.00</div>
+        </div>
+        <div class="kpi-mini-card">
+            <div class="kpi-label">Ocupacion</div>
+            <div class="kpi-value">0%</div>
+        </div>
+        <div class="kpi-mini-card">
+            <div class="kpi-label">Pendientes</div>
+            <div class="kpi-value">0</div>
+        </div>
+    </div>
+
+    <!-- Sistema Inteligente de Sugerencias (Asistente) -->
+    <div class="section-spacer mt-5">
+        <h2 class="jk-h3 mb-1">Pasos recomendados</h2>
+        <p class="jk-small mb-4">Ayudame a conocer mejor tu negocio para asistirte mejor.</p>
+
+        <div class="suggestion-grid">
+            <div class="jk-card suggestion-card jk-card-hover">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="icon-box p-2 rounded-3 bg-light text-primary">
+                        <i class="bi bi-shop fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="jk-body fw-600 mb-1">Completa tu negocio</h3>
+                        <p class="jk-small mb-3">Configura logo, direccion y datos de contacto.</p>
+                        <a href="#" class="jk-btn jk-btn-secondary jk-btn-sm py-1 px-3">Configurar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jk-card suggestion-card jk-card-hover" style="border-left-color: var(--jk-success);">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="icon-box p-2 rounded-3 bg-light text-success">
+                        <i class="bi bi-scissors fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="jk-body fw-600 mb-1">Agrega servicios</h3>
+                        <p class="jk-small mb-3">Define que ofreces y cuanto tiempo dura.</p>
+                        <a href="@Url.Action("Create", "Servicios")" class="jk-btn jk-btn-secondary jk-btn-sm py-1 px-3">Agregar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jk-card suggestion-card jk-card-hover" style="border-left-color: var(--jk-warning);">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="icon-box p-2 rounded-3 bg-light text-warning">
+                        <i class="bi bi-clock fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="jk-body fw-600 mb-1">Configura horarios</h3>
+                        <p class="jk-small mb-3">Define tus dias y horas de atencion.</p>
+                        <a href="#" class="jk-btn jk-btn-secondary jk-btn-sm py-1 px-3">Definir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

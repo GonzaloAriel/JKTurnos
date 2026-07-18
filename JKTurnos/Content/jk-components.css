@@ -1,0 +1,158 @@
+/* 
+   JKTurnos - Design System (JK-DS)
+   Core components and design tokens.
+   Inspiration: Apple, Notion, Linear, Stripe, Vercel.
+*/
+
+:root {
+    /* Design Tokens - Colors */
+    --jk-primary: #000000;         /* Linear / Vercel Feel */
+    --jk-primary-hover: #262626;
+    --jk-accent: #2563eb;          /* Modern Blue */
+    --jk-bg-app: #fbfbfc;          /* Apple / Notion Neutral */
+    --jk-white: #ffffff;
+    --jk-text-main: #111827;       /* High Contrast */
+    --jk-text-muted: #6b7280;      /* Slate Gray */
+    --jk-border: #e5e8eb;          /* Soft Borders */
+    --jk-success: #10b981;
+    --jk-warning: #f59e0b;
+    --jk-danger: #ef4444;
+    
+    /* Shadows - Vercel Inspired */
+    --jk-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --jk-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --jk-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Base Styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--jk-text-main);
+    background-color: var(--jk-bg-app);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Helpers */
+.jk-h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.025em; }
+.jk-h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.025em; }
+.jk-h3 { font-size: 1.25rem; font-weight: 600; }
+.jk-body-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.jk-body { font-size: 1rem; line-height: 1.5rem; }
+.jk-small { font-size: 0.875rem; line-height: 1.25rem; color: var(--jk-text-muted); }
+
+/* Buttons - Linear Style */
+.jk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid transparent;
+    gap: 8px;
+}
+
+.jk-btn-primary {
+    background: var(--jk-primary);
+    color: var(--jk-white);
+}
+
+.jk-btn-primary:hover {
+    background: var(--jk-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
+.jk-btn-secondary {
+    background: var(--jk-white);
+    color: var(--jk-text-main);
+    border-color: var(--jk-border);
+}
+
+.jk-btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.jk-btn-ghost {
+    background: transparent;
+    color: var(--jk-text-muted);
+}
+
+.jk-btn-ghost:hover {
+    background: #f3f4f6;
+    color: var(--jk-text-main);
+}
+
+/* Cards - Vercel Style */
+.jk-card {
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    box-shadow: var(--jk-shadow-sm);
+}
+
+.jk-card-hover:hover {
+    box-shadow: var(--jk-shadow-md);
+    border-color: #d1d5db;
+}
+
+/* Inputs - Floating Label Aesthetic (Base classes) */
+.jk-input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.jk-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--jk-text-muted);
+    margin-bottom: 6px;
+}
+
+.jk-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--jk-border);
+    background: var(--jk-white);
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.jk-input:focus {
+    outline: none;
+    border-color: var(--jk-accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Badges / Chips */
+.jk-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.jk-badge-success { background: #ecfdf5; color: #065f46; }
+.jk-badge-warning { background: #fffbeb; color: #92400e; }
+.jk-badge-danger { background: #fef2f2; color: #991b1b; }
+
+/* Transitions */
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -66,6 +66,42 @@ namespace JKTurnos.Migrations
                 });
             }
 
+            // 4. CONFIGURACION Turnos
+            if (!context.EstadosTurno.Any())
+            {
+                context.EstadosTurno.Add(
+                    new EstadoTurno
+                    {
+                        TenantId = tenant.Id,
+                        Nombre = "Pendiente",
+                        Color = "#ffc107",
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+
+                context.EstadosTurno.Add(
+                    new EstadoTurno
+                    {
+                        TenantId = tenant.Id,
+                        Nombre = "Confirmado",
+                        Color = "#0d6efd",
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+
+                context.EstadosTurno.Add(
+                    new EstadoTurno
+                    {
+                        TenantId = tenant.Id,
+                        Nombre = "Atendido",
+                        Color = "#198754",
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+
+                context.SaveChanges();
+            }
+
             context.SaveChanges();
         }
     }

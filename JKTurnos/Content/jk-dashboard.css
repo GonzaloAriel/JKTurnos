@@ -1,0 +1,60 @@
+/* 
+   JKTurnos - Dashboard Styles
+   Specific styles for the Command Center.
+*/
+
+.welcome-section {
+    margin-bottom: 32px;
+}
+
+.contextual-greeting {
+    margin-bottom: 8px;
+}
+
+.contextual-status {
+    color: var(--jk-text-muted);
+    font-weight: 400;
+}
+
+/* Suggestion Cards */
+.suggestion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.suggestion-card {
+    border-left: 4px solid var(--jk-accent);
+}
+
+/* KPI Mini Cards */
+.kpi-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.kpi-mini-card {
+    flex: 1;
+    min-width: 150px;
+    padding: 16px;
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: 12px;
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    color: var(--jk-text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}

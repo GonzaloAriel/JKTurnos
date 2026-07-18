@@ -1,0 +1,52 @@
+<nav id="sidebar" class="d-flex flex-column p-3">
+    <div class="sidebar-header mb-4 px-2">
+        <div class="jk-h3 mb-0">JKTurnos</div>
+        <div class="jk-small">Asistente de tiempo</div>
+    </div>
+
+    <div class="sidebar-menu flex-grow-1">
+        <div class="sidebar-group mb-4">
+            <div class="jk-small fw-600 text-uppercase mb-2 px-2" style="letter-spacing: 0.05em; font-size: 0.7rem; opacity: 0.6;">Principal</div>
+            <a href="@Url.Action("Index", "Home")" class="jk-btn jk-btn-ghost w-100 justify-content-start @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active-link" : "")">
+                <i class="bi bi-house-door me-2"></i> Command Center
+            </a>
+            <a href="#" class="jk-btn jk-btn-ghost w-100 justify-content-start">
+                <i class="bi bi-calendar3 me-2"></i> Mi Agenda
+            </a>
+        </div>
+
+        <div class="sidebar-group mb-4">
+            <div class="jk-small fw-600 text-uppercase mb-2 px-2" style="letter-spacing: 0.05em; font-size: 0.7rem; opacity: 0.6;">Gestion</div>
+            <a href="@Url.Action("Index", "Clientes")" class="jk-btn jk-btn-ghost w-100 justify-content-start @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "active-link" : "")">
+                <i class="bi bi-people me-2"></i> Clientes
+            </a>
+            <a href="@Url.Action("Index", "Servicios")" class="jk-btn jk-btn-ghost w-100 justify-content-start @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "active-link" : "")">
+                <i class="bi bi-briefcase me-2"></i> Servicios
+            </a>
+            <a href="#" class="jk-btn jk-btn-ghost w-100 justify-content-start">
+                <i class="bi bi-person-badge me-2"></i> Recursos
+            </a>
+        </div>
+
+        <div class="sidebar-group">
+            <div class="jk-small fw-600 text-uppercase mb-2 px-2" style="letter-spacing: 0.05em; font-size: 0.7rem; opacity: 0.6;">Configuracion</div>
+            <a href="#" class="jk-btn jk-btn-ghost w-100 justify-content-start">
+                <i class="bi bi-gear me-2"></i> Negocio
+            </a>
+        </div>
+    </div>
+
+    <div class="sidebar-footer pt-3" style="border-top: 1px solid var(--jk-border);">
+        <a href="@Url.Action("Logout", "Account")" class="jk-btn jk-btn-ghost w-100 justify-content-start text-danger">
+            <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesion
+        </a>
+    </div>
+</nav>
+
+<style>
+    .active-link {
+        background: #f3f4f6 !important;
+        color: var(--jk-primary) !important;
+        font-weight: 600 !important;
+    }
+</style>

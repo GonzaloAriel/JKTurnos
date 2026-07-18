@@ -1,0 +1,71 @@
+/* 
+   JKTurnos - Layout Architecture
+   Core grid and responsive behavior.
+   Philosophy: Mobile-First, Desktop-Optimized.
+*/
+
+:root {
+    --sidebar-width: 260px;
+    --topbar-height: 64px;
+    --bottom-nav-height: 60px;
+    --content-padding: 24px;
+    --content-padding-mobile: 16px;
+}
+
+/* Base Layout Structure */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--jk-bg-app);
+}
+
+#main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevent overflow issues in flex items */
+    transition: all 0.3s ease;
+}
+
+/* Content Area */
+.content-area {
+    padding: var(--content-padding);
+    flex: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 991.98px) {
+    .content-area {
+        padding: var(--content-padding-mobile);
+        padding-bottom: calc(var(--bottom-nav-height) + 20px);
+    }
+    
+    #sidebar {
+        display: none; /* Sidebar hidden on mobile by default */
+    }
+}
+
+/* Desktop Adjustments */
+@media (min-width: 992px) {
+    #sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        border-right: 1px solid var(--jk-border);
+        background: var(--jk-white);
+        flex-shrink: 0;
+    }
+}
+
+/* Helper Classes for Spacing (Calma mediante el control) */
+.section-spacer {
+    margin-bottom: 40px;
+}
+
+.item-spacer {
+    margin-bottom: 16px;
+}
