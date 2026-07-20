@@ -1,0 +1,186 @@
+/* 
+   JKTurnos - Home / Command Center Styles
+   Inspiration: Stripe / Linear / Vercel
+*/
+
+.jk-home-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-32);
+}
+
+/* Header Contextual */
+.jk-welcome-banner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-8);
+}
+
+/* Layout Grid - Modern Multi-column */
+.jk-grid-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--jk-space-32);
+}
+
+@media (max-width: 991.98px) {
+    .jk-grid-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Quick Action Grid */
+.jk-home-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--jk-space-16);
+}
+
+@media (max-width: 575.98px) {
+    .jk-home-quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jk-home-action-card {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-16);
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    padding: var(--jk-space-20);
+    text-decoration: none;
+    color: var(--jk-text);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--jk-shadow-sm);
+}
+
+.jk-home-action-card:hover {
+    border-color: var(--jk-text);
+    transform: translateY(-2px);
+    box-shadow: var(--jk-shadow-md);
+}
+
+.jk-home-action-card i {
+    font-size: 1.4rem;
+    color: var(--jk-accent);
+}
+
+.jk-home-action-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.jk-home-action-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.jk-home-action-subtitle {
+    font-size: 0.8rem;
+    color: var(--jk-text-muted);
+}
+
+/* Mini KPI Card Row */
+.jk-home-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--jk-space-16);
+}
+
+@media (max-width: 575.98px) {
+    .jk-home-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.jk-home-kpi-card {
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius);
+    padding: var(--jk-space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-4);
+    box-shadow: var(--jk-shadow-sm);
+}
+
+.jk-home-kpi-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--jk-text-muted);
+}
+
+.jk-home-kpi-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Agenda / My Day Timeline */
+.jk-home-agenda-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--jk-space-48) var(--jk-space-24);
+}
+
+.jk-home-agenda-empty i {
+    font-size: 2rem;
+    color: var(--jk-text-muted);
+    opacity: 0.5;
+    margin-bottom: var(--jk-space-16);
+}
+
+/* Task Checklists / Suggestions */
+.jk-suggestion-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-12);
+}
+
+.jk-suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-12) var(--jk-space-16);
+    border-radius: var(--jk-radius);
+    background-color: var(--jk-bg);
+    border: 1px solid var(--jk-border);
+}
+
+.jk-suggestion-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--jk-border);
+    border-radius: 50%;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.jk-suggestion-checkbox:hover {
+    border-color: var(--jk-text);
+    background-color: rgba(0,0,0,0.03);
+}
+
+.jk-suggestion-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.jk-suggestion-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.jk-suggestion-desc {
+    font-size: 0.775rem;
+    color: var(--jk-text-muted);
+}

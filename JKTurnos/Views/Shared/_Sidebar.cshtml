@@ -1,52 +1,75 @@
-<nav id="sidebar" class="d-flex flex-column p-3">
-    <div class="sidebar-header mb-4 px-2">
-        <div class="jk-h3 mb-0">JKTurnos</div>
-        <div class="jk-small">Asistente de tiempo</div>
+<nav id="sidebar"
+     class="d-flex flex-column"
+     role="navigation"
+     aria-label="Menu principal"
+     data-collapsed="false">
+    <div class="sidebar-header">
+        <div class="sidebar-brand">
+            <i class="bi bi-calendar-check sidebar-brand-icon"></i>
+            <span class="sidebar-text sidebar-brand-text">JKTurnos</span>
+        </div>
+        <span class="sidebar-subtitle sidebar-text">Asistente de tiempo</span>
     </div>
 
     <div class="sidebar-menu flex-grow-1">
-        <div class="sidebar-group mb-4">
-            <div class="jk-small fw-600 text-uppercase mb-2 px-2" style="letter-spacing: 0.05em; font-size: 0.7rem; opacity: 0.6;">Principal</div>
-            <a href="@Url.Action("Index", "Home")" class="jk-btn jk-btn-ghost w-100 justify-content-start @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active-link" : "")">
-                <i class="bi bi-house-door me-2"></i> Command Center
+        <div class="sidebar-group">
+            <div class="sidebar-group-label"><span class="sidebar-text">Principal</span></div>
+            <a href="@Url.Action("Index", "Home")"
+               class="jk-btn jk-btn-ghost w-100 @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "sidebar-active" : "")"
+               data-sidebar-item
+               @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "aria-current=\"page\"" : "")>
+                <i class="bi bi-house-door"></i>
+                <span class="sidebar-text">Command Center</span>
             </a>
-            <a href="#" class="jk-btn jk-btn-ghost w-100 justify-content-start">
-                <i class="bi bi-calendar3 me-2"></i> Mi Agenda
-            </a>
-        </div>
-
-        <div class="sidebar-group mb-4">
-            <div class="jk-small fw-600 text-uppercase mb-2 px-2" style="letter-spacing: 0.05em; font-size: 0.7rem; opacity: 0.6;">Gestion</div>
-            <a href="@Url.Action("Index", "Clientes")" class="jk-btn jk-btn-ghost w-100 justify-content-start @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "active-link" : "")">
-                <i class="bi bi-people me-2"></i> Clientes
-            </a>
-            <a href="@Url.Action("Index", "Servicios")" class="jk-btn jk-btn-ghost w-100 justify-content-start @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "active-link" : "")">
-                <i class="bi bi-briefcase me-2"></i> Servicios
-            </a>
-            <a href="#" class="jk-btn jk-btn-ghost w-100 justify-content-start">
-                <i class="bi bi-person-badge me-2"></i> Recursos
+            <a href="#" class="jk-btn jk-btn-ghost w-100" data-sidebar-item>
+                <i class="bi bi-calendar3"></i>
+                <span class="sidebar-text">Mi Agenda</span>
             </a>
         </div>
 
         <div class="sidebar-group">
-            <div class="jk-small fw-600 text-uppercase mb-2 px-2" style="letter-spacing: 0.05em; font-size: 0.7rem; opacity: 0.6;">Configuracion</div>
-            <a href="#" class="jk-btn jk-btn-ghost w-100 justify-content-start">
-                <i class="bi bi-gear me-2"></i> Negocio
+            <div class="sidebar-group-label"><span class="sidebar-text">Gestion</span></div>
+            <a href="@Url.Action("Index", "Clientes")"
+               class="jk-btn jk-btn-ghost w-100 @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "sidebar-active" : "")"
+               data-sidebar-item
+               @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "aria-current=\"page\"" : "")>
+                <i class="bi bi-people"></i>
+                <span class="sidebar-text">Clientes</span>
+            </a>
+            <a href="@Url.Action("Index", "Servicios")"
+               class="jk-btn jk-btn-ghost w-100 @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "sidebar-active" : "")"
+               data-sidebar-item
+               @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "aria-current=\"page\"" : "")>
+                <i class="bi bi-briefcase"></i>
+                <span class="sidebar-text">Servicios</span>
+            </a>
+            <a href="#" class="jk-btn jk-btn-ghost w-100" data-sidebar-item>
+                <i class="bi bi-person-badge"></i>
+                <span class="sidebar-text">Recursos</span>
+            </a>
+        </div>
+
+        <div class="sidebar-group">
+            <div class="sidebar-group-label"><span class="sidebar-text">Configuracion</span></div>
+            <a href="#" class="jk-btn jk-btn-ghost w-100" data-sidebar-item>
+                <i class="bi bi-gear"></i>
+                <span class="sidebar-text">Negocio</span>
             </a>
         </div>
     </div>
 
-    <div class="sidebar-footer pt-3" style="border-top: 1px solid var(--jk-border);">
-        <a href="@Url.Action("Logout", "Account")" class="jk-btn jk-btn-ghost w-100 justify-content-start text-danger">
-            <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesion
+    <div class="sidebar-footer">
+        <button class="sidebar-collapse-btn jk-btn jk-btn-ghost w-100"
+                id="sidebar-collapse-toggle"
+                type="button"
+                aria-label="Colapsar sidebar"
+                title="Colapsar sidebar">
+            <i class="bi bi-chevron-left"></i>
+            <span class="sidebar-text">Colapsar</span>
+        </button>
+        <a href="@Url.Action("Logout", "Account")" class="jk-btn jk-btn-ghost w-100 btn-logout" data-sidebar-item>
+            <i class="bi bi-box-arrow-left"></i>
+            <span class="sidebar-text">Cerrar Sesion</span>
         </a>
     </div>
 </nav>
-
-<style>
-    .active-link {
-        background: #f3f4f6 !important;
-        color: var(--jk-primary) !important;
-        font-weight: 600 !important;
-    }
-</style>

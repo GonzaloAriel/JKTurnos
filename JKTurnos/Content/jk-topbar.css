@@ -1,0 +1,65 @@
+/*
+   JKTurnos - Topbar Component Styles
+*/
+
+.jk-topbar {
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: var(--jk-white);
+    border-bottom: 1px solid var(--jk-border);
+}
+
+.jk-topbar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.jk-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.jk-search-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--jk-text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    transition: background 0.2s;
+}
+
+.jk-search-placeholder:hover {
+    background: #f9f9f9;
+}
+
+.jk-topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.jk-topbar-username {
+    font-size: 0.9rem;
+    color: var(--jk-text-primary);
+}
+
+.jk-topbar-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--jk-text-primary);
+    color: var(--jk-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+}

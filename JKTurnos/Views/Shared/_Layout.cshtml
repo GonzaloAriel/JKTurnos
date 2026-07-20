@@ -17,8 +17,10 @@
     <link href="~/Content/jk-dashboard.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container" id="app-container">
         @Html.Partial("_Sidebar")
+        
+        <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
         
         <div id="main-content">
             @Html.Partial("_Topbar")

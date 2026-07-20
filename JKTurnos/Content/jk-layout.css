@@ -2,17 +2,19 @@
    JKTurnos - Layout Architecture
    Core grid and responsive behavior.
    Philosophy: Mobile-First, Desktop-Optimized.
+   Sidebar: Collapsible, Drawer, Responsive.
 */
 
 :root {
     --sidebar-width: 260px;
+    --sidebar-collapsed-width: 64px;
     --topbar-height: 64px;
     --bottom-nav-height: 60px;
     --content-padding: 24px;
     --content-padding-mobile: 16px;
 }
 
-/* Base Layout Structure */
+/* ===== BASE LAYOUT ===== */
 .app-container {
     display: flex;
     min-height: 100vh;
@@ -23,11 +25,11 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0; /* Prevent overflow issues in flex items */
-    transition: all 0.3s ease;
+    min-width: 0;
+    transition: margin-left 0.2s ease;
 }
 
-/* Content Area */
+/* ===== CONTENT AREA ===== */
 .content-area {
     padding: var(--content-padding);
     flex: 1;
@@ -36,36 +38,376 @@
     width: 100%;
 }
 
-/* Mobile Adjustments */
-@media (max-width: 991.98px) {
+/* ===== SIDEBAR BASE ===== */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--jk-white);
+    border-right: 1px solid var(--jk-border);
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.2s ease;
+    z-index: 1020;
+    padding: 16px 12px;
+}
+
+#sidebar .sidebar-text {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity 0.15s ease, width 0.15s ease, margin 0.15s ease;
+    vertical-align: middle;
+}
+
+#sidebar .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+}
+
+#sidebar .sidebar-brand-icon {
+    font-size: 1.25rem;
+    color: var(--jk-accent);
+    flex-shrink: 0;
+}
+
+#sidebar .sidebar-brand-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--jk-text-main);
+}
+
+#sidebar .sidebar-subtitle {
+    font-size: 0.75rem;
+    color: var(--jk-text-muted);
+    padding: 0 8px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+/* Sidebar Groups */
+.sidebar-group {
+    margin-bottom: 20px;
+}
+
+.sidebar-group-label {
+    padding: 0 8px;
+    margin-bottom: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--jk-text-muted);
+    opacity: 0.5;
+}
+
+/* Sidebar Buttons */
+#sidebar .jk-btn {
+    justify-content: flex-start;
+    padding: 8px 12px;
+    margin-bottom: 2px;
+    border-radius: 6px;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+#sidebar .jk-btn i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+}
+
+/* Sidebar Active */
+.sidebar-active {
+    background: #f3f4f6 !important;
+    color: var(--jk-accent) !important;
+    font-weight: 600 !important;
+}
+
+/* Sidebar Footer */
+#sidebar .sidebar-footer {
+    border-top: 1px solid var(--jk-border);
+    padding-top: 12px;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#sidebar .btn-logout {
+    color: var(--jk-danger);
+    opacity: 0.8;
+}
+
+#sidebar .btn-logout:hover {
+    opacity: 1;
+    background: #fef2f2;
+}
+
+/* Sidebar Collapse Button */
+#sidebar #sidebar-collapse-toggle i {
+    transition: transform 0.2s ease;
+}
+
+/* ===== SIDEBAR COLLAPSED ===== */
+#sidebar.is-collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+#sidebar.is-collapsed .sidebar-text,
+#sidebar.is-collapsed .sidebar-group-label {
+    display: none;
+}
+
+#sidebar.is-collapsed .sidebar-brand {
+    justify-content: center;
+    padding: 4px 0;
+}
+
+#sidebar.is-collapsed #sidebar-collapse-toggle i {
+    transform: rotate(180deg);
+}
+
+#sidebar.is-collapsed .jk-btn {
+    justify-content: center;
+    padding: 8px;
+}
+
+#sidebar.is-collapsed .sidebar-footer {
+    align-items: center;
+}
+
+/* ===== SIDEBAR OVERLAY (Mobile) ===== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1030;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sidebar-overlay.visible {
+    display: block;
+    opacity: 1;
+}
+
+/* ===== RESPONSIVE: MOBILE (<768px) ===== */
+@media (max-width: 767.98px) {
     .content-area {
         padding: var(--content-padding-mobile);
         padding-bottom: calc(var(--bottom-nav-height) + 20px);
     }
-    
+
     #sidebar {
-        display: none; /* Sidebar hidden on mobile by default */
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        z-index: 1040;
+        transition: left 0.2s ease;
+        box-shadow: none;
+        border-right: none;
+        padding: 20px 16px;
+    }
+
+    #sidebar.is-open {
+        left: 0;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    }
+
+    #sidebar.is-open .sidebar-text,
+    #sidebar.is-open .sidebar-group-label {
+        display: inline-block;
+    }
+
+    #sidebar.is-open .sidebar-group-label {
+        display: block;
+    }
+
+    #sidebar #sidebar-collapse-toggle {
+        display: none;
+    }
+
+    .topbar-title {
+        display: none;
     }
 }
 
-/* Desktop Adjustments */
-@media (min-width: 992px) {
+/* ===== RESPONSIVE: TABLET (768px - 1199px) ===== */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .content-area {
+        max-width: 100%;
+    }
+
     #sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
         position: sticky;
         top: 0;
-        border-right: 1px solid var(--jk-border);
-        background: var(--jk-white);
-        flex-shrink: 0;
+        width: var(--sidebar-collapsed-width);
+    }
+
+    #sidebar .sidebar-text,
+    #sidebar .sidebar-group-label {
+        display: none;
+    }
+
+    #sidebar .sidebar-brand {
+        justify-content: center;
+        padding: 4px 0;
+    }
+
+    #sidebar .jk-btn {
+        justify-content: center;
+        padding: 8px;
+    }
+
+    #sidebar .sidebar-footer {
+        align-items: center;
+    }
+
+    #sidebar:not(.is-collapsed) {
+        width: var(--sidebar-width);
+    }
+
+    #sidebar:not(.is-collapsed) .sidebar-text,
+    #sidebar:not(.is-collapsed) .sidebar-group-label {
+        display: inline-block;
+    }
+
+    #sidebar:not(.is-collapsed) .sidebar-group-label {
+        display: block;
+    }
+
+    #sidebar:not(.is-collapsed) .sidebar-brand {
+        justify-content: flex-start;
+        padding: 4px 8px;
+    }
+
+    #sidebar:not(.is-collapsed) .jk-btn {
+        justify-content: flex-start;
+        padding: 8px 12px;
+    }
+
+    #sidebar:not(.is-collapsed) .sidebar-footer {
+        align-items: stretch;
+    }
+
+    #sidebar #sidebar-collapse-toggle {
+        display: none;
+    }
+
+    .topbar-title {
+        display: block;
     }
 }
 
-/* Helper Classes for Spacing (Calma mediante el control) */
+/* ===== RESPONSIVE: DESKTOP (>=1200px) ===== */
+@media (min-width: 1200px) {
+    #sidebar {
+        position: sticky;
+        top: 0;
+        width: var(--sidebar-width);
+    }
+
+    #sidebar #sidebar-collapse-toggle {
+        display: flex;
+    }
+}
+
+/* ===== TOPBAR ===== */
+.jk-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--topbar-height);
+    padding: 0 24px;
+    background: var(--jk-white);
+    border-bottom: 1px solid var(--jk-border);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-menu-btn {
+    padding: 6px 8px !important;
+}
+
+.topbar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--jk-text-main);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 16px;
+    border-left: 1px solid var(--jk-border);
+}
+
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    background: var(--jk-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.user-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--jk-text-main);
+}
+
+@media (max-width: 767.98px) {
+    .user-name {
+        display: none;
+    }
+
+    .jk-topbar {
+        padding: 0 16px;
+    }
+}
+
+/* ===== HELPER CLASSES ===== */
 .section-spacer {
     margin-bottom: 40px;
 }
 
 .item-spacer {
     margin-bottom: 16px;
+}
+
+/* ===== BODY NO-SCROLL (when drawer open) ===== */
+body.drawer-open {
+    overflow: hidden;
 }

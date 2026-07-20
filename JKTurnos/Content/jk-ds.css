@@ -1,0 +1,242 @@
+/* 
+   JKTurnos - Design System Core (JK-DS)
+   Tokens y Componentes Base Reutilizables
+   Filosofia: Elegancia, Calma, Productividad (Apple/Linear/Stripe)
+*/
+
+:root {
+    /* Paleta de Colores - Estricta y Sofisticada */
+    --jk-white: #ffffff;
+    --jk-bg: #f5f5f7;            /* Gris Apple muy suave */
+    --jk-sidebar: #fcfcfd;
+    --jk-text: #1d1d1f;           /* Negro Apple */
+    --jk-text-muted: #86868b;     /* Gris Muted Apple */
+    --jk-border: #e8e8ed;         /* Borde sutil */
+    --jk-accent: #0066cc;         /* Azul Apple */
+    --jk-success: #1d1d1f;        /* Negro para un look mas sofisticado en success, o verde: */
+    --jk-success-green: #34c759;
+    --jk-warning: #ff9500;
+    --jk-danger: #ff3b30;
+    
+    /* Espaciado Consistente */
+    --jk-space-4: 4px;
+    --jk-space-8: 8px;
+    --jk-space-12: 12px;
+    --jk-space-16: 16px;
+    --jk-space-20: 20px;
+    --jk-space-24: 24px;
+    --jk-space-32: 32px;
+    --jk-space-48: 48px;
+    
+    /* Bordes y Sombras */
+    --jk-radius-sm: 6px;
+    --jk-radius: 10px;
+    --jk-radius-lg: 16px;
+    --jk-shadow-sm: 0 1px 2px rgba(0,0,0,0.02);
+    --jk-shadow-md: 0 4px 12px rgba(0,0,0,0.04);
+    --jk-shadow-lg: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* Base Reset & Typography */
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--jk-text);
+    background-color: var(--jk-bg);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Helpers */
+.jk-h1 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+.jk-h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
+.jk-h3 { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; }
+.jk-body-lg { font-size: 1.1rem; line-height: 1.5; font-weight: 400; }
+.jk-body { font-size: 0.95rem; line-height: 1.5; }
+.jk-small { font-size: 0.825rem; line-height: 1.4; color: var(--jk-text-muted); }
+.jk-muted { color: var(--jk-text-muted); }
+
+/* --- REUSABLE COMPONENTS --- */
+
+/* Card Component (Vercel Style) */
+.jk-card {
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    padding: var(--jk-space-24);
+    box-shadow: var(--jk-shadow-sm);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.jk-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--jk-shadow-md);
+    border-color: var(--jk-text-muted);
+}
+
+/* Button Component (Linear Style) */
+.jk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--jk-space-8);
+    padding: 10px var(--jk-space-16);
+    border-radius: var(--jk-radius);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.jk-btn-primary {
+    background: var(--jk-text);
+    color: var(--jk-white);
+}
+
+.jk-btn-primary:hover {
+    background: #2c2c2e;
+    transform: translateY(-1px);
+}
+
+.jk-btn-secondary {
+    background: var(--jk-white);
+    color: var(--jk-text);
+    border-color: var(--jk-border);
+}
+
+.jk-btn-secondary:hover {
+    background: #f5f5f7;
+    border-color: var(--jk-text-muted);
+}
+
+.jk-btn-ghost {
+    background: transparent;
+    color: var(--jk-text-muted);
+}
+
+.jk-btn-ghost:hover {
+    background: #f5f5f7;
+    color: var(--jk-text);
+}
+
+/* Inputs & Form Elements */
+.jk-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-8);
+    margin-bottom: var(--jk-space-16);
+}
+
+.jk-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--jk-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.jk-input {
+    width: 100%;
+    padding: 12px var(--jk-space-16);
+    border-radius: var(--jk-radius);
+    border: 1px solid var(--jk-border);
+    background: var(--jk-white);
+    font-size: 0.95rem;
+    color: var(--jk-text);
+    transition: all 0.2s ease;
+}
+
+.jk-input:focus {
+    outline: none;
+    border-color: var(--jk-text);
+    box-shadow: 0 0 0 3px rgba(29, 29, 31, 0.05);
+}
+
+/* Badges / Chips */
+.jk-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.jk-badge-success { background: #e3fbeb; color: var(--jk-success-green); }
+.jk-badge-warning { background: #fff3cd; color: var(--jk-warning); }
+.jk-badge-danger { background: #f8d7da; color: var(--jk-danger); }
+
+/* Tables Modern */
+.jk-table-container {
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--jk-shadow-sm);
+}
+
+.jk-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.jk-table th {
+    background: #f5f5f7;
+    padding: var(--jk-space-16);
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--jk-text-muted);
+    border-bottom: 1px solid var(--jk-border);
+}
+
+.jk-table td {
+    padding: var(--jk-space-16);
+    border-bottom: 1px solid var(--jk-border);
+    font-size: 0.95rem;
+    color: var(--jk-text);
+}
+
+.jk-table tr:last-child td {
+    border-bottom: none;
+}
+
+.jk-table tr:hover td {
+    background: #fafafc;
+}
+
+/* Loading Skeletons */
+.jk-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: var(--jk-radius-sm);
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Imports of other sub-sheets */
+@import url('jk-sidebar.css');
+@import url('jk-topbar.css');
+@import url('jk-home.css');

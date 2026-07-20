@@ -1,0 +1,124 @@
+/* 
+   JKTurnos - Sidebar Component Styles
+   Inspiration: Linear / Notion
+*/
+
+.jk-sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--jk-white);
+    border-right: 1px solid var(--jk-border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 32px 24px 24px 24px;
+}
+
+.jk-sidebar-header {
+    margin-bottom: 48px;
+}
+
+.jk-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--jk-text-primary);
+}
+
+.jk-sidebar-logo {
+    width: 32px;
+    height: 32px;
+    background: var(--jk-text-primary);
+    color: var(--jk-white);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.jk-sidebar-title-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.jk-sidebar-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.jk-sidebar-subtitle {
+    font-size: 0.75rem;
+    color: var(--jk-text-secondary);
+}
+
+.jk-sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    flex-grow: 1;
+}
+
+.jk-nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.jk-nav-label {
+    font-size: 0.725rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--jk-text-secondary);
+    margin-bottom: 8px;
+    padding-left: 12px;
+}
+
+.jk-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--border-radius);
+    color: var(--jk-text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.jk-nav-item i {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+.jk-nav-item:hover {
+    background-color: #f9f9f9;
+    color: var(--jk-text-primary);
+}
+
+.jk-nav-item.active {
+    background-color: #f0f0f0;
+    color: var(--jk-text-primary);
+    font-weight: 600;
+}
+
+.jk-sidebar-footer {
+    padding-top: 16px;
+    border-top: 1px solid var(--jk-border);
+}
+
+.jk-nav-item-logout {
+    color: var(--jk-danger);
+}
+
+.jk-nav-item-logout:hover {
+    background-color: #fef2f2;
+    color: var(--jk-danger);
+}

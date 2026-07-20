@@ -1,0 +1,424 @@
+CONTEXTO PROYECTO JKTURNOS
+
+Estoy desarrollando desde cero un sistema SaaS Multi-Tenant llamado JKTurnos usando:
+
+Ruta: C:\Users\Gonzo\Desktop\JKTurnos\Sistema Turnos\JKTurnos
+
+ASP.NET MVC 5
+.NET Framework 4.7
+Entity Framework 6 Code First
+SQL Server Express
+OWIN Cookie Authentication
+Bootstrap
+Arquitectura Monolito MVC
+Repository Pattern
+Multi-Tenant por TenantId
+
+IMPORTANTE:
+
+NO usar ASP.NET Identity.
+NO usar .NET Core.
+NO usar Inyeccion de Dependencias por ahora.
+Todo simple y manual.
+Explicaciones paso a paso.
+Siempre indicar:
+Archivo
+Carpeta
+Codigo completo
+Que hace
+Como funciona
+Los textos de vistas deben escribirse SIN ACENTOS para evitar problemas de encoding.
+Nunca asumir que algo existe.
+Siempre verificar primero el estado actual del proyecto antes de avanzar.
+ESTRUCTURA ACTUAL
+Autenticacion
+
+Implementada con OWIN Cookie Authentication.
+
+Claims actuales
+
+NameIdentifier = UserId
+
+Name = Nombre usuario
+
+Email = Email usuario
+
+Role = Rol usuario
+
+TenantId = TenantId
+
+Login funcionando correctamente.
+
+Logout funcionando.
+
+Authorize funcionando.
+
+BASE DE DATOS
+Conexion
+
+Web.config:
+
+<connectionStrings>
+  <add
+    name="JKTurnosConnection"
+    connectionString="Server=.\SQLEXPRESS;Database=JKTurnosDB;Trusted_Connection=True;TrustServerCertificate=True;"
+    providerName="System.Data.SqlClient" />
+</connectionStrings>
+ENTIDADES IMPLEMENTADAS
+BaseEntity
+Id
+CreatedAt
+UpdatedAt
+IsActive
+Tenant
+Id
+Nombre
+Subdominio
+CreatedAt
+UpdatedAt
+IsActive
+User
+Id
+Nombre
+Email
+PasswordHash
+Role
+TenantId
+CreatedAt
+UpdatedAt
+IsActive
+ConfiguracionTenant
+Id
+TenantId
+NombreComercial
+Telefono
+Email
+Direccion
+CreatedAt
+UpdatedAt
+IsActive
+Cliente
+Id
+TenantId
+Nombre
+Telefono
+Email
+Notas
+CreatedAt
+UpdatedAt
+IsActive
+
+Implementado completamente.
+
+CRUD funcionando.
+
+Filtrado por TenantId funcionando.
+
+Servicio
+Id
+TenantId
+Nombre
+Descripcion
+Precio
+DuracionMinutos
+CreatedAt
+UpdatedAt
+IsActive
+
+Implementado completamente.
+
+CRUD funcionando.
+
+Filtrado por TenantId funcionando.
+
+JKCONTEXT
+
+Existe:
+
+public class JKContext : DbContext
+
+DbSets:
+
+Tenants
+Users
+ConfiguracionesTenant
+Clientes
+Servicios
+MIGRACIONES
+
+Configuracion:
+
+AutomaticMigrationsEnabled = true;
+
+Seed funcionando.
+
+SEED ACTUAL
+
+Crea automaticamente:
+
+Tenant
+
+Nombre: JK Demo
+Subdominio: local
+
+Usuario administrador
+
+Email: admin@jkturnos.com
+Password: admin123
+Role: Admin
+
+ConfiguracionTenant
+
+NombreComercial: JKTurnos Demo
+INFRAESTRUCTURA IMPLEMENTADA
+PasswordHasher
+
+Ubicacion:
+
+Infrastructure/PasswordHasher.cs
+
+Usa BCrypt.
+
+TenantProvider
+
+Ubicacion:
+
+Infrastructure/TenantProvider.cs
+
+Obtiene TenantId desde Claims.
+
+Implementado y funcionando.
+
+REPOSITORY
+BaseRepository<TEntity>
+
+Ubicacion:
+
+Data/BaseRepository.cs
+
+Funciones:
+
+GetAll()
+GetById()
+Add()
+Update()
+Delete()
+
+Filtra automaticamente por:
+
+TenantId
+IsActive
+
+Soft Delete funcionando.
+
+CONTROLADORES IMPLEMENTADOS
+AccountController
+
+Login
+
+Logout
+
+HomeController
+
+Protegido con Authorize.
+
+Muestra informacion de usuario logueado.
+
+ClientesController
+
+CRUD completo.
+
+ServiciosController
+
+CRUD completo.
+
+VISTAS IMPLEMENTADAS
+Clientes
+
+Index
+
+Create
+
+Edit
+
+Delete
+
+Servicios
+
+Index
+
+Create
+
+Edit
+
+Delete
+
+IMPORTANTE:
+
+En Edit siempre incluir:
+
+@Html.HiddenFor(x => x.Id)
+@Html.HiddenFor(x => x.CreatedAt)
+@Html.HiddenFor(x => x.TenantId)
+@Html.HiddenFor(x => x.IsActive)
+
+Porque si no EF intenta actualizar CreatedAt con DateTime.MinValue y SQL Server produce:
+
+datetime2 -> datetime out of range
+
+Error ya resuelto.
+
+PROBLEMAS YA RESUELTOS
+TenantId no encontrado
+
+Solucion:
+
+TenantProvider usa Claims.
+
+Claims agregados correctamente durante Login.
+
+AntiForgeryToken
+
+Error:
+
+ClaimUidExtractor
+SingleOrDefault
+more than one matching element
+
+Solucion:
+
+No duplicar NameIdentifier.
+
+Debe existir solo uno.
+
+Edit Servicio
+
+Error:
+
+datetime2 out of range
+
+Solucion:
+
+Enviar HiddenFor de:
+
+Id
+CreatedAt
+TenantId
+IsActive
+ESTADO ACTUAL
+
+Funciona:
+
+✅ Login
+
+✅ Logout
+
+✅ OWIN
+
+✅ Claims
+
+✅ TenantProvider
+
+✅ BaseRepository
+
+✅ Tenant
+
+✅ Usuario
+
+✅ ConfiguracionTenant
+
+✅ Clientes CRUD
+
+✅ Servicios CRUD
+
+✅ Multi-Tenant basico
+
+✅ EF6
+
+✅ SQL Server
+
+ORDEN DE CONSTRUCCION A PARTIR DE AHORA
+
+Seguir exactamente este orden:
+
+Empleado Entity
+EmpleadoService
+EmpleadosController
+Views Empleados
+
+Luego:
+
+HorarioEmpleado
+HorarioExcepcionEmpleado
+HorarioService
+
+Luego:
+
+Turno
+TurnoService
+TurnosController
+Views Turnos
+
+Luego:
+
+Dashboard
+Agenda Calendario
+Admin Global
+Gestion de Tenants
+REGLAS PARA RESPONDER
+
+Cuando propongas codigo:
+
+Indicar siempre archivo exacto.
+Indicar carpeta exacta.
+Explicar para que sirve.
+Explicar como funciona.
+Entregar codigo completo.
+No omitir using.
+No asumir dependencias existentes.
+Avanzar paso a paso.
+Esperar confirmacion de compilacion antes de continuar.
+
+FIN DEL CONTEXTO DEL PROYECTO JKTURNOS.
+***********************************************************************************************
+Nueva actualizacion 12/7/2026
+
+Estado REAL del proyecto hoy
+✅ Infraestructura
+OWIN Authentication
+Cookie Authentication
+Claims
+PasswordHasher
+TenantProvider
+BaseController
+BaseRepository
+Multi-Tenant funcionando
+✅ Base de datos
+
+Ya existen:
+
+Tenant
+User
+ConfiguracionTenant
+Cliente
+Servicio
+
+con:
+
+EF6 Code First
+Migrations
+Seed
+Soft Delete
+TenantId
+✅ CRUD completos
+Clientes
+Servicios
+✅ Ya resolvimos
+Login
+Logout
+Authorize
+TenantId por Claims
+AntiForgery
+HiddenFor en Edit
+datetime2 out of range
+filtrado automatico por Tenant
