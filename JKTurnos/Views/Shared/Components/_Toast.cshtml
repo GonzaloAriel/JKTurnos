@@ -1,0 +1,24 @@
+@*
+    JKTurnos - Toast Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_Toast.cshtml",
+        new ViewDataDictionary {
+            { "Id", "toast-container" }
+        })
+
+    Add toasts dynamically via JS:
+    function showToast(message, type) {
+        var container = document.getElementById('toast-container');
+        var toast = document.createElement('div');
+        toast.className = 'jk-toast jk-toast-' + type;
+        toast.innerHTML = '<i class="bi bi-check-circle"></i> ' + message;
+        container.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 4000);
+    }
+*@
+
+@{
+    string id = ViewBag.Id ?? "jk-toast-container";
+}
+
+<div class="jk-toast-container" id="@id"></div>

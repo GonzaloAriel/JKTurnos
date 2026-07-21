@@ -1,0 +1,122 @@
+/* 
+   JKTurnos - Design Tokens
+   Single source of truth for all visual variables.
+   Inspiration: Apple (colors, radius), Linear (accent), Vercel (shadows).
+   Do NOT hardcode values. Use these variables everywhere.
+*/
+
+:root {
+
+    /* ===== COLOR PALETTE ===== */
+
+    /* Neutral (Apple-inspired) */
+    --jk-white: #ffffff;
+    --jk-bg: #f5f5f7;
+    --jk-surface: #ffffff;
+    --jk-sidebar-bg: #fcfcfd;
+
+    /* Text (Apple) */
+    --jk-text-primary: #1d1d1f;
+    --jk-text-secondary: #86868b;
+    --jk-text-tertiary: #aeaeb2;
+
+    /* Borders */
+    --jk-border: #e8e8ed;
+    --jk-border-light: #f0f0f0;
+
+    /* Brand / Accent (Linear blue) */
+    --jk-accent: #2563eb;
+    --jk-accent-hover: #1d4ed8;
+    --jk-accent-light: #f0f5ff;
+
+    /* Semantic (Apple) */
+    --jk-success: #34c759;
+    --jk-success-light: #e8f8ed;
+    --jk-warning: #ff9500;
+    --jk-warning-light: #fff3e0;
+    --jk-danger: #ff3b30;
+    --jk-danger-light: #ffe8e6;
+
+    /* ===== TYPOGRAPHY ===== */
+
+    --jk-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+    /* Font sizes (4px scale) */
+    --jk-text-xs: 0.75rem;    /* 12px */
+    --jk-text-sm: 0.8125rem;  /* 13px */
+    --jk-text-base: 0.875rem; /* 14px */
+    --jk-text-md: 1rem;       /* 16px */
+    --jk-text-lg: 1.125rem;   /* 18px */
+    --jk-text-xl: 1.25rem;    /* 20px */
+    --jk-text-2xl: 1.5rem;    /* 24px */
+    --jk-text-3xl: 2rem;      /* 32px */
+
+    /* Line heights */
+    --jk-leading-tight: 1.2;
+    --jk-leading-normal: 1.5;
+    --jk-leading-relaxed: 1.6;
+
+    /* Font weights */
+    --jk-weight-normal: 400;
+    --jk-weight-medium: 500;
+    --jk-weight-semibold: 600;
+    --jk-weight-bold: 700;
+
+    /* ===== SPACING (4px base) ===== */
+
+    --jk-space-4: 4px;
+    --jk-space-8: 8px;
+    --jk-space-12: 12px;
+    --jk-space-16: 16px;
+    --jk-space-20: 20px;
+    --jk-space-24: 24px;
+    --jk-space-32: 32px;
+    --jk-space-48: 48px;
+    --jk-space-64: 64px;
+
+    /* ===== BORDER RADIUS ===== */
+
+    --jk-radius-sm: 6px;
+    --jk-radius: 10px;
+    --jk-radius-lg: 12px;
+    --jk-radius-xl: 16px;
+    --jk-radius-full: 9999px;
+
+    /* ===== SHADOWS ===== */
+
+    --jk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+    --jk-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --jk-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+    /* ===== Z-INDEX SCALE ===== */
+
+    --jk-z-base: 1;
+    --jk-z-topbar: 10;
+    --jk-z-sidebar: 1020;
+    --jk-z-overlay: 1030;
+    --jk-z-drawer: 1040;
+    --jk-z-modal: 1050;
+    --jk-z-toast: 1060;
+
+    /* ===== LAYOUT ===== */
+
+    --jk-sidebar-width: 260px;
+    --jk-sidebar-collapsed: 64px;
+    --jk-topbar-height: 64px;
+    --jk-bottom-nav-height: 60px;
+    --jk-content-padding: 24px;
+    --jk-content-padding-mobile: 16px;
+    --jk-content-max-width: 1400px;
+
+    /* ===== BREAKPOINTS (for reference, use in media queries) ===== */
+
+    /* Mobile: <768px */
+    /* Tablet: 768px - 1199px */
+    /* Desktop: >=1200px */
+
+    /* ===== TRANSITIONS ===== */
+
+    --jk-transition-fast: 0.15s ease;
+    --jk-transition: 0.2s ease;
+    --jk-transition-slow: 0.3s ease;
+}

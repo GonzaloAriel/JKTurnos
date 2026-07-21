@@ -1,0 +1,38 @@
+@*
+    JKTurnos - Timeline Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_Timeline.cshtml",
+        new ViewDataDictionary {
+            { "Items", new [] {
+                new { Time = "Hace 2h", Title = "Bienvenido", Description = "Tu cuenta fue creada.", Dot = "" },
+                new { Time = "Hace 2h", Title = "Primer login", Description = "Accediste al panel.", Dot = "success" }
+            }}
+        })
+*@
+
+@{
+    var items = ViewBag.Items as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+
+@if (items.Any())
+{
+    <div class="jk-timeline">
+        @foreach (var item in items)
+        {
+            string dotClass = !string.IsNullOrEmpty(item.Dot) ? "jk-timeline-dot-" + item.Dot : "";
+            <div class="jk-timeline-item">
+                <div class="jk-timeline-dot @dotClass"></div>
+                <div class="jk-timeline-time">@item.Time</div>
+                <p class="jk-timeline-text">@item.Title</p>
+                @if (!string.IsNullOrEmpty(item.Description))
+                {
+                    <p class="jk-timeline-desc">@item.Description</p>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="jk-text-center jk-muted" style="padding:24px 0;">Sin actividad reciente</p>
+}

@@ -1,0 +1,29 @@
+@*
+    JKTurnos - KPI Card Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+        new ViewDataDictionary {
+            { "Label", "Ingresos Hoy" },
+            { "Value", "$0.00" },
+            { "Trend", "up" },
+            { "TrendValue", "+12%" }
+        })
+*@
+
+@{
+    string label = ViewBag.Label ?? "";
+    string value = ViewBag.Value ?? "";
+    string trend = ViewBag.Trend ?? "";     /* "up", "down", or empty */
+    string trendValue = ViewBag.TrendValue ?? "";
+}
+
+<div class="jk-kpi">
+    <div class="jk-kpi-label">@label</div>
+    <div class="jk-kpi-value">@value</div>
+    @if (!string.IsNullOrEmpty(trend) && !string.IsNullOrEmpty(trendValue))
+    {
+        <div class="jk-kpi-trend jk-kpi-trend-@trend">
+            <i class="bi bi-arrow-@(trend)-short"></i> @trendValue
+        </div>
+    }
+</div>

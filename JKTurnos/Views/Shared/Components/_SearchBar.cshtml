@@ -1,0 +1,19 @@
+@*
+    JKTurnos - Search Bar Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_SearchBar.cshtml",
+        new ViewDataDictionary {
+            { "Placeholder", "Buscar clientes..." },
+            { "Id", "search-clientes" }
+        })
+*@
+
+@{
+    string placeholder = ViewBag.Placeholder ?? "Buscar...";
+    string id = ViewBag.Id ?? "jk-search";
+}
+
+<div class="jk-search">
+    <i class="bi bi-search"></i>
+    <input type="text" id="@id" placeholder="@placeholder" />
+</div>

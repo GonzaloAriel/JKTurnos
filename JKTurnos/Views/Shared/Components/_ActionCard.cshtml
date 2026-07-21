@@ -1,0 +1,31 @@
+@*
+    JKTurnos - Action Card Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+        new ViewDataDictionary {
+            { "Title", "Nuevo Turno" },
+            { "Description", "Crea un turno para un cliente" },
+            { "Icon", "plus-circle" },
+            { "Url", "#" }
+        })
+*@
+
+@{
+    string title = ViewBag.Title ?? "";
+    string description = ViewBag.Description ?? "";
+    string icon = ViewBag.Icon ?? "circle";
+    string url = ViewBag.Url ?? "#";
+}
+
+<a href="@url" class="jk-action-card">
+    <div class="jk-action-card-icon">
+        <i class="bi bi-@icon"></i>
+    </div>
+    <div class="jk-action-card-text">
+        <div class="jk-action-card-title">@title</div>
+        @if (!string.IsNullOrEmpty(description))
+        {
+            <p class="jk-action-card-desc">@description</p>
+        }
+    </div>
+</a>

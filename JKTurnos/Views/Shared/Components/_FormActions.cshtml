@@ -1,0 +1,25 @@
+@*
+    JKTurnos - Form Actions Component
+    Renders the submit + cancel button bar for all forms.
+
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_FormActions.cshtml",
+        new ViewDataDictionary {
+            { "SubmitText", "Guardar" },
+            { "CancelUrl", Url.Action("Index") }
+        })
+*@
+
+@{
+    string submitText = ViewBag.SubmitText ?? "Guardar";
+    string cancelUrl = ViewBag.CancelUrl ?? "#";
+}
+
+<div class="jk-flex jk-gap-12 jk-mt-16">
+    <button type="submit" class="jk-btn jk-btn-primary">
+        <i class="bi bi-check-lg"></i> @submitText
+    </button>
+    <a href="@cancelUrl" class="jk-btn jk-btn-ghost">
+        Cancelar
+    </a>
+</div>

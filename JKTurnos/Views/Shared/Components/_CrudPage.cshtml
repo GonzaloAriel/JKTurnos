@@ -1,0 +1,16 @@
+@* JKTurnos - CRUD Page Component. Wraps PageHeader + CrudToolbar + content slot. *@
+
+@{
+    var pageContent = ViewBag.PageContent;
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+@Html.Partial("~/Views/Shared/Components/_CrudToolbar.cshtml")
+
+@if (pageContent != null)
+{
+    <div class="jk-mt-24">
+        @pageContent
+    </div>
+}

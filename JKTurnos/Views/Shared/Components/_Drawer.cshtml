@@ -1,0 +1,35 @@
+@*
+    JKTurnos - Drawer Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_Drawer.cshtml",
+        new ViewDataDictionary {
+            { "Id", "drawer-cliente" },
+            { "Title", "Detalle del Cliente" },
+            { "Size", "md" }
+        })
+
+    Then inside your page, the drawer content goes in a div with
+    class="jk-drawer-body" within the drawer.
+
+    Open/close via JS: toggle class "open" on both
+    .jk-drawer-backdrop and .jk-drawer elements.
+*@
+
+@{
+    string id = ViewBag.Id ?? "drawer";
+    string title = ViewBag.Title ?? "";
+    string sizeClass = ViewBag.Size == "lg" ? "jk-drawer-lg" : "";
+}
+
+<div class="jk-drawer-backdrop" id="@(id)-backdrop"></div>
+<div class="jk-drawer @sizeClass" id="@id">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title">@title</h3>
+        <button class="jk-drawer-close" onclick="document.getElementById('@id').classList.remove('open');document.getElementById('@(id)-backdrop').classList.remove('open');">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body">
+        @RenderBody()
+    </div>
+</div>

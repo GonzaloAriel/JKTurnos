@@ -1,0 +1,20 @@
+@*
+    JKTurnos - Floating Action Button Component (mobile only)
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_FloatingButton.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "plus-lg" },
+            { "Url", Url.Action("Create", "Turnos") },
+            { "Label", "Nuevo Turno" }
+        })
+*@
+
+@{
+    string icon = ViewBag.Icon ?? "plus-lg";
+    string url = ViewBag.Url ?? "#";
+    string label = ViewBag.Label ?? "";
+}
+
+<a href="@url" class="jk-fab" title="@label" aria-label="@label">
+    <i class="bi bi-@icon"></i>
+</a>

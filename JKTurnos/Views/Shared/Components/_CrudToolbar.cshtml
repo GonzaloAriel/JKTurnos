@@ -1,0 +1,21 @@
+@*
+    JKTurnos - CRUD Toolbar Component
+    Renders the search bar + filter area for list pages.
+    Extend with filter buttons as needed.
+
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_CrudToolbar.cshtml")
+
+    Depends on ViewBag.SearchPlaceholder and ViewBag.SearchId.
+*@
+
+@{
+    string searchPlaceholder = ViewBag.SearchPlaceholder ?? "Buscar...";
+    string searchId = ViewBag.SearchId ?? "search";
+}
+
+@Html.Partial("~/Views/Shared/Components/_SearchBar.cshtml",
+    new ViewDataDictionary {
+        { "Placeholder", searchPlaceholder },
+        { "Id", searchId }
+    })

@@ -226,16 +226,37 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\DesignSystem\jk-base.css" />
+    <Content Include="Content\DesignSystem\jk-components.css" />
+    <Content Include="Content\DesignSystem\jk-layout.css" />
+    <Content Include="Content\DesignSystem\jk-tokens.css" />
+    <Content Include="Content\DesignSystem\jk-utilities.css" />
+    <Content Include="Content\jk-components.css" />
+    <Content Include="Content\jk-dashboard.css" />
+    <Content Include="Content\jk-ds.css" />
+    <Content Include="Content\jk-home.css" />
     <Content Include="Content\jk-layout.css" />
+    <Content Include="Content\jk-sidebar.css" />
+    <Content Include="Content\jk-topbar.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="obj\Debug\JKTurnos.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\JKTurnos.dll" />
+    <Content Include="obj\Debug\JKTurnos.pdb" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Docs\DashboardLayoutSystem.md" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <Content Include="obj\Debug\JKTurnos.csproj.AssemblyReference.cache" />
+    <Content Include="obj\Debug\JKTurnos.csproj.CoreCompileInputs.cache" />
+    <Content Include="obj\Debug\JKTurnos.csproj.GenerateResource.cache" />
+    <Content Include="obj\Debug\JKTurnos.csproj.Up2Date" />
+    <Content Include="07_MIGRACION_DS_FASE3.md" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -272,9 +293,27 @@
     <Content Include="Views\Servicios\Delete.cshtml" />
     <Content Include="Views\Shared\_Sidebar.cshtml" />
     <Content Include="Views\Shared\_Topbar.cshtml" />
+    <Content Include="Views\Shared\Components\_ActionCard.cshtml" />
+    <Content Include="Views\Shared\Components\_Avatar.cshtml" />
+    <Content Include="Views\Shared\Components\_Drawer.cshtml" />
+    <Content Include="Views\Shared\Components\_EmptyState.cshtml" />
+    <Content Include="Views\Shared\Components\_FloatingButton.cshtml" />
+    <Content Include="Views\Shared\Components\_KpiCard.cshtml" />
+    <Content Include="Views\Shared\Components\_PageHeader.cshtml" />
+    <Content Include="Views\Shared\Components\_SearchBar.cshtml" />
+    <Content Include="Views\Shared\Components\_SectionHeader.cshtml" />
+    <Content Include="Views\Shared\Components\_Timeline.cshtml" />
+    <Content Include="Views\Shared\Components\_Toast.cshtml" />
+    <Content Include="Views\Shared\Components\_CrudPage.cshtml" />
+    <Content Include="Views\Shared\Components\_CrudToolbar.cshtml" />
+    <Content Include="Views\Shared\Components\_TableActions.cshtml" />
+    <Content Include="Views\Shared\Components\_FormLayout.cshtml" />
+    <Content Include="Views\Shared\Components\_FormActions.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Pages\" />
+    <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -319,6 +358,11 @@
     <EmbeddedResource Include="Migrations\202606020230491_Turnos.resx">
       <DependentUpon>202606020230491_Turnos.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="obj\Debug\JKTurnos.Migrations.AddClientes.resources" />
+    <EmbeddedResource Include="obj\Debug\JKTurnos.Migrations.AddConfiguracionTenant.resources" />
+    <EmbeddedResource Include="obj\Debug\JKTurnos.Migrations.AddServicio.resources" />
+    <EmbeddedResource Include="obj\Debug\JKTurnos.Migrations.Initial.resources" />
+    <EmbeddedResource Include="obj\Debug\JKTurnos.Migrations.Turnos.resources" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

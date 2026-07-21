@@ -1,75 +1,75 @@
 <nav id="sidebar"
-     class="d-flex flex-column"
+     class="jk-sidebar d-flex flex-column"
      role="navigation"
      aria-label="Menu principal"
      data-collapsed="false">
-    <div class="sidebar-header">
-        <div class="sidebar-brand">
-            <i class="bi bi-calendar-check sidebar-brand-icon"></i>
-            <span class="sidebar-text sidebar-brand-text">JKTurnos</span>
-        </div>
-        <span class="sidebar-subtitle sidebar-text">Asistente de tiempo</span>
+    <div class="jk-sidebar-header">
+        <a href="@Url.Action("Index", "Home")" class="jk-sidebar-brand">
+            <i class="bi bi-calendar-check jk-sidebar-brand-icon"></i>
+            <span class="jk-sidebar-name">JKTurnos</span>
+        </a>
+        <span class="jk-sidebar-subtitle">Asistente de tiempo</span>
     </div>
 
-    <div class="sidebar-menu flex-grow-1">
-        <div class="sidebar-group">
-            <div class="sidebar-group-label"><span class="sidebar-text">Principal</span></div>
+    <div class="jk-sidebar-menu flex-grow-1">
+        <div class="jk-nav-group">
+            <span class="jk-nav-label">Principal</span>
             <a href="@Url.Action("Index", "Home")"
-               class="jk-btn jk-btn-ghost w-100 @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "sidebar-active" : "")"
+               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")"
                data-sidebar-item
                @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-house-door"></i>
-                <span class="sidebar-text">Command Center</span>
+                <span>Command Center</span>
             </a>
-            <a href="#" class="jk-btn jk-btn-ghost w-100" data-sidebar-item>
+            <a href="#" class="jk-nav-item" data-sidebar-item>
                 <i class="bi bi-calendar3"></i>
-                <span class="sidebar-text">Mi Agenda</span>
+                <span>Mi Agenda</span>
             </a>
         </div>
 
-        <div class="sidebar-group">
-            <div class="sidebar-group-label"><span class="sidebar-text">Gestion</span></div>
+        <div class="jk-nav-group">
+            <span class="jk-nav-label">Gestion</span>
             <a href="@Url.Action("Index", "Clientes")"
-               class="jk-btn jk-btn-ghost w-100 @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "sidebar-active" : "")"
+               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "active" : "")"
                data-sidebar-item
                @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-people"></i>
-                <span class="sidebar-text">Clientes</span>
+                <span>Clientes</span>
             </a>
             <a href="@Url.Action("Index", "Servicios")"
-               class="jk-btn jk-btn-ghost w-100 @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "sidebar-active" : "")"
+               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "active" : "")"
                data-sidebar-item
                @(ViewContext.RouteData.Values["controller"].ToString() == "Servicios" ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-briefcase"></i>
-                <span class="sidebar-text">Servicios</span>
+                <span>Servicios</span>
             </a>
-            <a href="#" class="jk-btn jk-btn-ghost w-100" data-sidebar-item>
+            <a href="#" class="jk-nav-item" data-sidebar-item>
                 <i class="bi bi-person-badge"></i>
-                <span class="sidebar-text">Recursos</span>
+                <span>Recursos</span>
             </a>
         </div>
 
-        <div class="sidebar-group">
-            <div class="sidebar-group-label"><span class="sidebar-text">Configuracion</span></div>
-            <a href="#" class="jk-btn jk-btn-ghost w-100" data-sidebar-item>
+        <div class="jk-nav-group">
+            <span class="jk-nav-label">Configuracion</span>
+            <a href="#" class="jk-nav-item" data-sidebar-item>
                 <i class="bi bi-gear"></i>
-                <span class="sidebar-text">Negocio</span>
+                <span>Negocio</span>
             </a>
         </div>
     </div>
 
-    <div class="sidebar-footer">
-        <button class="sidebar-collapse-btn jk-btn jk-btn-ghost w-100"
+    <div class="jk-sidebar-footer">
+        <button class="jk-nav-collapse"
                 id="sidebar-collapse-toggle"
                 type="button"
                 aria-label="Colapsar sidebar"
                 title="Colapsar sidebar">
             <i class="bi bi-chevron-left"></i>
-            <span class="sidebar-text">Colapsar</span>
+            <span>Colapsar</span>
         </button>
-        <a href="@Url.Action("Logout", "Account")" class="jk-btn jk-btn-ghost w-100 btn-logout" data-sidebar-item>
+        <a href="@Url.Action("Logout", "Account")" class="jk-nav-item jk-nav-item-logout" data-sidebar-item>
             <i class="bi bi-box-arrow-left"></i>
-            <span class="sidebar-text">Cerrar Sesion</span>
+            <span>Cerrar Sesion</span>
         </a>
     </div>
 </nav>

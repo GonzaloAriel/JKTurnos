@@ -11,95 +11,168 @@
     {
         greeting = "Buenas noches";
     }
+
+    var today = DateTime.Now;
+    var dayNames = new string[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
+    var monthNames = new string[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
+    string todayDate = dayNames[(int)today.DayOfWeek] + " " + today.Day + " " + monthNames[today.Month - 1];
 }
 
 <div class="fade-in">
-    <!-- Cabecera Contextual (Intelligent Assistant) -->
+
+    <!-- ===== 1. BIENVENIDA PERSONALIZADA ===== -->
     <div class="welcome-section">
-        <h1 class="jk-h1 contextual-greeting">@greeting, @User.Identity.Name.</h1>
-        <p class="jk-body-lg contextual-status">
-            <i class="bi bi-stars text-warning me-1"></i>
-            Todo listo para comenzar tu jornada. Tienes <span class="fw-600">0 turnos</span> para hoy.
+        <h1 class="contextual-greeting">@greeting, @User.Identity.Name.</h1>
+        <p class="contextual-status">
+            <i class="bi bi-sun welcome-icon"></i>
+            No tienes turnos agendados para hoy. Tu agenda esta libre.
         </p>
     </div>
 
-    <!-- Acciones de Alta Intencion (Linear Style) -->
-    <div class="d-flex flex-wrap gap-3 mb-5">
-        <button class="jk-btn jk-btn-primary py-3 px-4">
-            <i class="bi bi-plus-lg fs-5"></i>
-            <span class="fs-6">Nuevo Turno</span>
-        </button>
-        <button class="jk-btn jk-btn-secondary py-3 px-4">
-            <i class="bi bi-person-plus fs-5"></i>
-            <span class="fs-6">Nuevo Cliente</span>
-        </button>
-        <button class="jk-btn jk-btn-ghost py-3 px-4">
-            <i class="bi bi-search fs-5"></i>
-            <span class="fs-6">Buscar</span>
-        </button>
-    </div>
-
-    <!-- KPIs Minimalistas (Lugar secundario) -->
-    <div class="jk-small fw-600 text-uppercase mb-3" style="letter-spacing: 0.05em; opacity: 0.6;">Resumen de soporte</div>
-    <div class="kpi-row">
-        <div class="kpi-mini-card">
-            <div class="kpi-label">Ingresos Hoy</div>
-            <div class="kpi-value">$0.00</div>
+    <!-- ===== 2. ACCIONES RAPIDAS ===== -->
+    <div class="home-section">
+        <div class="section-header">
+            <h2 class="section-title">Acciones rapidas</h2>
         </div>
-        <div class="kpi-mini-card">
-            <div class="kpi-label">Ocupacion</div>
-            <div class="kpi-value">0%</div>
-        </div>
-        <div class="kpi-mini-card">
-            <div class="kpi-label">Pendientes</div>
-            <div class="kpi-value">0</div>
+        <div class="quick-actions">
+            <a href="#" class="quick-action-link">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo Turno
+            </a>
+            <a href="@Url.Action("Create", "Clientes")" class="quick-action-link">
+                <i class="bi bi-person-plus"></i>
+                Nuevo Cliente
+            </a>
+            <a href="#" class="quick-action-link">
+                <i class="bi bi-calendar3"></i>
+                Ver Agenda
+            </a>
+            <a href="#" class="quick-action-link">
+                <i class="bi bi-gear"></i>
+                Configurar
+            </a>
         </div>
     </div>
 
-    <!-- Sistema Inteligente de Sugerencias (Asistente) -->
-    <div class="section-spacer mt-5">
-        <h2 class="jk-h3 mb-1">Pasos recomendados</h2>
-        <p class="jk-small mb-4">Ayudame a conocer mejor tu negocio para asistirte mejor.</p>
+    <!-- ===== 3. MI DIA ===== -->
+    <div class="home-section">
+        <div class="mi-dia">
+            <div class="mi-dia-header">
+                <h2 class="mi-dia-title">Mi dia</h2>
+                <span class="mi-dia-date">@todayDate</span>
+            </div>
+            <div class="mi-dia-body">
+                <div class="mi-dia-empty">
+                    <div class="mi-dia-empty-icon">
+                        <i class="bi bi-sun"></i>
+                    </div>
+                    <h3 class="mi-dia-empty-title">Tu agenda esta libre</h3>
+                    <p class="mi-dia-empty-text">
+                        No tienes turnos agendados para hoy.
+                        Crea tu primer turno para comenzar.
+                    </p>
+                    <button class="jk-btn jk-btn-primary">Crear mi primer turno</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 4. RESUMEN DEL NEGOCIO / KPIs ===== -->
+    <div class="home-section">
+        <div class="section-header">
+            <h2 class="section-title">Resumen del dia</h2>
+        </div>
+        <div class="kpi-row">
+            <div class="kpi-item">
+                <div class="kpi-label">Turnos Hoy</div>
+                <div class="kpi-value">0</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Ingresos</div>
+                <div class="kpi-value">$0.00</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Ocupacion</div>
+                <div class="kpi-value">0%</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Clientes</div>
+                <div class="kpi-value">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 5. ACCIONES SUGERIDAS ===== -->
+    <div class="home-section">
+        <div class="section-header">
+            <h2 class="section-title">Acciones sugeridas</h2>
+        </div>
+        <p class="suggestion-intro">
+            Ayudame a conocer mejor tu negocio para asistirte mejor.
+        </p>
 
         <div class="suggestion-grid">
-            <div class="jk-card suggestion-card jk-card-hover">
-                <div class="d-flex align-items-start gap-3">
-                    <div class="icon-box p-2 rounded-3 bg-light text-primary">
-                        <i class="bi bi-shop fs-4"></i>
-                    </div>
-                    <div>
-                        <h3 class="jk-body fw-600 mb-1">Completa tu negocio</h3>
-                        <p class="jk-small mb-3">Configura logo, direccion y datos de contacto.</p>
-                        <a href="#" class="jk-btn jk-btn-secondary jk-btn-sm py-1 px-3">Configurar</a>
-                    </div>
+            <div class="suggestion-card">
+                <div class="suggestion-icon suggestion-icon-blue">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">Completa tu negocio</div>
+                    <div class="suggestion-desc">Configura logo, direccion y datos de contacto.</div>
+                    <a href="#" class="suggestion-action">
+                        Configurar <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
-            <div class="jk-card suggestion-card jk-card-hover" style="border-left-color: var(--jk-success);">
-                <div class="d-flex align-items-start gap-3">
-                    <div class="icon-box p-2 rounded-3 bg-light text-success">
-                        <i class="bi bi-scissors fs-4"></i>
-                    </div>
-                    <div>
-                        <h3 class="jk-body fw-600 mb-1">Agrega servicios</h3>
-                        <p class="jk-small mb-3">Define que ofreces y cuanto tiempo dura.</p>
-                        <a href="@Url.Action("Create", "Servicios")" class="jk-btn jk-btn-secondary jk-btn-sm py-1 px-3">Agregar</a>
-                    </div>
+            <div class="suggestion-card">
+                <div class="suggestion-icon suggestion-icon-green">
+                    <i class="bi bi-scissors"></i>
+                </div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">Agrega servicios</div>
+                    <div class="suggestion-desc">Define que ofreces y cuanto tiempo dura cada uno.</div>
+                    <a href="@Url.Action("Create", "Servicios")" class="suggestion-action">
+                        Agregar <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
-            <div class="jk-card suggestion-card jk-card-hover" style="border-left-color: var(--jk-warning);">
-                <div class="d-flex align-items-start gap-3">
-                    <div class="icon-box p-2 rounded-3 bg-light text-warning">
-                        <i class="bi bi-clock fs-4"></i>
-                    </div>
-                    <div>
-                        <h3 class="jk-body fw-600 mb-1">Configura horarios</h3>
-                        <p class="jk-small mb-3">Define tus dias y horas de atencion.</p>
-                        <a href="#" class="jk-btn jk-btn-secondary jk-btn-sm py-1 px-3">Definir</a>
-                    </div>
+            <div class="suggestion-card">
+                <div class="suggestion-icon suggestion-icon-amber">
+                    <i class="bi bi-clock"></i>
+                </div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">Configura horarios</div>
+                    <div class="suggestion-desc">Define tus dias y horas de atencion.</div>
+                    <a href="#" class="suggestion-action">
+                        Definir <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- ===== 6. ACTIVIDAD RECIENTE ===== -->
+    <div class="home-section">
+        <div class="section-header">
+            <h2 class="section-title">Actividad reciente</h2>
+        </div>
+
+        <div class="activity-timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-time">Hace 2 horas</div>
+                <p class="timeline-text">Bienvenido a JKTurnos</p>
+                <p class="timeline-desc">Tu cuenta fue creada y configurada exitosamente.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot timeline-dot-success"></div>
+                <div class="timeline-time">Hace 2 horas</div>
+                <p class="timeline-text">Primer inicio de sesion</p>
+                <p class="timeline-desc">Accediste a tu panel de administracion.</p>
+            </div>
+        </div>
+    </div>
+
 </div>

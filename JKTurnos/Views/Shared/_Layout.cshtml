@@ -11,21 +11,34 @@
     
     @Styles.Render("~/Content/css")
     
-    <!-- JK Design System -->
+    <!-- JK Design System v1 (existing, will be phased out) -->
     <link href="~/Content/jk-components.css" rel="stylesheet" />
     <link href="~/Content/jk-layout.css" rel="stylesheet" />
     <link href="~/Content/jk-dashboard.css" rel="stylesheet" />
+
+    <!-- JK Design System v2 (progressive migration) -->
+    <link href="~/Content/DesignSystem/jk-tokens.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-base.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-layout.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-components.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-utilities.css" rel="stylesheet" />
+
+    <!-- Page-specific styles -->
+    @if (IsSectionDefined("PageStyles"))
+    {
+        @RenderSection("PageStyles", required: false)
+    }
 </head>
 <body>
-    <div class="app-container" id="app-container">
+    <div class="app-container jk-app-shell" id="app-container">
         @Html.Partial("_Sidebar")
         
-        <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+        <div class="jk-sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
         
         <div id="main-content">
             @Html.Partial("_Topbar")
             
-            <main class="content-area">
+            <main class="content-area jk-content-zone">
                 @RenderBody()
             </main>
         </div>

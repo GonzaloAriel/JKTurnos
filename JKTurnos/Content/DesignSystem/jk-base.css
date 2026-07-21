@@ -1,0 +1,151 @@
+/* 
+   JKTurnos - Base Styles
+   Reset, typography, body defaults and reusable text classes.
+   Dependencies: jk-tokens.css
+*/
+
+/* === RESET === */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--jk-font-sans);
+    font-size: var(--jk-text-base);
+    line-height: var(--jk-leading-normal);
+    color: var(--jk-text-primary);
+    background-color: var(--jk-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* === TYPOGRAPHY === */
+
+.jk-hero {
+    font-size: var(--jk-text-3xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.03em;
+    line-height: var(--jk-leading-tight);
+}
+
+.jk-h1 {
+    font-size: var(--jk-text-2xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.02em;
+    line-height: var(--jk-leading-tight);
+}
+
+.jk-h2 {
+    font-size: var(--jk-text-xl);
+    font-weight: var(--jk-weight-semibold);
+    letter-spacing: -0.02em;
+}
+
+.jk-h3 {
+    font-size: var(--jk-text-lg);
+    font-weight: var(--jk-weight-semibold);
+    letter-spacing: -0.01em;
+}
+
+.jk-h4 {
+    font-size: var(--jk-text-md);
+    font-weight: var(--jk-weight-semibold);
+}
+
+.jk-body {
+    font-size: var(--jk-text-base);
+    line-height: var(--jk-leading-normal);
+}
+
+.jk-body-lg {
+    font-size: var(--jk-text-md);
+    line-height: var(--jk-leading-relaxed);
+}
+
+.jk-small {
+    font-size: var(--jk-text-sm);
+    line-height: var(--jk-leading-normal);
+    color: var(--jk-text-secondary);
+}
+
+.jk-xs {
+    font-size: var(--jk-text-xs);
+    line-height: var(--jk-leading-normal);
+    color: var(--jk-text-tertiary);
+}
+
+.jk-label {
+    font-size: var(--jk-text-xs);
+    font-weight: var(--jk-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--jk-text-secondary);
+}
+
+.jk-muted {
+    color: var(--jk-text-secondary);
+}
+
+.jk-semibold {
+    font-weight: var(--jk-weight-semibold);
+}
+
+.jk-bold {
+    font-weight: var(--jk-weight-bold);
+}
+
+/* Text alignment */
+.jk-text-left { text-align: left; }
+.jk-text-center { text-align: center; }
+.jk-text-right { text-align: right; }
+
+/* === ANIMATIONS === */
+
+.fade-in {
+    animation: fadeIn var(--jk-transition-slow) ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-right {
+    animation: slideInRight var(--jk-transition) ease-out;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Skeleton loading */
+.jk-skeleton {
+    background: linear-gradient(90deg, var(--jk-border-light) 25%, var(--jk-border) 50%, var(--jk-border-light) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: var(--jk-radius-sm);
+}

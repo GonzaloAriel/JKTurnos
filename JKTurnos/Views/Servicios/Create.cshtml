@@ -1,39 +1,44 @@
 @model JKTurnos.Models.Entities.Servicio
 
-<h2>Nuevo Servicio</h2>
-
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-
-    <div class="form-group">
-        <label>Nombre</label>
-        @Html.TextBoxFor(x => x.Nombre,
-            new { @class = "form-control" })
+@helper FormContent() {
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">@Html.DisplayNameFor(m => m.Nombre)</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "Nombre del servicio" })
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
     </div>
 
-    <div class="form-group">
-        <label>Descripcion</label>
-        @Html.TextAreaFor(x => x.Descripcion,
-            new { @class = "form-control" })
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Descripcion)">@Html.DisplayNameFor(m => m.Descripcion)</label>
+        @Html.TextAreaFor(m => m.Descripcion, new { @class = "jk-textarea", placeholder = "Descripcion del servicio", rows = 3 })
+        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "jk-field-error" })
     </div>
 
-    <div class="form-group">
-        <label>Duracion (minutos)</label>
-        @Html.TextBoxFor(x => x.DuracionMinutos,
-            new { @class = "form-control", type = "number" })
+    <div class="row">
+        <div class="col-md-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.DuracionMinutos)">Duracion (minutos)</label>
+                @Html.TextBoxFor(m => m.DuracionMinutos, new { @class = "jk-input", type = "number", placeholder = "60" })
+                @Html.ValidationMessageFor(m => m.DuracionMinutos, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
+        <div class="col-md-6">
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.Precio)">@Html.DisplayNameFor(m => m.Precio)</label>
+                @Html.TextBoxFor(m => m.Precio, new { @class = "jk-input", type = "number", step = "0.01", placeholder = "0.00" })
+                @Html.ValidationMessageFor(m => m.Precio, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label>Precio</label>
-        @Html.TextBoxFor(x => x.Precio,
-            new { @class = "form-control", type = "number", step = "0.01" })
-    </div>
-
-    <br />
-
-    <button type="submit"
-            class="btn btn-success">
-        Guardar
-    </button>
 }
+
+@{
+    ViewBag.Title = "Nuevo Servicio";
+    ViewBag.Subtitle = "Define un nuevo servicio para tu negocio";
+    ViewBag.SubmitText = "Guardar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

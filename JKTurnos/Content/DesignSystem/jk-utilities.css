@@ -1,0 +1,115 @@
+/* 
+   JKTurnos - Utility Classes
+   Spacing, layout helpers, display utilities.
+   Dependencies: jk-tokens.css
+   Use these instead of inline styles or Bootstrap utilities.
+*/
+
+/* ===== DISPLAY ===== */
+
+.jk-hidden { display: none !important; }
+.jk-block { display: block; }
+.jk-inline { display: inline; }
+.jk-inline-block { display: inline-block; }
+.jk-flex { display: flex; }
+.jk-inline-flex { display: inline-flex; }
+
+/* ===== FLEX HELPERS ===== */
+
+.jk-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jk-flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.jk-flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.jk-flex-wrap { flex-wrap: wrap; }
+.jk-flex-shrink-0 { flex-shrink: 0; }
+.jk-flex-1 { flex: 1; }
+.jk-gap-4 { gap: var(--jk-space-4); }
+.jk-gap-8 { gap: var(--jk-space-8); }
+.jk-gap-12 { gap: var(--jk-space-12); }
+.jk-gap-16 { gap: var(--jk-space-16); }
+.jk-gap-24 { gap: var(--jk-space-24); }
+
+/* ===== SPACING (margin) ===== */
+
+.jk-m-0 { margin: 0; }
+.jk-mt-4 { margin-top: var(--jk-space-4); }
+.jk-mt-8 { margin-top: var(--jk-space-8); }
+.jk-mt-12 { margin-top: var(--jk-space-12); }
+.jk-mt-16 { margin-top: var(--jk-space-16); }
+.jk-mt-24 { margin-top: var(--jk-space-24); }
+.jk-mt-32 { margin-top: var(--jk-space-32); }
+.jk-mt-48 { margin-top: var(--jk-space-48); }
+
+.jk-mb-0 { margin-bottom: 0; }
+.jk-mb-4 { margin-bottom: var(--jk-space-4); }
+.jk-mb-8 { margin-bottom: var(--jk-space-8); }
+.jk-mb-12 { margin-bottom: var(--jk-space-12); }
+.jk-mb-16 { margin-bottom: var(--jk-space-16); }
+.jk-mb-24 { margin-bottom: var(--jk-space-24); }
+.jk-mb-32 { margin-bottom: var(--jk-space-32); }
+.jk-mb-48 { margin-bottom: var(--jk-space-48); }
+
+.jk-ml-auto { margin-left: auto; }
+.jk-mr-auto { margin-right: auto; }
+
+/* ===== SPACING (padding) ===== */
+
+.jk-p-0 { padding: 0; }
+.jk-p-4 { padding: var(--jk-space-4); }
+.jk-p-8 { padding: var(--jk-space-8); }
+.jk-p-12 { padding: var(--jk-space-12); }
+.jk-p-16 { padding: var(--jk-space-16); }
+.jk-p-24 { padding: var(--jk-space-24); }
+
+/* ===== WIDTH ===== */
+
+.jk-w-full { width: 100%; }
+.jk-w-auto { width: auto; }
+
+/* ===== RESPONSIVE HELPERS ===== */
+
+/* Hide on mobile */
+@media (max-width: 767.98px) {
+    .jk-hide-mobile { display: none !important; }
+}
+
+/* Hide on tablet and below */
+@media (max-width: 1199.98px) {
+    .jk-hide-tablet { display: none !important; }
+}
+
+/* Show only on mobile */
+@media (min-width: 768px) {
+    .jk-show-mobile { display: none !important; }
+}
+
+/* Show only on desktop */
+@media (max-width: 1199.98px) {
+    .jk-show-desktop { display: none !important; }
+}
+
+/* ===== VISUALLY HIDDEN (accessibility) ===== */
+
+.jk-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}

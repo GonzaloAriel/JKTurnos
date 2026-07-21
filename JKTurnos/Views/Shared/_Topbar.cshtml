@@ -1,29 +1,29 @@
 <header id="topbar" class="jk-topbar">
-    <div class="topbar-left">
-        <button class="jk-btn jk-btn-ghost topbar-menu-btn d-xl-none"
+    <div class="jk-topbar-left">
+        <button class="jk-topbar-toggle d-xl-none"
                 id="mobile-menu-toggle"
                 type="button"
                 aria-label="Abrir menu"
                 aria-controls="sidebar"
                 aria-expanded="false">
-            <i class="bi bi-list fs-4"></i>
+            <i class="bi bi-list"></i>
         </button>
-        <span class="jk-h3 mb-0 topbar-title">JKTurnos</span>
+        <span class="jk-topbar-title">JKTurnos</span>
     </div>
 
-    <div class="topbar-right">
-        <button class="jk-btn jk-btn-ghost p-2" aria-label="Notificaciones">
-            <i class="bi bi-bell fs-5"></i>
+    <div class="jk-topbar-right">
+        <button class="jk-btn-icon" aria-label="Notificaciones">
+            <i class="bi bi-bell"></i>
         </button>
-        <div class="user-profile">
-            <div class="avatar-circle">
+        <div class="jk-topbar-user">
+            <div class="jk-avatar">
                 @{
                     string name = User.Identity.Name;
                     string initial = !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "?";
                 }
                 @initial
             </div>
-            <span class="user-name">@(name ?? "Usuario")</span>
+            <span class="jk-topbar-username">@(name ?? "Usuario")</span>
         </div>
     </div>
 </header>

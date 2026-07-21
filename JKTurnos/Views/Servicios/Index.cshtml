@@ -1,42 +1,85 @@
 @model List<JKTurnos.Models.Entities.Servicio>
 
-<h2>Servicios</h2>
+@helper ListContent() {
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Duracion</th>
+                        <th class="jk-hide-tablet">Precio</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.DuracionMinutos min</td>
+                            <td class="jk-hide-tablet">$ @item.Precio.ToString("N2")</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                    new ViewDataDictionary {
+                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                        { "ItemName", item.Nombre },
+                                        { "Compact", false }
+                                    })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<p>
-    <a href="@Url.Action("Create")" class="btn btn-primary">
-        Nuevo Servicio
-    </a>
-</p>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Duracion</th>
-            <th>Precio</th>
-            <th></th>
-        </tr>
-    </thead>
-
-    <tbody>
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@item.Nombre</td>
-                <td>@item.DuracionMinutos min</td>
-                <td>$ @item.Precio</td>
-                <td>
-                    <a href="@Url.Action("Edit", new { id = item.Id })"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-
-                    <a href="@Url.Action("Delete", new { id = item.Id })"
-                       class="btn btn-danger btn-sm">
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@item.Nombre</strong>
+                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                        new ViewDataDictionary {
+                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                            { "ItemName", item.Nombre },
+                            { "Compact", true }
+                        })
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-clock"></i> @item.DuracionMinutos min
+                </div>
+                <div class="jk-small jk-mt-4">
+                    <i class="bi bi-currency-dollar"></i> $ @item.Precio.ToString("N2")
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}
+
+@helper EmptyContent() {
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "briefcase" },
+            { "Title", "No tienes servicios" },
+            { "Description", "Define los servicios que ofreces para comenzar a agendar turnos." },
+            { "ActionText", "Crear Servicio" },
+            { "ActionUrl", Url.Action("Create") }
+        })
+}
+
+@{
+    ViewBag.Title = "Servicios";
+    ViewBag.Subtitle = "Administra los servicios que ofreces";
+    ViewBag.PrimaryAction = Url.Action("Create");
+    ViewBag.PrimaryActionLabel = "Nuevo Servicio";
+    ViewBag.SearchPlaceholder = "Buscar servicios...";
+    ViewBag.SearchId = "search-servicios";
+
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")

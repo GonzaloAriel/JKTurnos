@@ -1,0 +1,37 @@
+@*
+    JKTurnos - Empty State Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "calendar3" },
+            { "Title", "Sin turnos agendados" },
+            { "Description", "Crea tu primer turno para comenzar." },
+            { "ActionText", "Crear Turno" },
+            { "ActionUrl", "#" }
+        })
+*@
+
+@{
+    string icon = ViewBag.Icon ?? "inbox";
+    string title = ViewBag.Title ?? "Sin datos";
+    string description = ViewBag.Description ?? "";
+    string actionText = ViewBag.ActionText ?? "";
+    string actionUrl = ViewBag.ActionUrl ?? "";
+}
+
+<div class="jk-empty-state">
+    <div class="jk-empty-state-icon">
+        <i class="bi bi-@icon"></i>
+    </div>
+    <h3 class="jk-empty-state-title">@title</h3>
+    @if (!string.IsNullOrEmpty(description))
+    {
+        <p class="jk-empty-state-text">@description</p>
+    }
+    @if (!string.IsNullOrEmpty(actionText) && !string.IsNullOrEmpty(actionUrl))
+    {
+        <div class="jk-empty-state-action">
+            <a href="@actionUrl" class="jk-btn jk-btn-primary">@actionText</a>
+        </div>
+    }
+</div>

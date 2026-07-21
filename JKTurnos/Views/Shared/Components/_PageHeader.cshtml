@@ -1,0 +1,40 @@
+@*
+    JKTurnos - Page Header Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml",
+        new ViewDataDictionary {
+            { "Title", "Clientes" },
+            { "Subtitle", "Administra tus clientes" },
+            { "PrimaryAction", Url.Action("Create") },
+            { "PrimaryActionLabel", "Nuevo Cliente" }
+        })
+*@
+
+@{
+    string title = ViewBag.Title ?? "";
+    string subtitle = ViewBag.Subtitle ?? "";
+    string primaryAction = ViewBag.PrimaryAction ?? "";
+    string primaryActionLabel = ViewBag.PrimaryActionLabel ?? "";
+    string primaryActionIcon = ViewBag.PrimaryActionIcon ?? "plus-lg";
+}
+
+<div class="jk-page-header">
+    <div class="jk-page-header-top">
+        <div class="jk-page-header-text">
+            <h1 class="jk-page-title">@title</h1>
+            @if (!string.IsNullOrEmpty(subtitle))
+            {
+                <p class="jk-page-subtitle">@subtitle</p>
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(primaryAction))
+        {
+            <div class="jk-page-header-actions">
+                <a href="@primaryAction" class="jk-btn jk-btn-primary">
+                    <i class="bi bi-@primaryActionIcon"></i>
+                    @primaryActionLabel
+                </a>
+            </div>
+        }
+    </div>
+</div>

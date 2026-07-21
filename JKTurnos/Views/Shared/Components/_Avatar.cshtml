@@ -1,0 +1,18 @@
+@*
+    JKTurnos - Avatar Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_Avatar.cshtml",
+        new ViewDataDictionary {
+            { "Name", "Admin" },
+            { "Size", "md" }       /* "sm", "md", "lg" */
+        })
+*@
+
+@{
+    string name = ViewBag.Name ?? "?";
+    string size = ViewBag.Size ?? "md";
+    string initial = !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "?";
+    string sizeClass = size == "sm" ? "jk-avatar-sm" : (size == "lg" ? "jk-avatar-lg" : "");
+}
+
+<div class="jk-avatar @sizeClass" title="@name">@initial</div>

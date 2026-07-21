@@ -1,0 +1,24 @@
+@*
+    JKTurnos - Section Header Component
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_SectionHeader.cshtml",
+        new ViewDataDictionary {
+            { "Title", "Acciones rapidas" },
+            { "ActionText", "Ver todo" },
+            { "ActionUrl", "#" }
+        })
+*@
+
+@{
+    string title = ViewBag.Title ?? "";
+    string actionText = ViewBag.ActionText ?? "";
+    string actionUrl = ViewBag.ActionUrl ?? "";
+}
+
+<div class="jk-flex-between" style="margin-bottom: var(--jk-space-16);">
+    <h2 class="jk-label" style="margin:0;">@title</h2>
+    @if (!string.IsNullOrEmpty(actionText) && !string.IsNullOrEmpty(actionUrl))
+    {
+        <a href="@actionUrl" class="jk-small" style="font-weight:500;color:var(--jk-accent);text-decoration:none;">@actionText</a>
+    }
+</div>

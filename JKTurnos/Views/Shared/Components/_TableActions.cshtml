@@ -1,0 +1,50 @@
+@*
+    JKTurnos - Table Actions Component
+    Renders the Edit/Delete action pair for table rows and mobile cards.
+
+    Usage:
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>...</td>
+            <td>
+                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                    new ViewDataDictionary {
+                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                        { "ItemName", item.Nombre },
+                        { "Compact", false }
+                    })
+            </td>
+        </tr>
+    }
+
+    For mobile (compact without text labels):
+    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+        new ViewDataDictionary {
+            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+            { "ItemName", item.Nombre },
+            { "Compact", true }
+        })
+*@
+
+@{
+    string editUrl = ViewBag.EditUrl ?? "#";
+    string deleteUrl = ViewBag.DeleteUrl ?? "#";
+    string editLabel = ViewBag.EditLabel ?? "Editar";
+    string deleteLabel = ViewBag.DeleteLabel ?? "Eliminar";
+    string itemName = ViewBag.ItemName ?? "";
+    bool compact = ViewBag.Compact ?? false;
+}
+
+<a class="jk-btn jk-btn-sm jk-btn-ghost" href="@editUrl"
+   @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="Editar @itemName"</text> }>
+    <i class="bi bi-pencil"></i>
+    @if (!compact) { <text>@editLabel</text> }
+</a>
+<a class="jk-btn jk-btn-sm jk-btn-danger" href="@deleteUrl"
+   @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="Eliminar @itemName"</text> }>
+    <i class="bi bi-trash"></i>
+    @if (!compact) { <text>@deleteLabel</text> }
+</a>
