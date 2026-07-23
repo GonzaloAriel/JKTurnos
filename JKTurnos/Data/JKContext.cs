@@ -19,5 +19,6 @@ namespace JKTurnos.Data
         public DbSet<Servicio> Servicios { get; set; }
         public DbSet<Turno> Turnos { get; set; }
         public DbSet<EstadoTurno> EstadosTurno { get; set; }
+        public DbSet<Recurso> Recursos { get; set; }
     }
 }

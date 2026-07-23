@@ -43,7 +43,7 @@ namespace JKTurnos.Migrations
                 {
                     Nombre = "Administrador",
                     Email = adminEmail,
-                    PasswordHash = PasswordHasher.Hash("admin123"),
+                    PasswordHash = PasswordHasher.Hash("123456"),
                     Role = "Admin",
                     TenantId = tenant.Id,
                     CreatedAt = DateTime.Now,
@@ -66,8 +66,8 @@ namespace JKTurnos.Migrations
                 });
             }
 
-            // 4. CONFIGURACION Turnos
-            if (!context.EstadosTurno.Any())
+            // 4. ESTADOS DE TURNO
+            if (!context.EstadosTurno.Any(x => x.TenantId == tenant.Id))
             {
                 context.EstadosTurno.Add(
                     new EstadoTurno
@@ -100,6 +100,125 @@ namespace JKTurnos.Migrations
                     });
 
                 context.SaveChanges();
+            }
+
+            // 5. CLIENTES DEMO
+            var clientes = new[]
+            {
+                new { Nombre = "Juan Perez",    Telefono = "1122334455", Email = "juan@email.com" },
+                new { Nombre = "Maria Garcia",  Telefono = "1122334466", Email = "maria@email.com" },
+                new { Nombre = "Carlos Lopez",  Telefono = "1122334477", Email = "carlos@email.com" }
+            };
+
+            foreach (var c in clientes)
+            {
+                if (!context.Clientes.Any(x => x.Email == c.Email && x.TenantId == tenant.Id))
+                {
+                    context.Clientes.Add(new Cliente
+                    {
+                        TenantId = tenant.Id,
+                        Nombre = c.Nombre,
+                        Telefono = c.Telefono,
+                        Email = c.Email,
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+                }
+            }
+
+            context.SaveChanges();
+
+            // 6. SERVICIOS DEMO
+            var servicios = new[]
+            {
+                new { Nombre = "Corte",   Descripcion = "Corte de cabello",         Precio = 3500m, DuracionMinutos = 30 },
+                new { Nombre = "Color",   Descripcion = "Coloracion completa",       Precio = 8000m, DuracionMinutos = 60 },
+                new { Nombre = "Peinado", Descripcion = "Peinado y styling",         Precio = 5000m, DuracionMinutos = 45 }
+            };
+
+            foreach (var s in servicios)
+            {
+                if (!context.Servicios.Any(x => x.Nombre == s.Nombre && x.TenantId == tenant.Id))
+                {
+                    context.Servicios.Add(new Servicio
+                    {
+                        TenantId = tenant.Id,
+                        Nombre = s.Nombre,
+                        Descripcion = s.Descripcion,
+                        Precio = s.Precio,
+                        DuracionMinutos = s.DuracionMinutos,
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+                }
+            }
+
+            context.SaveChanges();
+
+            // 7. TURNOS DEMO
+            var estadoPendiente = context.EstadosTurno
+                .FirstOrDefault(x => x.Nombre == "Pendiente" && x.TenantId == tenant.Id);
+            var estadoConfirmado = context.EstadosTurno
+                .FirstOrDefault(x => x.Nombre == "Confirmado" && x.TenantId == tenant.Id);
+            var hoy = DateTime.Today;
+
+            var turnosDemo = new[]
+            {
+                new {
+                    ClienteEmail = "juan@email.com",
+                    ServicioNombre = "Corte",
+                    HoraInicio = hoy.AddHours(10),
+                    HoraFin = hoy.AddHours(10).AddMinutes(30),
+                    Estado = estadoPendiente,
+                    Obs = "Cliente nuevo"
+                },
+                new {
+                    ClienteEmail = "maria@email.com",
+                    ServicioNombre = "Color",
+                    HoraInicio = hoy.AddHours(11),
+                    HoraFin = hoy.AddHours(11).AddMinutes(60),
+                    Estado = estadoConfirmado,
+                    Obs = ""
+                },
+                new {
+                    ClienteEmail = "carlos@email.com",
+                    ServicioNombre = "Peinado",
+                    HoraInicio = hoy.AddHours(14),
+                    HoraFin = hoy.AddHours(14).AddMinutes(45),
+                    Estado = estadoPendiente,
+                    Obs = "Confirmar horario"
+                }
+            };
+
+            foreach (var t in turnosDemo)
+            {
+                var cliente = context.Clientes.FirstOrDefault(x => x.Email == t.ClienteEmail && x.TenantId == tenant.Id);
+                var servicio = context.Servicios.FirstOrDefault(x => x.Nombre == t.ServicioNombre && x.TenantId == tenant.Id);
+
+                if (cliente == null || servicio == null || t.Estado == null)
+                    continue;
+
+                var existeTurno = context.Turnos.Any(x =>
+                    x.ClienteId == cliente.Id &&
+                    x.ServicioId == servicio.Id &&
+                    x.FechaHoraInicio == t.HoraInicio &&
+                    x.TenantId == tenant.Id);
+
+                if (!existeTurno)
+                {
+                    context.Turnos.Add(new Turno
+                    {
+                        TenantId = tenant.Id,
+                        ClienteId = cliente.Id,
+                        ServicioId = servicio.Id,
+                        EstadoTurnoId = t.Estado.Id,
+                        FechaHoraInicio = t.HoraInicio,
+                        FechaHoraFin = t.HoraFin,
+                        Observaciones = t.Obs,
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+                }
             }
 
             context.SaveChanges();
