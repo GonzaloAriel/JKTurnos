@@ -1,0 +1,267 @@
+@using System.Collections.Generic
+@using System.Linq
+
+@functions {
+    public static IEnumerable<KeyValuePair<string, string>> GetColorOptions()
+    {
+        yield return new KeyValuePair<string, string>("Azul", "#2563EB");
+        yield return new KeyValuePair<string, string>("Verde", "#34C759");
+        yield return new KeyValuePair<string, string>("Rojo", "#FF3B30");
+        yield return new KeyValuePair<string, string>("Naranja", "#FF9500");
+        yield return new KeyValuePair<string, string>("Amarillo", "#FFCC00");
+        yield return new KeyValuePair<string, string>("Violeta", "#AF52DE");
+        yield return new KeyValuePair<string, string>("Rosa", "#FF2D55");
+        yield return new KeyValuePair<string, string>("Turquesa", "#40E0D0");
+        yield return new KeyValuePair<string, string>("Gris", "#8E8E93");
+        yield return new KeyValuePair<string, string>("Marron", "#A2845E");
+        yield return new KeyValuePair<string, string>("Indigo", "#5856D6");
+        yield return new KeyValuePair<string, string>("Cian", "#00C7BE");
+    }
+}
+
+@{
+    var colorValue = ViewData["color"] as string ?? "";
+}
+
+<style>
+    .jk-color-selector {
+        position: relative;
+        width: 100%;
+        margin-top: 12px;
+    }
+
+    .jk-color-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 10px 14px;
+        background: var(--jk-surface);
+        border: 1px solid var(--jk-border);
+        border-radius: var(--jk-radius);
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--jk-text-primary);
+        transition: border-color 0.15s ease;
+    }
+
+    .jk-color-trigger:hover {
+        border-color: var(--jk-accent);
+    }
+
+    .jk-color-trigger:focus-visible {
+        outline: 2px solid var(--jk-accent);
+        outline-offset: 2px;
+    }
+
+    .jk-color-preview {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .jk-color-preview-swatch {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        border: 1px solid var(--jk-border);
+    }
+
+    .jk-color-preview-label {
+        font-size: 14px;
+        color: var(--jk-text-primary);
+    }
+
+    .jk-color-trigger .bi-chevron-down {
+        font-size: 14px;
+        color: var(--jk-text-secondary);
+    }
+
+    .jk-color-selector .bi-chevron-down {
+        transition: transform 0.2s ease;
+    }
+
+    .jk-color-selector.open .bi-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .jk-color-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 110;
+        background: var(--jk-surface);
+        border: 1px solid var(--jk-border);
+        border-radius: var(--jk-radius);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        list-style: none;
+        margin: 0;
+        padding: 4px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-4px);
+        transition: opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease;
+    }
+
+    .jk-color-selector.open .jk-color-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .jk-color-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--jk-text-primary);
+        transition: background-color 0.1s ease;
+    }
+
+    .jk-color-option:hover {
+        background: var(--jk-bg);
+    }
+
+    .jk-color-option:focus-visible {
+        outline: 2px solid var(--jk-accent);
+        outline-offset: -2px;
+    }
+
+    .jk-color-option-swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        border: 1px solid var(--jk-border);
+    }
+
+    .jk-color-option-label {
+        flex: 1;
+    }
+
+    .jk-color-option-check {
+        font-size: 14px;
+        color: var(--jk-accent);
+        display: none;
+    }
+
+    .jk-color-option.selected .jk-color-option-check {
+        display: block;
+    }
+</style>
+
+<div class="jk-color-selector">
+    @Html.Hidden("Color", colorValue, new { @class = "jk-color-hidden" })
+
+    <button type="button"
+            class="jk-color-trigger"
+            aria-haspopup="listbox"
+            aria-expanded="false">
+        <span class="jk-color-preview">
+            <span class="jk-color-preview-swatch" style="background-color:@colorValue;"></span>
+            <span class="jk-color-preview-label">Seleccionar color</span>
+        </span>
+        <i class="bi bi-chevron-down"></i>
+    </button>
+
+    <ul class="jk-color-dropdown" role="listbox">
+        @foreach (var opt in GetColorOptions())
+        {
+            <li role="option"
+                class="jk-color-option"
+                data-color="@opt.Value"
+                data-label="@opt.Key"
+                aria-selected="false">
+                <span class="jk-color-option-swatch" style="background-color:@opt.Value;"></span>
+                <span class="jk-color-option-label">@opt.Key</span>
+                <i class="bi bi-check-lg jk-color-option-check"></i>
+            </li>
+        }
+    </ul>
+</div>
+
+<script>
+    (function() {
+        var selectors = document.querySelectorAll('.jk-color-selector');
+        selectors.forEach(function(selector) {
+            if (selector.hasAttribute('data-jk-color-init')) return;
+            selector.setAttribute('data-jk-color-init', 'true');
+
+            var trigger = selector.querySelector('.jk-color-trigger');
+            var options = selector.querySelectorAll('.jk-color-option');
+            var previewSwatch = selector.querySelector('.jk-color-preview-swatch');
+            var previewLabel = selector.querySelector('.jk-color-preview-label');
+            var hiddenInput = selector.querySelector('input.jk-color-hidden');
+
+            function selectOption(option) {
+                var color = option.getAttribute('data-color');
+                var label = option.getAttribute('data-label');
+
+                options.forEach(function(o) {
+                    o.classList.remove('selected');
+                    o.setAttribute('aria-selected', 'false');
+                });
+
+                option.classList.add('selected');
+                option.setAttribute('aria-selected', 'true');
+                previewSwatch.style.backgroundColor = color;
+                previewLabel.textContent = label;
+
+                if (hiddenInput) hiddenInput.value = color;
+            }
+
+            function getSelectedOption() {
+                var value = hiddenInput ? hiddenInput.value : '';
+                if (!value) return null;
+
+                var match = null;
+                options.forEach(function(opt) {
+                    if (opt.getAttribute('data-color').toUpperCase() === value.toUpperCase()) {
+                        match = opt;
+                    }
+                });
+                return match;
+            }
+
+            var selected = getSelectedOption();
+            if (selected) {
+                selectOption(selected);
+            } else if (options.length > 0) {
+                selectOption(options[0]);
+                if (hiddenInput && !hiddenInput.value) {
+                    hiddenInput.value = options[0].getAttribute('data-color');
+                }
+            }
+
+            function open() { selector.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); }
+            function close() { selector.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); }
+            function toggle() { if (selector.classList.contains('open')) close(); else open(); }
+
+            trigger.addEventListener('click', toggle);
+
+            options.forEach(function(opt) {
+                opt.addEventListener('click', function() {
+                    selectOption(this);
+                    close();
+                    trigger.focus();
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!selector.contains(e.target)) close();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && selector.classList.contains('open')) {
+                    close();
+                    trigger.focus();
+                }
+            });
+        });
+    })();
+</script>

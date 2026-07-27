@@ -23,7 +23,7 @@ namespace JKTurnos.Controllers
 
         public ActionResult Create()
         {
-            return View();
+            return View(new Recurso());
         }
 
         [HttpPost]

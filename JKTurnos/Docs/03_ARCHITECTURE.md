@@ -319,3 +319,25 @@ No crear dependencias circulares.
 No romper el flujo MVC.
 
 Toda nueva funcionalidad debe respetar esta arquitectura.
+
+---
+
+Arquitectura validada - 26/7/2026
+
+Módulos implementados utilizando el patrón oficial:
+
+✓ Clientes
+✓ Servicios
+✓ Recursos
+
+Conclusión:
+
+El patrón CRUD oficial queda aprobado para el proyecto JKTurnos.
+
+Todo nuevo módulo CRUD deberá seguir esta estructura.
+
+No crear nuevos componentes salvo necesidad comprobada.
+
+No duplicar HTML existente.
+
+Priorizar siempre reutilización sobre especialización.

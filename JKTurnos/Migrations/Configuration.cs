@@ -155,7 +155,34 @@ namespace JKTurnos.Migrations
 
             context.SaveChanges();
 
-            // 7. TURNOS DEMO
+            // 7. RECURSOS DEMO
+            var recursos = new[]
+            {
+                new { Nombre = "Dr. Juan Martinez", Descripcion = "Profesional principal", Tipo = TipoRecurso.Profesional, Color = "#2563eb" },
+                new { Nombre = "Consultorio A", Descripcion = "Consultorio principal", Tipo = TipoRecurso.Consultorio, Color = "#34c759" },
+                new { Nombre = "Equipo de Odontologia", Descripcion = "Equipo dental", Tipo = TipoRecurso.Equipo, Color = "#ff9500" }
+            };
+
+            foreach (var r in recursos)
+            {
+                if (!context.Recursos.Any(x => x.Nombre == r.Nombre && x.TenantId == tenant.Id))
+                {
+                    context.Recursos.Add(new Recurso
+                    {
+                        TenantId = tenant.Id,
+                        Nombre = r.Nombre,
+                        Descripcion = r.Descripcion,
+                        Tipo = r.Tipo,
+                        Color = r.Color,
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+                }
+            }
+
+            context.SaveChanges();
+
+            // 8. TURNOS DEMO
             var estadoPendiente = context.EstadosTurno
                 .FirstOrDefault(x => x.Nombre == "Pendiente" && x.TenantId == tenant.Id);
             var estadoConfirmado = context.EstadosTurno

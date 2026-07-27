@@ -1,0 +1,88 @@
+@model List<JKTurnos.Models.Entities.Recurso>
+
+@helper ListContent() {
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th class="jk-hide-tablet">Color</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.Tipo</td>
+                            <td class="jk-hide-tablet">@item.Color</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                    new ViewDataDictionary {
+                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                        { "ItemName", item.Nombre },
+                                        { "Compact", false }
+                                    })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@item.Nombre</strong>
+                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                        new ViewDataDictionary {
+                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                            { "ItemName", item.Nombre },
+                            { "Compact", true }
+                        })
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-tag"></i> @item.Tipo
+                </div>
+                @if (!string.IsNullOrEmpty(item.Color))
+                {
+                    <div class="jk-small jk-mt-4">
+                        <i class="bi bi-palette"></i> @item.Color
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@helper EmptyContent() {
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "person-badge" },
+            { "Title", "No tienes recursos" },
+            { "Description", "Define los recursos de tu negocio para comenzar a asignar turnos." },
+            { "ActionText", "Crear Recurso" },
+            { "ActionUrl", Url.Action("Create") }
+        })
+}
+
+@{
+    ViewBag.Title = "Recursos";
+    ViewBag.Subtitle = "Administra los recursos de tu negocio";
+    ViewBag.PrimaryAction = Url.Action("Create");
+    ViewBag.PrimaryActionLabel = "Nuevo Recurso";
+    ViewBag.SearchPlaceholder = "Buscar recursos...";
+    ViewBag.SearchId = "search-recursos";
+
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")
