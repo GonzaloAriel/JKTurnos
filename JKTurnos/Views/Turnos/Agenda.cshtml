@@ -1,0 +1,25 @@
+@{
+    ViewBag.Title = "Mi Agenda";
+    ViewBag.Subtitle = "Administra tu agenda del dia";
+    ViewBag.PrimaryAction = "#";
+    ViewBag.PrimaryActionLabel = "Nuevo Turno";
+    ViewBag.PrimaryActionIcon = "plus-lg";
+}
+
+<div class="jk-agenda" role="application" aria-label="Agenda de turnos">
+
+    @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+    @Html.Partial("~/Views/Shared/Components/_AgendaToolbar.cshtml")
+
+    @Html.Partial("~/Views/Shared/Components/_AgendaGrid.cshtml")
+
+</div>
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-agenda.css" rel="stylesheet" />
+}
+
+@section scripts {
+    <script src="~/Scripts/jk-agenda.js"></script>
+}

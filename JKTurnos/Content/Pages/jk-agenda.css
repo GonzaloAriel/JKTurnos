@@ -1,0 +1,284 @@
+/*
+   JKTurnos - Agenda Grid Styles
+   Calendar grid with sticky columns/rows.
+   Dependencies: jk-tokens.css
+*/
+
+/* ===== AGENDA CONTAINER ===== */
+
+.jk-agenda {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+/* ===== TOOLBAR ===== */
+
+.jk-agenda-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--jk-space-12);
+    margin-bottom: var(--jk-space-16);
+}
+
+.jk-agenda-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-16);
+}
+
+.jk-agenda-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+}
+
+.jk-agenda-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-4);
+}
+
+.jk-agenda-date-label {
+    font-size: var(--jk-text-lg);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+    margin-left: var(--jk-space-8);
+    white-space: nowrap;
+}
+
+.jk-agenda-today-btn {
+    font-weight: var(--jk-weight-semibold);
+}
+
+/* View toggle */
+
+.jk-agenda-view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--jk-bg);
+    border-radius: var(--jk-radius);
+    padding: 2px;
+}
+
+.jk-agenda-view-toggle .jk-btn {
+    border-radius: calc(var(--jk-radius) - 2px);
+}
+
+.jk-agenda-view-toggle .jk-btn.active {
+    background: var(--jk-surface);
+    color: var(--jk-text-primary);
+    border-color: var(--jk-border);
+    box-shadow: var(--jk-shadow-sm);
+}
+
+/* ===== FILTERS ===== */
+
+.jk-agenda-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    margin-bottom: var(--jk-space-16);
+    flex-wrap: wrap;
+}
+
+.jk-agenda-filter-label {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-medium);
+    color: var(--jk-text-secondary);
+}
+
+.jk-agenda-filter-list {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    flex-wrap: wrap;
+}
+
+.jk-agenda-filter-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--jk-space-6);
+    cursor: pointer;
+    font-size: var(--jk-text-sm);
+    color: var(--jk-text-secondary);
+    user-select: none;
+}
+
+.jk-agenda-filter-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--jk-accent);
+    cursor: pointer;
+}
+
+.jk-agenda-resource-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.jk-agenda-resource-name {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-medium);
+    color: var(--jk-text-primary);
+}
+
+/* ===== GRID WRAPPER (scrollable) ===== */
+
+.jk-agenda-grid-wrap {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    background: var(--jk-surface);
+    min-height: 0;
+    position: relative;
+}
+
+/* ===== GRID ===== */
+
+.jk-agenda-grid {
+    display: grid;
+    grid-template-columns: 64px repeat(var(--jk-resource-count, 3), minmax(180px, 1fr));
+    grid-auto-rows: 48px;
+    min-width: 100%;
+    width: max-content;
+}
+
+/* ===== CORNER CELL ===== */
+
+.jk-agenda-corner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    background: var(--jk-bg);
+    border-bottom: 1px solid var(--jk-border);
+    border-right: 1px solid var(--jk-border);
+    height: 44px;
+}
+
+/* ===== RESOURCE HEADERS ===== */
+
+.jk-agenda-resource-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+    padding: 0 var(--jk-space-12);
+    background: var(--jk-bg);
+    border-bottom: 1px solid var(--jk-border);
+    border-right: 1px solid var(--jk-border-light);
+    height: 44px;
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+}
+
+.jk-agenda-resource-header .jk-agenda-resource-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+}
+
+/* ===== HOUR COLUMN ===== */
+
+.jk-agenda-hour {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 0 var(--jk-space-8);
+    background: var(--jk-surface);
+    border-right: 1px solid var(--jk-border);
+    border-bottom: 1px solid var(--jk-border-light);
+    min-height: 48px;
+}
+
+.jk-agenda-hour-text {
+    font-size: var(--jk-text-xs);
+    color: var(--jk-text-tertiary);
+    font-weight: var(--jk-weight-medium);
+    line-height: 1;
+    margin-top: -6px;
+    padding-top: 0;
+}
+
+/* ===== CELLS ===== */
+
+.jk-agenda-cell {
+    border-bottom: 1px solid var(--jk-border-light);
+    border-right: 1px solid var(--jk-border-light);
+    min-height: 48px;
+    transition: background var(--jk-transition-fast);
+    cursor: pointer;
+}
+
+.jk-agenda-cell:hover {
+    background: var(--jk-accent-light);
+}
+
+.jk-agenda-cell-hour-start {
+    border-top: 1px solid var(--jk-border);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 1199.98px) {
+    .jk-agenda-grid {
+        grid-template-columns: 56px repeat(var(--jk-resource-count, 3), minmax(160px, 1fr));
+    }
+
+    .jk-agenda-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .jk-agenda-toolbar-right {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .jk-agenda {
+        padding-bottom: calc(var(--jk-bottom-nav-height) + 20px);
+    }
+
+    .jk-agenda-grid-wrap {
+        border-radius: var(--jk-radius);
+        margin: 0 calc(-1 * var(--jk-content-padding-mobile));
+        border-left: none;
+        border-right: none;
+    }
+
+    .jk-agenda-grid {
+        grid-template-columns: 48px 1fr;
+        grid-auto-rows: 44px;
+    }
+
+    .jk-agenda-date-label {
+        font-size: var(--jk-text-base);
+    }
+
+    .jk-agenda-resource-header {
+        display: none;
+    }
+
+    .jk-agenda-hour {
+        min-height: 44px;
+    }
+
+    .jk-agenda-cell {
+        min-height: 44px;
+    }
+}

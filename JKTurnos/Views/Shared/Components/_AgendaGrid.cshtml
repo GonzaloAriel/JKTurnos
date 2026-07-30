@@ -1,0 +1,61 @@
+@*
+    JKTurnos - Agenda Grid Component
+    Grilla de calendario con columna de horas sticky y fila de recursos sticky.
+*@
+
+@{
+    string[] demoResources = new[] { "Dr. Juan", "Consultorio A", "Sala 1" };
+    string[] demoColors = new[] { "#2563eb", "#34c759", "#ff9500" };
+    int resourceCount = demoResources.Length;
+
+    var hours = new List<string>();
+    for (int h = 8; h <= 19; h++)
+    {
+        hours.Add(h.ToString("D2") + ":00");
+        if (h < 19) { hours.Add(h.ToString("D2") + ":30"); }
+    }
+    int hourCount = hours.Count;
+}
+
+<div class="jk-agenda-grid-wrap" role="grid" aria-label="Grilla de agenda">
+    <div class="jk-agenda-grid" style="--jk-resource-count: @resourceCount;">
+
+        @* Corner cell *@
+        <div class="jk-agenda-corner" role="presentation"></div>
+
+        @* Resource headers *@
+        @for (int i = 0; i < resourceCount; i++)
+        {
+            <div class="jk-agenda-resource-header" role="columnheader" aria-label="@demoResources[i]">
+                <span class="jk-agenda-resource-dot" style="background-color: @demoColors[i]"></span>
+                <span class="jk-agenda-resource-name">@demoResources[i]</span>
+            </div>
+        }
+
+        @* Hour rows *@
+        @for (int h = 0; h < hourCount; h++)
+        {
+            var hour = hours[h];
+
+            <div class="jk-agenda-hour" role="rowheader" aria-label="@hour">
+                @if (hour.EndsWith(":00"))
+                {
+                    <span class="jk-agenda-hour-text">@hour</span>
+                }
+            </div>
+
+            for (int i = 0; i < resourceCount; i++)
+            {
+                if (hour.EndsWith(":00"))
+                {
+                    @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" role="gridcell" data-hour="@hour" aria-label="@demoResources[i] @hour"></div>
+                }
+                else
+                {
+                    @:<div class="jk-agenda-cell" role="gridcell" data-hour="@hour" aria-label="@demoResources[i] @hour"></div>
+                }
+            }
+        }
+
+    </div>
+</div>

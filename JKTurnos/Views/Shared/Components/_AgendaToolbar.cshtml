@@ -1,0 +1,57 @@
+@*
+    JKTurnos - Agenda Toolbar Component
+    Navigation temporal + selector de vista + filtro de recursos.
+*@
+
+@{
+    string dateDisplay = ViewBag.CurrentDateDisplay ?? "";
+}
+
+<div class="jk-agenda-toolbar" role="toolbar" aria-label="Navegacion de agenda">
+    <div class="jk-agenda-toolbar-left">
+        <div class="jk-agenda-nav">
+            <button class="jk-btn-icon" aria-label="Dia anterior" type="button">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="jk-btn jk-btn-ghost jk-agenda-today-btn" type="button">
+                Hoy
+            </button>
+            <button class="jk-btn-icon" aria-label="Dia siguiente" type="button">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <span class="jk-agenda-date-label" aria-live="polite">@dateDisplay</span>
+        </div>
+    </div>
+
+    <div class="jk-agenda-toolbar-right">
+        <div class="jk-agenda-view-toggle" role="tablist" aria-label="Vista de agenda">
+            <button class="jk-btn jk-btn-sm jk-agenda-view-btn active" role="tab" aria-selected="true" type="button">
+                Dia
+            </button>
+            <button class="jk-btn jk-btn-sm jk-btn-ghost jk-agenda-view-btn" role="tab" aria-selected="false" type="button">
+                Semana
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="jk-agenda-filters" role="group" aria-label="Filtro de recursos">
+    <span class="jk-agenda-filter-label">Recursos:</span>
+    <div class="jk-agenda-filter-list">
+        <label class="jk-agenda-filter-item">
+            <input type="checkbox" checked aria-checked="true" />
+            <span class="jk-agenda-resource-dot" style="background-color: #2563eb"></span>
+            <span class="jk-agenda-resource-name">Dr. Juan</span>
+        </label>
+        <label class="jk-agenda-filter-item">
+            <input type="checkbox" checked aria-checked="true" />
+            <span class="jk-agenda-resource-dot" style="background-color: #34c759"></span>
+            <span class="jk-agenda-resource-name">Consultorio A</span>
+        </label>
+        <label class="jk-agenda-filter-item">
+            <input type="checkbox" checked aria-checked="true" />
+            <span class="jk-agenda-resource-dot" style="background-color: #ff9500"></span>
+            <span class="jk-agenda-resource-name">Sala 1</span>
+        </label>
+    </div>
+</div>
