@@ -1,0 +1,591 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Edmx Version="3.0" xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <Runtime>
+    <ConceptualModels>
+      <Schema Namespace="JKTurnos.Data" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Cliente" customannotation:ClrType="JKTurnos.Models.Entities.Cliente, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="120" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Telefono" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="120" FixedLength="false" Unicode="true" />
+          <Property Name="Direccion" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Notas" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ConfiguracionTenant" customannotation:ClrType="JKTurnos.Models.Entities.ConfiguracionTenant, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="NombreComercial" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Telefono" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Direccion" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="LogoUrl" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Tenant" Relationship="Self.ConfiguracionTenant_Tenant" FromRole="ConfiguracionTenant_Tenant_Source" ToRole="ConfiguracionTenant_Tenant_Target" />
+        </EntityType>
+        <EntityType Name="Tenant" customannotation:ClrType="JKTurnos.Models.Entities.Tenant, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Subdominio" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EstadoTurno" customannotation:ClrType="JKTurnos.Models.Entities.EstadoTurno, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Color" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Recurso" customannotation:ClrType="JKTurnos.Models.Entities.Recurso, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Tipo" Type="Self.TipoRecurso" Nullable="false" />
+          <Property Name="Color" Type="String" MaxLength="7" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Servicio" customannotation:ClrType="JKTurnos.Models.Entities.Servicio, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Precio" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="DuracionMinutos" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Turno" customannotation:ClrType="JKTurnos.Models.Entities.Turno, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="ClienteId" Type="Int32" Nullable="false" />
+          <Property Name="ServicioId" Type="Int32" Nullable="false" />
+          <Property Name="EstadoTurnoId" Type="Int32" Nullable="false" />
+          <Property Name="FechaHoraInicio" Type="DateTime" Nullable="false" />
+          <Property Name="FechaHoraFin" Type="DateTime" Nullable="false" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Cliente" Relationship="Self.Turno_Cliente" FromRole="Turno_Cliente_Source" ToRole="Turno_Cliente_Target" />
+          <NavigationProperty Name="EstadoTurno" Relationship="Self.Turno_EstadoTurno" FromRole="Turno_EstadoTurno_Source" ToRole="Turno_EstadoTurno_Target" />
+          <NavigationProperty Name="Servicio" Relationship="Self.Turno_Servicio" FromRole="Turno_Servicio_Source" ToRole="Turno_Servicio_Target" />
+        </EntityType>
+        <EntityType Name="User" customannotation:ClrType="JKTurnos.Models.Entities.User, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Role" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TenantId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Tenant" Relationship="Self.User_Tenant" FromRole="User_Tenant_Source" ToRole="User_Tenant_Target" />
+        </EntityType>
+        <EnumType Name="TipoRecurso" IsFlags="false" customannotation:ClrType="JKTurnos.Models.Entities.TipoRecurso, JKTurnos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" UnderlyingType="Int32">
+          <Member Name="Profesional" Value="0" />
+          <Member Name="Sala" Value="1" />
+          <Member Name="Equipo" Value="2" />
+          <Member Name="Cancha" Value="3" />
+          <Member Name="Consultorio" Value="4" />
+          <Member Name="Cabina" Value="5" />
+          <Member Name="Vehiculo" Value="6" />
+          <Member Name="Box" Value="7" />
+        </EnumType>
+        <Association Name="ConfiguracionTenant_Tenant">
+          <End Role="ConfiguracionTenant_Tenant_Source" Type="Self.ConfiguracionTenant" Multiplicity="*" />
+          <End Role="ConfiguracionTenant_Tenant_Target" Type="Self.Tenant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="ConfiguracionTenant_Tenant_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ConfiguracionTenant_Tenant_Source">
+              <PropertyRef Name="TenantId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Turno_Cliente">
+          <End Role="Turno_Cliente_Source" Type="Self.Turno" Multiplicity="*" />
+          <End Role="Turno_Cliente_Target" Type="Self.Cliente" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Turno_Cliente_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Turno_Cliente_Source">
+              <PropertyRef Name="ClienteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Turno_EstadoTurno">
+          <End Role="Turno_EstadoTurno_Source" Type="Self.Turno" Multiplicity="*" />
+          <End Role="Turno_EstadoTurno_Target" Type="Self.EstadoTurno" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Turno_EstadoTurno_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Turno_EstadoTurno_Source">
+              <PropertyRef Name="EstadoTurnoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Turno_Servicio">
+          <End Role="Turno_Servicio_Source" Type="Self.Turno" Multiplicity="*" />
+          <End Role="Turno_Servicio_Target" Type="Self.Servicio" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Turno_Servicio_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Turno_Servicio_Source">
+              <PropertyRef Name="ServicioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_Tenant">
+          <End Role="User_Tenant_Source" Type="Self.User" Multiplicity="*" />
+          <End Role="User_Tenant_Target" Type="Self.Tenant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="User_Tenant_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User_Tenant_Source">
+              <PropertyRef Name="TenantId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="JKContext" customannotation:UseClrTypes="true">
+          <EntitySet Name="Clientes" EntityType="Self.Cliente" />
+          <EntitySet Name="ConfiguracionesTenant" EntityType="Self.ConfiguracionTenant" />
+          <EntitySet Name="Tenants" EntityType="Self.Tenant" />
+          <EntitySet Name="EstadosTurno" EntityType="Self.EstadoTurno" />
+          <EntitySet Name="Recursos" EntityType="Self.Recurso" />
+          <EntitySet Name="Servicios" EntityType="Self.Servicio" />
+          <EntitySet Name="Turnos" EntityType="Self.Turno" />
+          <EntitySet Name="Users" EntityType="Self.User" />
+          <AssociationSet Name="ConfiguracionTenant_Tenant" Association="Self.ConfiguracionTenant_Tenant">
+            <End Role="ConfiguracionTenant_Tenant_Source" EntitySet="ConfiguracionesTenant" />
+            <End Role="ConfiguracionTenant_Tenant_Target" EntitySet="Tenants" />
+          </AssociationSet>
+          <AssociationSet Name="Turno_Cliente" Association="Self.Turno_Cliente">
+            <End Role="Turno_Cliente_Source" EntitySet="Turnos" />
+            <End Role="Turno_Cliente_Target" EntitySet="Clientes" />
+          </AssociationSet>
+          <AssociationSet Name="Turno_EstadoTurno" Association="Self.Turno_EstadoTurno">
+            <End Role="Turno_EstadoTurno_Source" EntitySet="Turnos" />
+            <End Role="Turno_EstadoTurno_Target" EntitySet="EstadosTurno" />
+          </AssociationSet>
+          <AssociationSet Name="Turno_Servicio" Association="Self.Turno_Servicio">
+            <End Role="Turno_Servicio_Source" EntitySet="Turnos" />
+            <End Role="Turno_Servicio_Target" EntitySet="Servicios" />
+          </AssociationSet>
+          <AssociationSet Name="User_Tenant" Association="Self.User_Tenant">
+            <End Role="User_Tenant_Source" EntitySet="Users" />
+            <End Role="User_Tenant_Target" EntitySet="Tenants" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </ConceptualModels>
+    <Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CodeFirstDatabase" CdmEntityContainer="JKContext">
+          <EntitySetMapping Name="Clientes">
+            <EntityTypeMapping TypeName="JKTurnos.Data.Cliente">
+              <MappingFragment StoreEntitySet="Cliente">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Direccion" ColumnName="Direccion" />
+                <ScalarProperty Name="Notas" ColumnName="Notas" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ConfiguracionesTenant">
+            <EntityTypeMapping TypeName="JKTurnos.Data.ConfiguracionTenant">
+              <MappingFragment StoreEntitySet="ConfiguracionTenant">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="NombreComercial" ColumnName="NombreComercial" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Direccion" ColumnName="Direccion" />
+                <ScalarProperty Name="LogoUrl" ColumnName="LogoUrl" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tenants">
+            <EntityTypeMapping TypeName="JKTurnos.Data.Tenant">
+              <MappingFragment StoreEntitySet="Tenant">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Subdominio" ColumnName="Subdominio" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EstadosTurno">
+            <EntityTypeMapping TypeName="JKTurnos.Data.EstadoTurno">
+              <MappingFragment StoreEntitySet="EstadoTurno">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Recursos">
+            <EntityTypeMapping TypeName="JKTurnos.Data.Recurso">
+              <MappingFragment StoreEntitySet="Recurso">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Servicios">
+            <EntityTypeMapping TypeName="JKTurnos.Data.Servicio">
+              <MappingFragment StoreEntitySet="Servicio">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="Precio" ColumnName="Precio" />
+                <ScalarProperty Name="DuracionMinutos" ColumnName="DuracionMinutos" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Turnos">
+            <EntityTypeMapping TypeName="JKTurnos.Data.Turno">
+              <MappingFragment StoreEntitySet="Turno">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="ClienteId" ColumnName="ClienteId" />
+                <ScalarProperty Name="ServicioId" ColumnName="ServicioId" />
+                <ScalarProperty Name="EstadoTurnoId" ColumnName="EstadoTurnoId" />
+                <ScalarProperty Name="FechaHoraInicio" ColumnName="FechaHoraInicio" />
+                <ScalarProperty Name="FechaHoraFin" ColumnName="FechaHoraFin" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="JKTurnos.Data.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="TenantId" ColumnName="TenantId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </Mappings>
+    <StorageModels>
+      <Schema Namespace="CodeFirstDatabaseSchema" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Cliente">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenantId" Type="int" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="120" Nullable="false" />
+          <Property Name="Telefono" Type="nvarchar" MaxLength="50" Nullable="true" />
+          <Property Name="Email" Type="nvarchar" MaxLength="120" Nullable="true" />
+          <Property Name="Direccion" Type="nvarchar" MaxLength="250" Nullable="true" />
+          <Property Name="Notas" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ConfiguracionTenant">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenantId" Type="int" customannotation:Index="{ Name: IX_TenantId, Order: 0 }" Nullable="false" />
+          <Property Name="NombreComercial" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Telefono" Type="nvarchar" MaxLength="50" Nullable="true" />
+          <Property Name="Email" Type="nvarchar" MaxLength="150" Nullable="true" />
+          <Property Name="Direccion" Type="nvarchar" MaxLength="250" Nullable="true" />
+          <Property Name="LogoUrl" Type="nvarchar" MaxLength="500" Nullable="true" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Tenant">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Subdominio" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EstadoTurno">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenantId" Type="int" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Color" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Recurso">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenantId" Type="int" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Descripcion" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Tipo" Type="int" Nullable="false" />
+          <Property Name="Color" Type="nvarchar" MaxLength="7" Nullable="true" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Servicio">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenantId" Type="int" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Descripcion" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Precio" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="DuracionMinutos" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Turno">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenantId" Type="int" Nullable="false" />
+          <Property Name="ClienteId" Type="int" customannotation:Index="{ Name: IX_ClienteId, Order: 0 }" Nullable="false" />
+          <Property Name="ServicioId" Type="int" customannotation:Index="{ Name: IX_ServicioId, Order: 0 }" Nullable="false" />
+          <Property Name="EstadoTurnoId" Type="int" customannotation:Index="{ Name: IX_EstadoTurnoId, Order: 0 }" Nullable="false" />
+          <Property Name="FechaHoraInicio" Type="datetime" Nullable="false" />
+          <Property Name="FechaHoraFin" Type="datetime" Nullable="false" />
+          <Property Name="Observaciones" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="PasswordHash" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Nombre" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Role" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="TenantId" Type="int" customannotation:Index="{ Name: IX_TenantId, Order: 0 }" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="ConfiguracionTenant_Tenant">
+          <End Role="Tenant" Type="Self.Tenant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ConfiguracionTenant" Type="Self.ConfiguracionTenant" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tenant">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ConfiguracionTenant">
+              <PropertyRef Name="TenantId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Turno_Cliente">
+          <End Role="Cliente" Type="Self.Cliente" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Turno" Type="Self.Turno" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cliente">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Turno">
+              <PropertyRef Name="ClienteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Turno_EstadoTurno">
+          <End Role="EstadoTurno" Type="Self.EstadoTurno" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Turno" Type="Self.Turno" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadoTurno">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Turno">
+              <PropertyRef Name="EstadoTurnoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Turno_Servicio">
+          <End Role="Servicio" Type="Self.Servicio" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Turno" Type="Self.Turno" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Servicio">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Turno">
+              <PropertyRef Name="ServicioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_Tenant">
+          <End Role="Tenant" Type="Self.Tenant" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tenant">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="TenantId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CodeFirstDatabase">
+          <EntitySet Name="Cliente" EntityType="Self.Cliente" Schema="dbo" Table="Clientes" />
+          <EntitySet Name="ConfiguracionTenant" EntityType="Self.ConfiguracionTenant" Schema="dbo" Table="ConfiguracionTenants" />
+          <EntitySet Name="Tenant" EntityType="Self.Tenant" Schema="dbo" Table="Tenants" />
+          <EntitySet Name="EstadoTurno" EntityType="Self.EstadoTurno" Schema="dbo" Table="EstadoTurnoes" />
+          <EntitySet Name="Recurso" EntityType="Self.Recurso" Schema="dbo" Table="Recursoes" />
+          <EntitySet Name="Servicio" EntityType="Self.Servicio" Schema="dbo" Table="Servicios" />
+          <EntitySet Name="Turno" EntityType="Self.Turno" Schema="dbo" Table="Turnoes" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" Table="Users" />
+          <AssociationSet Name="ConfiguracionTenant_Tenant" Association="Self.ConfiguracionTenant_Tenant">
+            <End Role="Tenant" EntitySet="Tenant" />
+            <End Role="ConfiguracionTenant" EntitySet="ConfiguracionTenant" />
+          </AssociationSet>
+          <AssociationSet Name="Turno_Cliente" Association="Self.Turno_Cliente">
+            <End Role="Cliente" EntitySet="Cliente" />
+            <End Role="Turno" EntitySet="Turno" />
+          </AssociationSet>
+          <AssociationSet Name="Turno_EstadoTurno" Association="Self.Turno_EstadoTurno">
+            <End Role="EstadoTurno" EntitySet="EstadoTurno" />
+            <End Role="Turno" EntitySet="Turno" />
+          </AssociationSet>
+          <AssociationSet Name="Turno_Servicio" Association="Self.Turno_Servicio">
+            <End Role="Servicio" EntitySet="Servicio" />
+            <End Role="Turno" EntitySet="Turno" />
+          </AssociationSet>
+          <AssociationSet Name="User_Tenant" Association="Self.User_Tenant">
+            <End Role="Tenant" EntitySet="Tenant" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </StorageModels>
+  </Runtime>
+  <Designer>
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="ProcessDependentTemplatesOnSave" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <Diagrams />
+  </Designer>
+</Edmx>
