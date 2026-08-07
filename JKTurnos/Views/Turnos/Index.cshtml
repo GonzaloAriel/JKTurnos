@@ -1,0 +1,65 @@
+@model List<JKTurnos.Models.Entities.Turno>
+
+@helper ListContent() {
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Fecha/Hora</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Recurso</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FechaHoraInicio.ToString("dd/MM HH:mm")</td>
+                            <td>@item.Cliente.Nombre</td>
+                            <td>@item.Servicio.Nombre</td>
+                            <td>@item.Recurso.Nombre</td>
+                            <td><span class="jk-badge">@item.EstadoTurno.Nombre</span></td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                    new ViewDataDictionary {
+                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                        { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
+                                        { "Compact", false }
+                                    })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@helper EmptyContent() {
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "calendar" },
+            { "Title", "No tienes turnos" },
+            { "Description", "Crea tu primer turno para comenzar a gestionar tu agenda." },
+            { "ActionText", "Crear Turno" },
+            { "ActionUrl", Url.Action("Create") }
+        })
+}
+
+@{
+    ViewBag.Title = "Turnos";
+    ViewBag.Subtitle = "Administra tus turnos";
+    ViewBag.PrimaryAction = Url.Action("Create");
+    ViewBag.PrimaryActionLabel = "Nuevo Turno";
+    ViewBag.SearchPlaceholder = "Buscar turnos...";
+    ViewBag.SearchId = "search-turnos";
+
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")

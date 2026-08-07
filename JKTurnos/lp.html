@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - JKTurnos</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link href="/Content/bootstrap.css" rel="stylesheet"/>
+<link href="/Content/site.css" rel="stylesheet"/>
+
+    
+    <!-- JK Design System v1 (existing, will be phased out) -->
+    <link href="/Content/jk-components.css" rel="stylesheet" />
+    <link href="/Content/jk-layout.css" rel="stylesheet" />
+    <link href="/Content/jk-dashboard.css" rel="stylesheet" />
+
+    <!-- JK Design System v2 (progressive migration) -->
+    <link href="/Content/DesignSystem/jk-tokens.css" rel="stylesheet" />
+    <link href="/Content/DesignSystem/jk-base.css" rel="stylesheet" />
+    <link href="/Content/DesignSystem/jk-layout.css" rel="stylesheet" />
+    <link href="/Content/DesignSystem/jk-components.css" rel="stylesheet" />
+    <link href="/Content/DesignSystem/jk-utilities.css" rel="stylesheet" />
+
+    <!-- Page-specific styles -->
+</head>
+<body>
+    <div class="app-container jk-app-shell" id="app-container">
+        <nav id="sidebar"
+     class="jk-sidebar d-flex flex-column"
+     role="navigation"
+     aria-label="Menu principal"
+     data-collapsed="false">
+    <div class="jk-sidebar-header">
+        <a href="/" class="jk-sidebar-brand">
+            <i class="bi bi-calendar-check jk-sidebar-brand-icon"></i>
+            <span class="jk-sidebar-name">JKTurnos</span>
+        </a>
+        <span class="jk-sidebar-subtitle">Asistente de tiempo</span>
+    </div>
+
+    <div class="jk-sidebar-menu flex-grow-1">
+        <div class="jk-nav-group">
+            <span class="jk-nav-label">Principal</span>
+            <a href="/"
+               class="jk-nav-item "
+               data-sidebar-item
+               >
+                <i class="bi bi-house-door"></i>
+                <span>Command Center</span>
+            </a>
+            <a href="/Turnos/Agenda"
+               class="jk-nav-item "
+               data-sidebar-item
+               >
+                <i class="bi bi-calendar3"></i>
+                <span>Mi Agenda</span>
+            </a>
+        </div>
+
+        <div class="jk-nav-group">
+            <span class="jk-nav-label">Gestion</span>
+            <a href="/Clientes"
+               class="jk-nav-item "
+               data-sidebar-item
+               >
+                <i class="bi bi-people"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="/Servicios"
+               class="jk-nav-item "
+               data-sidebar-item
+               >
+                <i class="bi bi-briefcase"></i>
+                <span>Servicios</span>
+            </a>
+            <a href="/Recursos"
+               class="jk-nav-item "
+               data-sidebar-item
+               >
+                <i class="bi bi-person-badge"></i>
+                <span>Recursos</span>
+            </a>
+        </div>
+
+        <div class="jk-nav-group">
+            <span class="jk-nav-label">Configuracion</span>
+            <a href="#" class="jk-nav-item" data-sidebar-item>
+                <i class="bi bi-gear"></i>
+                <span>Negocio</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="jk-sidebar-footer">
+        <button class="jk-nav-collapse"
+                id="sidebar-collapse-toggle"
+                type="button"
+                aria-label="Colapsar sidebar"
+                title="Colapsar sidebar">
+            <i class="bi bi-chevron-left"></i>
+            <span>Colapsar</span>
+        </button>
+        <a href="/Account/Logout" class="jk-nav-item jk-nav-item-logout" data-sidebar-item>
+            <i class="bi bi-box-arrow-left"></i>
+            <span>Cerrar Sesion</span>
+        </a>
+    </div>
+</nav>
+
+        
+        <div class="jk-sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+        
+        <div id="main-content">
+            <header id="topbar" class="jk-topbar">
+    <div class="jk-topbar-left">
+        <button class="jk-topbar-toggle d-xl-none"
+                id="mobile-menu-toggle"
+                type="button"
+                aria-label="Abrir menu"
+                aria-controls="sidebar"
+                aria-expanded="false">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="jk-topbar-title">JKTurnos</span>
+    </div>
+
+    <div class="jk-topbar-right">
+        <button class="jk-btn-icon" aria-label="Notificaciones">
+            <i class="bi bi-bell"></i>
+        </button>
+        <div class="jk-topbar-user">
+            <div class="jk-avatar">
+
+                ?
+            </div>
+            <span class="jk-topbar-username"></span>
+        </div>
+    </div>
+</header>
+
+            
+            <main class="content-area jk-content-zone">
+                
+
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-4">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h4>JKTurnos</h4>
+                </div>
+
+                <div class="card-body">
+
+<form action="/Account/Login" method="post"><input name="__RequestVerificationToken" type="hidden" value="ghUJN4hUrbJkedAQmT0jQu03u_Shj3RTWcvEwJ7ZyxyotNl-sPLu34W0bKqjUH9E402xRsDtoDtiTorTDtkHcMkLgvMbmqjkZIV3Orkhvfc1" />                        <div class="mb-3">
+                            <label for="Email">Email</label>
+                            <input class="form-control" data-val="true" data-val-required="El campo Email es obligatorio." id="Email" name="Email" type="text" value="" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="Password">Password</label>
+                            <input class="form-control" data-val="true" data-val-required="El campo Password es obligatorio." id="Password" name="Password" type="password" />
+                        </div>
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            Ingresar
+
+                        </button>
+</form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/Scripts/jquery-3.7.0.js"></script>
+
+    <script src="/Scripts/bootstrap.js"></script>
+
+    <script src="/Scripts/jk-layout.js"></script>
+    
+</body>
+</html>

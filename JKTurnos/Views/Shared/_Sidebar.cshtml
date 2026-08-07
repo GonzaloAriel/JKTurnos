@@ -22,9 +22,9 @@
                 <span>Command Center</span>
             </a>
             <a href="@Url.Action("Agenda", "Turnos")"
-               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" ? "active" : "")"
+               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Agenda" ? "active" : "")"
                data-sidebar-item
-               @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" ? "aria-current=\"page\"" : "")>
+               @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Agenda" ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-calendar3"></i>
                 <span>Mi Agenda</span>
             </a>
@@ -32,6 +32,13 @@
 
         <div class="jk-nav-group">
             <span class="jk-nav-label">Gestion</span>
+            <a href="@Url.Action("Index", "Turnos")"
+               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")"
+               data-sidebar-item
+               @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "aria-current=\"page\"" : "")>
+                <i class="bi bi-calendar-event"></i>
+                <span>Turnos</span>
+            </a>
             <a href="@Url.Action("Index", "Clientes")"
                class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Clientes" ? "active" : "")"
                data-sidebar-item

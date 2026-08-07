@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Entity;
 using JKTurnos.Data;
 using JKTurnos.Models.Entities;
 
@@ -22,13 +23,22 @@ namespace JKTurnos.Services
         public List<Turno> GetAll()
         {
             return _repo.GetAll()
+                        .Include(t => t.Cliente)
+                        .Include(t => t.Servicio)
+                        .Include(t => t.Recurso)
+                        .Include(t => t.EstadoTurno)
                         .OrderBy(x => x.FechaHoraInicio)
                         .ToList();
         }
 
         public Turno GetById(int id)
         {
-            return _repo.GetById(id);
+            return _repo.GetAll()
+                        .Include(t => t.Cliente)
+                        .Include(t => t.Servicio)
+                        .Include(t => t.Recurso)
+                        .Include(t => t.EstadoTurno)
+                        .FirstOrDefault(x => x.Id == id);
         }
 
         public DateTime CalcularFin(DateTime inicio, int servicioId)

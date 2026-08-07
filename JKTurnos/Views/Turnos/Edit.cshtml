@@ -1,0 +1,51 @@
+@model JKTurnos.Models.ViewModels.TurnoViewModel
+
+@helper FormContent() {
+    @Html.HiddenFor(m => m.Id)
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.ClienteId)">@Html.DisplayNameFor(m => m.ClienteId)</label>
+        @Html.DropDownListFor(m => m.ClienteId, Model.Clientes, "Seleccione un cliente", new { @class = "jk-input" })
+        @Html.ValidationMessageFor(m => m.ClienteId, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.ServicioId)">@Html.DisplayNameFor(m => m.ServicioId)</label>
+        @Html.DropDownListFor(m => m.ServicioId, Model.Servicios, "Seleccione un servicio", new { @class = "jk-input" })
+        @Html.ValidationMessageFor(m => m.ServicioId, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.RecursoId)">@Html.DisplayNameFor(m => m.RecursoId)</label>
+        @Html.DropDownListFor(m => m.RecursoId, Model.Recursos, "Seleccione un recurso", new { @class = "jk-input" })
+        @Html.ValidationMessageFor(m => m.RecursoId, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.EstadoTurnoId)">@Html.DisplayNameFor(m => m.EstadoTurnoId)</label>
+        @Html.DropDownListFor(m => m.EstadoTurnoId, Model.EstadosTurno, "Seleccione un estado", new { @class = "jk-input" })
+        @Html.ValidationMessageFor(m => m.EstadoTurnoId, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.FechaHoraInicio)">@Html.DisplayNameFor(m => m.FechaHoraInicio)</label>
+        @Html.TextBoxFor(m => m.FechaHoraInicio, new { @class = "jk-input", type = "datetime-local" })
+        @Html.ValidationMessageFor(m => m.FechaHoraInicio, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Observaciones)">@Html.DisplayNameFor(m => m.Observaciones)</label>
+        @Html.TextAreaFor(m => m.Observaciones, new { @class = "jk-input", placeholder = "Notas adicionales" })
+        @Html.ValidationMessageFor(m => m.Observaciones, "", new { @class = "jk-field-error" })
+    </div>
+}
+
+@{
+    ViewBag.Title = "Editar Turno";
+    ViewBag.Subtitle = "Modifica los datos del turno";
+    ViewBag.SubmitText = "Guardar Cambios";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

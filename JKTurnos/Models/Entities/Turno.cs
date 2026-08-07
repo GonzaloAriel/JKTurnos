@@ -10,6 +10,8 @@ namespace JKTurnos.Models.Entities
 
         public int ServicioId { get; set; }
 
+        public int RecursoId { get; set; }
+
         public int EstadoTurnoId { get; set; }
 
         public DateTime FechaHoraInicio { get; set; }
@@ -23,5 +25,7 @@ namespace JKTurnos.Models.Entities
         public virtual Servicio Servicio { get; set; }
 
         public virtual EstadoTurno EstadoTurno { get; set; }
+
+        public virtual Recurso Recurso { get; set; }
     }
 }
