@@ -187,6 +187,7 @@ namespace JKTurnos.Migrations
                 .FirstOrDefault(x => x.Nombre == "Pendiente" && x.TenantId == tenant.Id);
             var estadoConfirmado = context.EstadosTurno
                 .FirstOrDefault(x => x.Nombre == "Confirmado" && x.TenantId == tenant.Id);
+            var recurso = context.Recursos.FirstOrDefault(x => x.TenantId == tenant.Id);
             var hoy = DateTime.Today;
 
             var turnosDemo = new[]
@@ -222,7 +223,7 @@ namespace JKTurnos.Migrations
                 var cliente = context.Clientes.FirstOrDefault(x => x.Email == t.ClienteEmail && x.TenantId == tenant.Id);
                 var servicio = context.Servicios.FirstOrDefault(x => x.Nombre == t.ServicioNombre && x.TenantId == tenant.Id);
 
-                if (cliente == null || servicio == null || t.Estado == null)
+                if (cliente == null || servicio == null || t.Estado == null || recurso == null)
                     continue;
 
                 var existeTurno = context.Turnos.Any(x =>
@@ -238,6 +239,7 @@ namespace JKTurnos.Migrations
                         TenantId = tenant.Id,
                         ClienteId = cliente.Id,
                         ServicioId = servicio.Id,
+                        RecursoId = recurso.Id,
                         EstadoTurnoId = t.Estado.Id,
                         FechaHoraInicio = t.HoraInicio,
                         FechaHoraFin = t.HoraFin,
