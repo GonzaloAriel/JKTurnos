@@ -1,61 +1,165 @@
 @*
     JKTurnos - Agenda Grid Component
     Grilla de calendario con columna de horas sticky y fila de recursos sticky.
+    Renderiza los Time Blocks de los turnos del dia seleccionado (server-side).
+    Todos los items usan posicionamiento explicito (grid-row/grid-column) para que
+    los Time Blocks se superpongan a las celdas sin desplazarlas (no hay auto-placement).
 *@
 
+@model JKTurnos.Models.ViewModels.AgendaViewModel
+@using JKTurnos.Models.Entities
+
 @{
-    string[] demoResources = new[] { "Dr. Juan", "Consultorio A", "Sala 1" };
-    string[] demoColors = new[] { "#2563eb", "#34c759", "#ff9500" };
-    int resourceCount = demoResources.Length;
+    var recursos = Model.Recursos != null ? Model.Recursos.ToList() : new List<Recurso>();
+    var turnos = Model.Turnos != null ? Model.Turnos.ToList() : new List<Turno>();
+    var fecha = Model.Fecha;
+
+    var gridInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, 8, 0, 0);
+    var gridFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, 19, 30, 0);
+    int franjaMinutos = 30;
+    int filasFranja = 24;
+    int filasTotal = filasFranja + 1;
 
     var hours = new List<string>();
     for (int h = 8; h <= 19; h++)
     {
         hours.Add(h.ToString("D2") + ":00");
-        if (h < 19) { hours.Add(h.ToString("D2") + ":30"); }
+        hours.Add(h.ToString("D2") + ":30");
     }
     int hourCount = hours.Count;
+
+    var columnaRecurso = new Dictionary<int, int>();
+    for (int i = 0; i < recursos.Count; i++)
+    {
+        columnaRecurso[recursos[i].Id] = i;
+    }
 }
 
-<div class="jk-agenda-grid-wrap" role="grid" aria-label="Grilla de agenda">
-    <div class="jk-agenda-grid" style="--jk-resource-count: @resourceCount;">
+@if (recursos.Count == 0)
+{
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "collection" },
+            { "Title", "Necesitas agregar al menos un recurso" },
+            { "Description", "Sin recursos no puedes reservar turnos. Crea tu primer recurso para comenzar." },
+            { "ActionText", "Crear Recurso" },
+            { "ActionUrl", Url.Action("Create", "Recursos") }
+        })
+}
+else
+{
+    <div class="jk-agenda-grid-wrap" role="grid" aria-label="Grilla de agenda">
+        <div class="jk-agenda-grid" style="--jk-resource-count: @recursos.Count;">
 
-        @* Corner cell *@
-        <div class="jk-agenda-corner" role="presentation"></div>
+            @* Corner cell (fila 1, columna 1) *@
+            <div class="jk-agenda-corner" style="grid-row: 1; grid-column: 1;" role="presentation"></div>
 
-        @* Resource headers *@
-        @for (int i = 0; i < resourceCount; i++)
-        {
-            <div class="jk-agenda-resource-header" role="columnheader" aria-label="@demoResources[i]">
-                <span class="jk-agenda-resource-dot" style="background-color: @demoColors[i]"></span>
-                <span class="jk-agenda-resource-name">@demoResources[i]</span>
-            </div>
-        }
-
-        @* Hour rows *@
-        @for (int h = 0; h < hourCount; h++)
-        {
-            var hour = hours[h];
-
-            <div class="jk-agenda-hour" role="rowheader" aria-label="@hour">
-                @if (hour.EndsWith(":00"))
-                {
-                    <span class="jk-agenda-hour-text">@hour</span>
-                }
-            </div>
-
-            for (int i = 0; i < resourceCount; i++)
+            @* Resource headers (fila 1) *@
+            @for (int i = 0; i < recursos.Count; i++)
             {
-                if (hour.EndsWith(":00"))
+                var rec = recursos[i];
+                <div class="jk-agenda-resource-header" style="grid-row: 1; grid-column: @(i + 2);" role="columnheader" aria-label="@rec.Nombre">
+                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb")"></span>
+                    <span class="jk-agenda-resource-name">@rec.Nombre</span>
+                </div>
+            }
+
+            @* Hour rows + cells (filas 2..25) *@
+            @for (int h = 0; h < hourCount; h++)
+            {
+                var hour = hours[h];
+                int fila = h + 2;
+
+                <div class="jk-agenda-hour" style="grid-row: @fila; grid-column: 1;" role="rowheader" aria-label="@hour">
+                    @if (hour.EndsWith(":00"))
+                    {
+                        <span class="jk-agenda-hour-text">@hour</span>
+                    }
+                </div>
+
+                for (int i = 0; i < recursos.Count; i++)
                 {
-                    @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" role="gridcell" data-hour="@hour" aria-label="@demoResources[i] @hour"></div>
-                }
-                else
-                {
-                    @:<div class="jk-agenda-cell" role="gridcell" data-hour="@hour" aria-label="@demoResources[i] @hour"></div>
+                    var rec = recursos[i];
+                    if (hour.EndsWith(":00"))
+                    {
+                        @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
+                    }
+                    else
+                    {
+                        @:<div class="jk-agenda-cell" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
+                    }
                 }
             }
-        }
 
+            @* Time blocks (overlay: se superponen a las celdas de su columna) *@
+            @foreach (var t in turnos)
+            {
+                int colIdx;
+                if (!columnaRecurso.TryGetValue(t.RecursoId, out colIdx))
+                {
+                    continue;
+                }
+
+                var inicio = t.FechaHoraInicio < gridInicio ? gridInicio : t.FechaHoraInicio;
+                var fin = t.FechaHoraFin > gridFin ? gridFin : t.FechaHoraFin;
+                if (inicio >= gridFin || fin <= inicio)
+                {
+                    continue;
+                }
+
+                int franjaInicio = (int)Math.Floor((inicio - gridInicio).TotalMinutes / franjaMinutos);
+                int franjaSpan = Math.Max(1, (int)Math.Ceiling((fin - inicio).TotalMinutes / franjaMinutos));
+
+                if (franjaInicio >= filasFranja)
+                {
+                    continue;
+                }
+                if (franjaInicio + franjaSpan > filasFranja)
+                {
+                    franjaSpan = filasFranja - franjaInicio;
+                }
+
+                int durationSlots = franjaSpan;
+
+                int gridRowStart = franjaInicio + 2;
+                int gridRowEnd = gridRowStart + franjaSpan;
+                int gridColumn = colIdx + 2;
+
+                var recurso = recursos[colIdx];
+                var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Sin cliente";
+                var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Sin servicio";
+                var recursoColor = recurso.Color ?? "#2563eb";
+                var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
+                var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
+
+                <div class="jk-agenda-time-block@(durationSlots == 1 ? " is-compact" : "")"
+                     role="button"
+                     tabindex="0"
+                     data-turno-id="@t.Id"
+                     style="grid-column: @gridColumn; grid-row: @gridRowStart / @gridRowEnd; --jk-block-color: @recursoColor;"
+                     aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
+                    <div class="jk-agenda-time-block-band">
+                        <span class="jk-agenda-time-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
+                        <span class="jk-agenda-time-block-menu" aria-hidden="true"><i class="bi bi-three-dots"></i></span>
+                    </div>
+                    <div class="jk-agenda-time-block-body">
+                        <div class="jk-agenda-time-block-title">
+                            <span class="jk-agenda-time-block-status" title="@estadoNombre" style="--jk-status-color: @(estadoColor ?? "#aeaeb2")"><i class="bi bi-circle-fill"></i></span>
+                            <span class="jk-agenda-time-block-client">@clienteNombre</span>
+                        </div>
+                        <span class="jk-agenda-time-block-service">@servicioNombre</span>
+                    </div>
+                </div>
+            }
+
+        </div>
     </div>
-</div>
+
+    if (turnos.Count == 0)
+    {
+        <div class="jk-agenda-empty-day">
+            <span class="jk-agenda-empty-day-text">No tienes turnos hoy</span>
+            <a href="@Url.Action("Create", "Turnos")" class="jk-btn jk-btn-primary jk-btn-sm">Reservar turno</a>
+        </div>
+    }
+}

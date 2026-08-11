@@ -516,6 +516,10 @@
     <Content Include="Views\Recursos\Edit.cshtml" />
     <Content Include="Views\Recursos\Index.cshtml" />
     <Content Include="Views\Turnos\Agenda.cshtml" />
+    <Content Include="Views\Turnos\Create.cshtml" />
+    <Content Include="Views\Turnos\Delete.cshtml" />
+    <Content Include="Views\Turnos\Edit.cshtml" />
+    <Content Include="Views\Turnos\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

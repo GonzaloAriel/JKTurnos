@@ -28,13 +28,21 @@ namespace JKTurnos.Controllers
 
         public ActionResult Agenda()
         {
-            var today = DateTime.Now;
+            var hoy = DateTime.Today;
+
+            var model = new AgendaViewModel
+            {
+                Fecha = hoy,
+                Recursos = _recursoService.GetAll(),
+                Turnos = _turnoService.GetTurnosDelDia(hoy),
+                Estados = _estadoRepo.GetAll().ToList()
+            };
 
             var dayNames = new[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
             var monthNames = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
-            ViewBag.CurrentDateDisplay = dayNames[(int)today.DayOfWeek] + " " + today.Day + " " + monthNames[today.Month - 1] + ", " + today.Year;
+            ViewBag.CurrentDateDisplay = dayNames[(int)hoy.DayOfWeek] + " " + hoy.Day + " " + monthNames[hoy.Month - 1] + ", " + hoy.Year;
 
-            return View();
+            return View(model);
         }
 
         // GET: Turnos

@@ -1,10 +1,14 @@
 @*
     JKTurnos - Agenda Toolbar Component
-    Navigation temporal + selector de vista + filtro de recursos.
+    Navegacion temporal + selector de vista + filtro de recursos.
 *@
+
+@model JKTurnos.Models.ViewModels.AgendaViewModel
+@using JKTurnos.Models.Entities
 
 @{
     string dateDisplay = ViewBag.CurrentDateDisplay ?? "";
+    var recursos = Model.Recursos != null ? Model.Recursos.ToList() : new List<Recurso>();
 }
 
 <div class="jk-agenda-toolbar" role="toolbar" aria-label="Navegacion de agenda">
@@ -35,23 +39,19 @@
     </div>
 </div>
 
-<div class="jk-agenda-filters" role="group" aria-label="Filtro de recursos">
-    <span class="jk-agenda-filter-label">Recursos:</span>
-    <div class="jk-agenda-filter-list">
-        <label class="jk-agenda-filter-item">
-            <input type="checkbox" checked aria-checked="true" />
-            <span class="jk-agenda-resource-dot" style="background-color: #2563eb"></span>
-            <span class="jk-agenda-resource-name">Dr. Juan</span>
-        </label>
-        <label class="jk-agenda-filter-item">
-            <input type="checkbox" checked aria-checked="true" />
-            <span class="jk-agenda-resource-dot" style="background-color: #34c759"></span>
-            <span class="jk-agenda-resource-name">Consultorio A</span>
-        </label>
-        <label class="jk-agenda-filter-item">
-            <input type="checkbox" checked aria-checked="true" />
-            <span class="jk-agenda-resource-dot" style="background-color: #ff9500"></span>
-            <span class="jk-agenda-resource-name">Sala 1</span>
-        </label>
+@if (recursos.Count > 0)
+{
+    <div class="jk-agenda-filters" role="group" aria-label="Filtro de recursos">
+        <span class="jk-agenda-filter-label">Recursos:</span>
+        <div class="jk-agenda-filter-list">
+            @foreach (var rec in recursos)
+            {
+                <label class="jk-agenda-filter-item">
+                    <input type="checkbox" checked aria-checked="true" data-recurso-id="@rec.Id" />
+                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb")"></span>
+                    <span class="jk-agenda-resource-name">@rec.Nombre</span>
+                </label>
+            }
+        </div>
     </div>
-</div>
+}

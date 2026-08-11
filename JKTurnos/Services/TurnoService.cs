@@ -41,6 +41,21 @@ namespace JKTurnos.Services
                         .FirstOrDefault(x => x.Id == id);
         }
 
+        public List<Turno> GetTurnosDelDia(DateTime fecha)
+        {
+            var inicioDelDia = fecha.Date;
+            var finDelDia = inicioDelDia.AddDays(1);
+
+            return _repo.GetAll()
+                        .Include(t => t.Cliente)
+                        .Include(t => t.Servicio)
+                        .Include(t => t.Recurso)
+                        .Include(t => t.EstadoTurno)
+                        .Where(t => t.FechaHoraInicio < finDelDia && t.FechaHoraFin > inicioDelDia)
+                        .OrderBy(t => t.FechaHoraInicio)
+                        .ToList();
+        }
+
         public DateTime CalcularFin(DateTime inicio, int servicioId)
         {
             var servicio = _servicioRepo.GetById(servicioId);
