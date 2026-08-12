@@ -15,6 +15,7 @@ namespace JKTurnos.Controllers
         private readonly ClienteService _clienteService;
         private readonly ServicioService _servicioService;
         private readonly RecursoService _recursoService;
+        private readonly RecursoServicioService _recursoServicioService;
         private readonly BaseRepository<EstadoTurno> _estadoRepo;
 
         public TurnosController()
@@ -23,7 +24,26 @@ namespace JKTurnos.Controllers
             _clienteService = new ClienteService();
             _servicioService = new ServicioService();
             _recursoService = new RecursoService();
+            _recursoServicioService = new RecursoServicioService();
             _estadoRepo = new BaseRepository<EstadoTurno>();
+        }
+
+        public JsonResult GetRecursosPorServicio(int servicioId)
+        {
+            var recursoIds = _recursoServicioService.GetRecursoIdsPorServicio(servicioId);
+            var recursos = _recursoService.GetAll()
+                .Where(r => recursoIds.Contains(r.Id))
+                .Select(r => new { r.Id, r.Nombre });
+            return Json(recursos, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetServiciosPorRecurso(int recursoId)
+        {
+            var servicioIds = _recursoServicioService.GetServicioIdsPorRecurso(recursoId);
+            var servicios = _servicioService.GetAll()
+                .Where(s => servicioIds.Contains(s.Id))
+                .Select(s => new { s.Id, s.Nombre });
+            return Json(servicios, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Agenda()

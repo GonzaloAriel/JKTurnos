@@ -1,21 +1,22 @@
-@using System.Collections.Generic
-@using System.Linq
-
-@functions {
-    public static IEnumerable<KeyValuePair<string, string>> GetColorOptions()
+@functions
+{
+    public IEnumerable<KeyValuePair<string, string>> GetColorOptions()
     {
-        yield return new KeyValuePair<string, string>("Azul", "#2563EB");
-        yield return new KeyValuePair<string, string>("Verde", "#34C759");
-        yield return new KeyValuePair<string, string>("Rojo", "#FF3B30");
-        yield return new KeyValuePair<string, string>("Naranja", "#FF9500");
-        yield return new KeyValuePair<string, string>("Amarillo", "#FFCC00");
-        yield return new KeyValuePair<string, string>("Violeta", "#AF52DE");
-        yield return new KeyValuePair<string, string>("Rosa", "#FF2D55");
-        yield return new KeyValuePair<string, string>("Turquesa", "#40E0D0");
-        yield return new KeyValuePair<string, string>("Gris", "#8E8E93");
-        yield return new KeyValuePair<string, string>("Marron", "#A2845E");
-        yield return new KeyValuePair<string, string>("Indigo", "#5856D6");
-        yield return new KeyValuePair<string, string>("Cian", "#00C7BE");
+        return new List<KeyValuePair<string, string>>
+        {
+            new KeyValuePair<string, string>("Azul", "#2563EB"),
+            new KeyValuePair<string, string>("Verde", "#34C759"),
+            new KeyValuePair<string, string>("Rojo", "#FF3B30"),
+            new KeyValuePair<string, string>("Naranja", "#FF9500"),
+            new KeyValuePair<string, string>("Amarillo", "#FFCC00"),
+            new KeyValuePair<string, string>("Violeta", "#AF52DE"),
+            new KeyValuePair<string, string>("Rosa", "#FF2D55"),
+            new KeyValuePair<string, string>("Turquesa", "#40E0D0"),
+            new KeyValuePair<string, string>("Gris", "#8E8E93"),
+            new KeyValuePair<string, string>("Marron", "#A2845E"),
+            new KeyValuePair<string, string>("Indigo", "#5856D6"),
+            new KeyValuePair<string, string>("Cian", "#00C7BE")
+        };
     }
 }
 
@@ -156,14 +157,14 @@
 </style>
 
 <div class="jk-color-selector">
-    @Html.Hidden("Color", colorValue, new { @class = "jk-color-hidden" })
+    @Html.Hidden("Recurso.Color", colorValue, new { @class = "jk-color-hidden" })
 
     <button type="button"
             class="jk-color-trigger"
             aria-haspopup="listbox"
             aria-expanded="false">
         <span class="jk-color-preview">
-            <span class="jk-color-preview-swatch" style="background-color:@colorValue;"></span>
+            <span class="jk-color-preview-swatch" style="background-color: @colorValue;"></span>
             <span class="jk-color-preview-label">Seleccionar color</span>
         </span>
         <i class="bi bi-chevron-down"></i>
@@ -196,7 +197,7 @@
             var options = selector.querySelectorAll('.jk-color-option');
             var previewSwatch = selector.querySelector('.jk-color-preview-swatch');
             var previewLabel = selector.querySelector('.jk-color-preview-label');
-            var hiddenInput = selector.querySelector('input.jk-color-hidden');
+            var hiddenInput = selector.querySelector('.jk-color-hidden');
 
             function selectOption(option) {
                 var color = option.getAttribute('data-color');

@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using System.Data.Entity;
 using JKTurnos.Models.Entities;
 
 namespace JKTurnos.Data
@@ -20,5 +20,6 @@ namespace JKTurnos.Data
         public DbSet<Turno> Turnos { get; set; }
         public DbSet<EstadoTurno> EstadosTurno { get; set; }
         public DbSet<Recurso> Recursos { get; set; }
+        public DbSet<RecursoServicio> RecursoServicios { get; set; }
     }
 }

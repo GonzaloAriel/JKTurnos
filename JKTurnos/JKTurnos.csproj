@@ -178,12 +178,21 @@
     <Compile Include="Migrations\202607230115410_InitialCreate.Designer.cs">
       <DependentUpon>202607230115410_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608111546208_AddRecursoServicio.cs" />
+    <Compile Include="Migrations\202608111546208_AddRecursoServicio.Designer.cs">
+      <DependentUpon>202608111546208_AddRecursoServicio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608120100196_IntegridadRecursoServicio.cs" />
+    <Compile Include="Migrations\202608120100196_IntegridadRecursoServicio.Designer.cs">
+      <DependentUpon>202608120100196_IntegridadRecursoServicio.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\EstadoTurno.cs" />
     <Compile Include="Models\Entities\Recurso.cs" />
+    <Compile Include="Models\Entities\RecursoServicio.cs" />
     <Compile Include="Models\Entities\TipoRecurso.cs" />
     <Compile Include="Models\Entities\ITenantEntity.cs" />
     <Compile Include="Models\Entities\Servicio.cs" />
@@ -192,11 +201,13 @@
     <Compile Include="Models\Entities\User.cs" />
     <Compile Include="Models\ViewModels\AgendaViewModel.cs" />
     <Compile Include="Models\ViewModels\LoginVM.cs" />
+    <Compile Include="Models\ViewModels\RecursoViewModel.cs" />
     <Compile Include="Models\ViewModels\TurnoViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\ClienteService.cs" />
     <Compile Include="Services\RecursoService.cs" />
+    <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
     <Compile Include="Services\TurnoService.cs" />
     <Compile Include="Startup.cs" />
@@ -520,6 +531,10 @@
     <Content Include="Views\Turnos\Delete.cshtml" />
     <Content Include="Views\Turnos\Edit.cshtml" />
     <Content Include="Views\Turnos\Index.cshtml" />
+    <Content Include="Views\Shared\Components\_AgendaGrid.cshtml" />
+    <Content Include="Views\Shared\Components\_AgendaToolbar.cshtml" />
+    <Content Include="Views\Shared\Components\_CheckboxList.cshtml" />
+    <Content Include="Views\Shared\Components\_ColorSelector.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -558,6 +573,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202607230115410_InitialCreate.resx">
       <DependentUpon>202607230115410_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608111546208_AddRecursoServicio.resx">
+      <DependentUpon>202608111546208_AddRecursoServicio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608120100196_IntegridadRecursoServicio.resx">
+      <DependentUpon>202608120100196_IntegridadRecursoServicio.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

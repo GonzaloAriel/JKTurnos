@@ -66,7 +66,7 @@ Soft Delete obligatorio.
 
 Modulo Turnos CRUD consolidado.
 
-Referencia de la proxima etapa (Fase 3 del roadmap, Docs/02): Agenda, Turnos y Calendario. En curso: implementación de lógica de visualización de Agenda (Time Blocks).
+Referencia de la proxima etapa (Fase 3 del roadmap, Docs/02): Agenda, Turnos y Calendario. Time Blocks de Agenda con datos reales implementados y verificados visualmente (2026-08-11).
 
 ## Plan activo
 
@@ -74,7 +74,7 @@ Estado del ciclo: IMPLEMENTACION
 
 Registrar aqui unicamente el paso en curso. Actualizar bajo confirmacion del TEAM LEAD.
 
-Siguiente paso: implementación de la lógica de visualización de Agenda (Time Blocks) basada en turnos consolidados.
+Siguiente paso: (a definir por TEAM LEAD) etapas de interaccion de Agenda: navegacion de fechas y Drawer del Time Block (D-003). Base ya implementada: grid con turnos reales, posicionamiento explicito (D-012), layout compacto para turnos de 30 min y visual banda/pastel/dot de estado (D-011).
 
 
 ## Fuentes de verdad

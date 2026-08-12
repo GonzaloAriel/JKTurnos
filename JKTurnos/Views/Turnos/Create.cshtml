@@ -9,13 +9,13 @@
 
     <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.ServicioId)">@Html.DisplayNameFor(m => m.ServicioId)</label>
-        @Html.DropDownListFor(m => m.ServicioId, Model.Servicios, "Seleccione un servicio", new { @class = "jk-input" })
+        @Html.DropDownListFor(m => m.ServicioId, Model.Servicios, "Seleccione un servicio", new { @class = "jk-input", id = "ServicioId" })
         @Html.ValidationMessageFor(m => m.ServicioId, "", new { @class = "jk-field-error" })
     </div>
 
     <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.RecursoId)">@Html.DisplayNameFor(m => m.RecursoId)</label>
-        @Html.DropDownListFor(m => m.RecursoId, Model.Recursos, "Seleccione un recurso", new { @class = "jk-input" })
+        @Html.DropDownListFor(m => m.RecursoId, Model.Recursos, "Seleccione un recurso", new { @class = "jk-input", id = "RecursoId" })
         @Html.ValidationMessageFor(m => m.RecursoId, "", new { @class = "jk-field-error" })
     </div>
 
@@ -42,3 +42,44 @@
 }
 
 @Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
+
+@section scripts {
+    <script>
+        document.getElementById('ServicioId').addEventListener('change', function() {
+            var servicioId = this.value;
+            var recursoDdl = document.getElementById('RecursoId');
+            var currentRecurso = recursoDdl.value;
+
+            recursoDdl.innerHTML = '<option value="">Cargando...</option>';
+
+            fetch('@Url.Action("GetRecursosPorServicio", "Turnos")' + '?servicioId=' + servicioId)
+                .then(response => response.json())
+                .then(data => {
+                    recursoDdl.innerHTML = '<option value="">Seleccione un recurso</option>';
+                    data.forEach(r => {
+                        let selected = (r.Id == currentRecurso) ? 'selected' : '';
+                        recursoDdl.innerHTML += `<option value="${r.Id}" ${selected}>${r.Nombre}</option>`;
+                    });
+                });
+        });
+
+        document.getElementById('RecursoId').addEventListener('change', function() {
+            var recursoId = this.value;
+            var servicioDdl = document.getElementById('ServicioId');
+            var currentServicio = servicioDdl.value;
+
+            servicioDdl.innerHTML = '<option value="">Cargando...</option>';
+
+            fetch('@Url.Action("GetServiciosPorRecurso", "Turnos")' + '?recursoId=' + recursoId)
+                .then(response => response.json())
+                .then(data => {
+                    servicioDdl.innerHTML = '<option value="">Seleccione un servicio</option>';
+                    data.forEach(s => {
+                        let selected = (s.Id == currentServicio) ? 'selected' : '';
+                        servicioDdl.innerHTML += `<option value="${s.Id}" ${selected}>${s.Nombre}</option>`;
+                    });
+                });
+        });
+    </script>
+}
+

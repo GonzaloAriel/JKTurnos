@@ -1,0 +1,15 @@
+@model IEnumerable<SelectListItem>
+@{
+    string name = ViewBag.Name ?? "SelectedIds";
+    var selectedIds = ViewBag.SelectedIds as List<int> ?? new List<int>();
+}
+
+<div class="jk-checkbox-group">
+    @foreach (var item in Model)
+    {
+        <label class="jk-checkbox-item">
+            <input type="checkbox" name="@name" value="@item.Value" @(selectedIds.Contains(int.Parse(item.Value)) ? "checked" : "") />
+            <span class="jk-checkbox-label">@item.Text</span>
+        </label>
+    }
+</div>

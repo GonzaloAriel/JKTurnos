@@ -1,30 +1,35 @@
-@model JKTurnos.Models.Entities.Recurso
+@model JKTurnos.Models.ViewModels.RecursoViewModel
 
 @helper FormContent() {
-    @Html.HiddenFor(m => m.Id)
-    @Html.HiddenFor(m => m.CreatedAt)
-    @Html.HiddenFor(m => m.TenantId)
-    @Html.HiddenFor(m => m.IsActive)
+    @Html.HiddenFor(m => m.Recurso.Id)
+    @Html.HiddenFor(m => m.Recurso.CreatedAt)
+    @Html.HiddenFor(m => m.Recurso.TenantId)
+    @Html.HiddenFor(m => m.Recurso.IsActive)
 
     <div class="jk-form-group">
-        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">@Html.DisplayNameFor(m => m.Nombre)</label>
-        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "Nombre del recurso" })
-        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+        <label class="jk-label" for="@Html.IdFor(m => m.Recurso.Nombre)">@Html.DisplayNameFor(m => m.Recurso.Nombre)</label>
+        @Html.TextBoxFor(m => m.Recurso.Nombre, new { @class = "jk-input", placeholder = "Nombre del recurso" })
+        @Html.ValidationMessageFor(m => m.Recurso.Nombre, "", new { @class = "jk-field-error" })
     </div>
 
     <div class="jk-form-group">
-        <label class="jk-label" for="@Html.IdFor(m => m.Descripcion)">@Html.DisplayNameFor(m => m.Descripcion)</label>
-        @Html.TextAreaFor(m => m.Descripcion, new { @class = "jk-textarea", placeholder = "Descripcion del recurso", rows = 3 })
-        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "jk-field-error" })
+        <label class="jk-label" for="@Html.IdFor(m => m.Recurso.Descripcion)">@Html.DisplayNameFor(m => m.Recurso.Descripcion)</label>
+        @Html.TextAreaFor(m => m.Recurso.Descripcion, new { @class = "jk-textarea", placeholder = "Descripcion del recurso", rows = 3 })
+        @Html.ValidationMessageFor(m => m.Recurso.Descripcion, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label">Servicios que puede prestar</label>
+        @Html.Partial("~/Views/Shared/Components/_CheckboxList.cshtml", Model.TodosLosServicios, new ViewDataDictionary { { "Name", "ServicioIds" }, { "SelectedIds", Model.ServicioIds } })
     </div>
 
     <div class="row">
         <div class="col-md-6">
             <div class="jk-form-group">
-                <label class="jk-label" for="@Html.IdFor(m => m.Tipo)">Que tipo de recurso es?</label>
+                <label class="jk-label" for="@Html.IdFor(m => m.Recurso.Tipo)">Que tipo de recurso es?</label>
                 <p class="jk-small text-secondary jk-mt-4">Selecciona la categoria que mejor describa este recurso.</p>
-                @Html.EnumDropDownListFor(m => m.Tipo, new { @class = "jk-input" })
-                @Html.ValidationMessageFor(m => m.Tipo, "", new { @class = "jk-field-error" })
+                @Html.EnumDropDownListFor(m => m.Recurso.Tipo, new { @class = "jk-input" })
+                @Html.ValidationMessageFor(m => m.Recurso.Tipo, "", new { @class = "jk-field-error" })
             </div>
         </div>
         <div class="col-md-6">
@@ -32,18 +37,11 @@
                 <label class="jk-label" for="Color">Color identificatorio</label>
                 <p class="jk-small text-secondary jk-mt-4">Se utilizara para distinguir este recurso en el calendario y futuras vistas del sistema.</p>
 
-                @Html.Partial("~/Views/Shared/Components/_ColorSelector.cshtml", new ViewDataDictionary { { "color", Model.Color } })
+                @Html.Partial("~/Views/Shared/Components/_ColorSelector.cshtml", new ViewDataDictionary { { "color", Model.Recurso.Color } })
 
-                @Html.ValidationMessageFor(m => m.Color, "", new { @class = "jk-field-error" })
+                @Html.ValidationMessageFor(m => m.Recurso.Color, "", new { @class = "jk-field-error" })
             </div>
         </div>
-    </div>
-
-    <div class="jk-mt-24">
-        <p class="jk-small text-secondary">
-            <strong>Que es un recurso?</strong><br />
-            Es cualquier persona, espacio o elemento que deba estar disponible para atender un turno.
-        </p>
     </div>
 }
 
@@ -57,4 +55,3 @@
 }
 
 @Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
-

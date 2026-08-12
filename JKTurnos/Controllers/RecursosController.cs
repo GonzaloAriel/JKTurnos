@@ -1,6 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using JKTurnos.Controllers;
 using JKTurnos.Models.Entities;
+using JKTurnos.Models.ViewModels;
 using JKTurnos.Services;
 
 namespace JKTurnos.Controllers
@@ -9,10 +12,14 @@ namespace JKTurnos.Controllers
     public class RecursosController : BaseController
     {
         private readonly RecursoService _service;
+        private readonly RecursoServicioService _recursoServicioService;
+        private readonly ServicioService _servicioService;
 
         public RecursosController()
         {
             _service = new RecursoService();
+            _recursoServicioService = new RecursoServicioService();
+            _servicioService = new ServicioService();
         }
 
         public ActionResult Index()
@@ -23,17 +30,27 @@ namespace JKTurnos.Controllers
 
         public ActionResult Create()
         {
-            return View(new Recurso());
+            var model = new RecursoViewModel
+            {
+                Recurso = new Recurso(),
+                TodosLosServicios = _servicioService.GetAll().Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Nombre })
+            };
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Recurso model)
+        public ActionResult Create(RecursoViewModel model)
         {
             if (!ModelState.IsValid)
+            {
+                model.TodosLosServicios = _servicioService.GetAll().Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Nombre });
                 return View(model);
+            }
 
-            _service.Create(model);
+            _service.Create(model.Recurso);
+            _recursoServicioService.SetServiciosParaRecurso(model.Recurso.Id, model.ServicioIds, TenantId);
+            
             return RedirectToAction("Index");
         }
 
@@ -41,19 +58,32 @@ namespace JKTurnos.Controllers
         {
             var recurso = _service.GetById(id);
             if (recurso == null) return HttpNotFound();
-            return View(recurso);
+
+            var model = new RecursoViewModel
+            {
+                Recurso = recurso,
+                ServicioIds = _recursoServicioService.GetServicioIdsPorRecurso(id),
+                TodosLosServicios = _servicioService.GetAll().Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Nombre })
+            };
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Recurso model)
+        public ActionResult Edit(RecursoViewModel model)
         {
             if (!ModelState.IsValid)
+            {
+                model.TodosLosServicios = _servicioService.GetAll().Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Nombre });
                 return View(model);
+            }
 
-            _service.Update(model);
+            _service.Update(model.Recurso);
+            _recursoServicioService.SetServiciosParaRecurso(model.Recurso.Id, model.ServicioIds, TenantId);
+
             return RedirectToAction("Index");
         }
+// ... (Delete methods remain the same)
 
         public ActionResult Delete(int id)
         {

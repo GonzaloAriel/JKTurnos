@@ -827,8 +827,13 @@
 }
 
 /* Checkbox & Radio */
-.jk-checkbox-group,
-.jk-radio-group {
+.jk-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-8);
+}
+
+.jk-checkbox-item {
     display: flex;
     align-items: center;
     gap: var(--jk-space-8);
@@ -837,12 +842,15 @@
     color: var(--jk-text-primary);
 }
 
-.jk-checkbox-group input[type="checkbox"],
-.jk-radio-group input[type="radio"] {
+.jk-checkbox-item input[type="checkbox"] {
     width: 18px;
     height: 18px;
     accent-color: var(--jk-accent);
     cursor: pointer;
+}
+
+.jk-checkbox-label {
+    user-select: none;
 }
 
 /* Switch / Toggle */
