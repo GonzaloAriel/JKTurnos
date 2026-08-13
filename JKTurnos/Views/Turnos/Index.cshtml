@@ -19,10 +19,10 @@
                     {
                         <tr>
                             <td>@item.FechaHoraInicio.ToString("dd/MM HH:mm")</td>
-                            <td>@item.Cliente.Nombre</td>
-                            <td>@item.Servicio.Nombre</td>
-                            <td>@item.Recurso.Nombre</td>
-                            <td><span class="jk-badge">@item.EstadoTurno.Nombre</span></td>
+                            <td>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</td>
+                            <td>@(item.Servicio != null ? item.Servicio.Nombre : "Reservado")</td>
+                            <td>@(item.Recurso != null ? item.Recurso.Nombre : "Sin recurso")</td>
+                            <td><span class="jk-badge">@(item.EstadoTurno != null ? item.EstadoTurno.Nombre : "Sin estado")</span></td>
                             <td>
                                 @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
                                     new ViewDataDictionary {

@@ -20,9 +20,10 @@ namespace JKTurnos
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            Database.SetInitializer(
-                new MigrateDatabaseToLatestVersion<JKContext, Configuration>()
-            );
+            // Database.SetInitializer(
+            //     new MigrateDatabaseToLatestVersion<JKContext, Configuration>()
+            // );
+            Database.SetInitializer<JKContext>(null);
         }
     }
 }

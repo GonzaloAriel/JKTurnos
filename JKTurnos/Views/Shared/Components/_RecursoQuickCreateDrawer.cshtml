@@ -1,0 +1,256 @@
+@*
+    JKTurnos - Quick Create Recurso Drawer
+    Drawer de creacion rapida de un Recurso desde cualquier formulario
+    (ej: Servicio). Muestra el nuevo recurso (con su color) en un contenedor
+    de checkboxes.
+
+    Uso (trigger debe ir dentro del formulario, drawer fuera de el):
+    <button type="button" class="jk-btn jk-btn-ghost jk-btn-sm jk-mt-8"
+            data-jk-open-drawer="drawer-quick-recurso">
+        <i class="bi bi-plus-lg"></i> Crear recurso
+    </button>
+
+    @Html.Partial("~/Views/Shared/Components/_RecursoQuickCreateDrawer.cshtml",
+        new ViewDataDictionary {
+            { "DrawerId", "drawer-quick-recurso" },
+            { "ContainerId", "recursos-checkbox-group" }
+        })
+
+    Modo select (formularios con dropdown, ej: Turno): en lugar de ContainerId se
+    pasa SelectId con el id del <select>; el recurso creado se agrega como option
+    y queda seleccionado.
+
+    @Html.Partial("~/Views/Shared/Components/_RecursoQuickCreateDrawer.cshtml",
+        new ViewDataDictionary {
+            { "DrawerId", "drawer-quick-recurso" },
+            { "SelectId", "RecursoId" }
+        })
+
+    Requiere: _CheckboxList.cshtml renderizado con el ContainerId indicado (solo modo checkbox).
+*@
+
+@using JKTurnos.Models.Entities
+
+@{
+    string drawerId = ViewBag.DrawerId as string ?? "drawer-quick-recurso";
+    string containerId = ViewBag.ContainerId as string ?? "recursos-checkbox-group";
+    string selectId = ViewBag.SelectId as string ?? "";
+    string toastId = ViewBag.ToastId as string ?? "jk-toast-recurso";
+    string toastMessage = ViewBag.ToastMessage as string ?? "Recurso creado y vinculado al servicio";
+    string postUrl = Url.Action("QuickCreate", "Recursos");
+}
+
+@Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", toastId } })
+
+<div class="jk-drawer-backdrop" id="@(drawerId)-backdrop"></div>
+<aside class="jk-drawer" id="@drawerId" role="dialog" aria-modal="true" aria-labelledby="@(drawerId)-title" aria-hidden="true">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="@(drawerId)-title">Nuevo recurso reservable</h3>
+        <button type="button" class="jk-drawer-close" data-jk-close-drawer="@drawerId" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body">
+        <form data-jk-drawer-form novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="@(drawerId)-nombre">Nombre</label>
+                <input type="text" class="jk-input" id="@(drawerId)-nombre" name="Nombre" data-field="Nombre" placeholder="Ej: Dr. Juan o Consultorio A" />
+                <small class="jk-small text-secondary">Puede ser una persona, sala, equipo o espacio reservable.</small>
+                <div class="jk-field-error" data-error-for="Nombre" hidden></div>
+            </div>
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="@(drawerId)-tipo">Que tipo de recurso es?</label>
+                <select class="jk-input" id="@(drawerId)-tipo" name="Tipo" data-field="Tipo">
+                    @foreach (TipoRecurso tipo in Enum.GetValues(typeof(TipoRecurso)))
+                    {
+                        <option value="@((int)tipo)">@tipo.ToString()</option>
+                    }
+                </select>
+            </div>
+
+            <div class="jk-form-group">
+                <label class="jk-label">Color identificatorio</label>
+                <p class="jk-small text-secondary jk-mt-4">Se utilizara para distinguirlo en el calendario.</p>
+
+                @Html.Partial("~/Views/Shared/Components/_ColorSelector.cshtml", new ViewDataDictionary { { "color", "#2563EB" }, { "FieldName", "Color" } })
+            </div>
+
+            <div class="jk-flex jk-gap-12 jk-mt-16">
+                <button type="button" class="jk-btn jk-btn-ghost" data-jk-close-drawer="@drawerId">Cancelar</button>
+                <button type="submit" class="jk-btn jk-btn-primary">Crear recurso</button>
+            </div>
+        </form>
+    </div>
+</aside>
+
+<script>
+    (function () {
+        'use strict';
+
+        var drawerId = '@drawerId';
+        var containerId = '@containerId';
+        var selectId = '@selectId';
+        var toastMessage = '@toastMessage';
+        var postUrl = '@postUrl';
+
+        if (window['jk-drawer-recurso-init:' + drawerId]) return;
+        window['jk-drawer-recurso-init:' + drawerId] = true;
+
+        var drawer = document.getElementById(drawerId);
+        var backdrop = document.getElementById(drawerId + '-backdrop');
+        var form = drawer ? drawer.querySelector('[data-jk-drawer-form]') : null;
+        if (!drawer || !backdrop || !form) return;
+
+        var toastContainer = document.getElementById('@toastId');
+
+        function showToast(message, type) {
+            if (!toastContainer) return;
+            var toast = document.createElement('div');
+            toast.className = 'jk-toast jk-toast-' + (type || 'success');
+            var icon = type === 'error' ? 'bi-x-circle' : (type === 'info' ? 'bi-info-circle' : 'bi-check-circle');
+            toast.innerHTML = '<i class="bi ' + icon + '"></i>' + message;
+            toastContainer.appendChild(toast);
+            setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 4000);
+        }
+
+        function clearErrors() {
+            form.querySelectorAll('.jk-field-error').forEach(function (el) {
+                el.hidden = true;
+                el.textContent = '';
+            });
+            form.querySelectorAll('.jk-input.error').forEach(function (el) {
+                el.classList.remove('error');
+            });
+        }
+
+        function showFieldError(field, message) {
+            var input = form.querySelector('[data-field="' + field + '"]');
+            var error = form.querySelector('[data-error-for="' + field + '"]');
+            if (input) input.classList.add('error');
+            if (error) {
+                error.textContent = message;
+                error.hidden = false;
+            }
+        }
+
+        function openDrawer() {
+            drawer.classList.add('open');
+            backdrop.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('jk-drawer-open');
+            var first = form.querySelector('input, select, textarea');
+            if (first) setTimeout(function () { first.focus(); }, 150);
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            backdrop.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('jk-drawer-open');
+            form.reset();
+            clearErrors();
+        }
+
+        function addCheckbox(id, nombre, color) {
+            var group = document.getElementById(containerId);
+            if (!group) return;
+
+            var label = document.createElement('label');
+            label.className = 'jk-checkbox-item';
+
+            var input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = 'RecursoIds';
+            input.value = id;
+            input.checked = true;
+
+            var swatch = document.createElement('span');
+            swatch.className = 'jk-checkbox-swatch';
+            swatch.style.backgroundColor = color || '#2563EB';
+
+            var span = document.createElement('span');
+            span.className = 'jk-checkbox-label';
+            span.textContent = nombre;
+
+            label.appendChild(input);
+            label.appendChild(swatch);
+            label.appendChild(span);
+            group.appendChild(label);
+        }
+
+        function addOption(id, nombre) {
+            var select = document.getElementById(selectId);
+            if (!select) return;
+
+            var option = document.createElement('option');
+            option.value = id;
+            option.textContent = nombre;
+
+            select.appendChild(option);
+            select.value = id;
+        }
+
+        var triggers = document.querySelectorAll('[data-jk-open-drawer="' + drawerId + '"]');
+        triggers.forEach(function (trigger) {
+            trigger.addEventListener('click', openDrawer);
+        });
+
+        backdrop.addEventListener('click', closeDrawer);
+
+        drawer.querySelectorAll('[data-jk-close-drawer]').forEach(function (btn) {
+            btn.addEventListener('click', closeDrawer);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.key === 'Escape' || e.keyCode === 27) && drawer.classList.contains('open')) {
+                closeDrawer();
+            }
+        });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearErrors();
+
+            var nombreInput = form.querySelector('[data-field="Nombre"]');
+            var nombre = (nombreInput.value || '').trim();
+
+            if (!nombre) {
+                showFieldError('Nombre', 'El nombre es obligatorio');
+                return;
+            }
+
+            var submitBtn = form.querySelector('[type="submit"]');
+            submitBtn.disabled = true;
+
+            fetch(postUrl, { method: 'POST', body: new FormData(form) })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data && data.success) {
+                        if (selectId) {
+                            addOption(data.id, data.nombre);
+                        } else {
+                            addCheckbox(data.id, data.nombre, data.color);
+                        }
+                        closeDrawer();
+                        showToast(toastMessage, 'success');
+                    } else {
+                        var errors = data && data.errors;
+                        if (errors) {
+                            Object.keys(errors).forEach(function (key) {
+                                showFieldError(key, errors[key]);
+                            });
+                        } else {
+                            showToast('No se pudo crear el recurso', 'error');
+                        }
+                    }
+                })
+                .catch(function () {
+                    showToast('Error de conexion al crear el recurso', 'error');
+                })
+                .then(function () { submitBtn.disabled = false; });
+        });
+    })();
+</script>

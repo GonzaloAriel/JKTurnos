@@ -31,6 +31,63 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
+        public void SetRecursosParaServicio(int servicioId, List<int> recursoIds, int tenantId)
+        {
+            using (var db = new JKContext())
+            {
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var existingRelations = db.RecursoServicios
+                            .Where(rs => rs.ServicioId == servicioId && rs.TenantId == tenantId)
+                            .ToList();
+
+                        foreach (var recursoId in recursoIds)
+                        {
+                            var relation = existingRelations.FirstOrDefault(rs => rs.RecursoId == recursoId);
+                            if (relation != null)
+                            {
+                                if (!relation.IsActive)
+                                {
+                                    relation.IsActive = true;
+                                    relation.UpdatedAt = DateTime.Now;
+                                }
+                            }
+                            else
+                            {
+                                db.RecursoServicios.Add(new RecursoServicio
+                                {
+                                    RecursoId = recursoId,
+                                    ServicioId = servicioId,
+                                    TenantId = tenantId,
+                                    IsActive = true,
+                                    CreatedAt = DateTime.Now
+                                });
+                            }
+                        }
+
+                        var toDeactivate = existingRelations
+                            .Where(rs => rs.IsActive && !recursoIds.Contains(rs.RecursoId));
+
+                        foreach (var relation in toDeactivate)
+                        {
+                            relation.IsActive = false;
+                            relation.UpdatedAt = DateTime.Now;
+                        }
+
+                        db.SaveChanges();
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public void SetServiciosParaRecurso(int recursoId, List<int> servicioIds, int tenantId)
         {
             using (var db = new JKContext())

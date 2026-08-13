@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using JKTurnos.Data;
@@ -12,7 +12,7 @@ namespace JKTurnos.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationsEnabled = false;
         }
 
         protected override void Seed(JKContext context)

@@ -2,10 +2,10 @@
 
 @{
     ViewBag.Title = "Eliminar Turno";
-    ViewBag.Subtitle = "¿Estás seguro de que deseas eliminar este turno?";
-    ViewBag.DeleteDescription = "Esta acción no se puede deshacer. Se eliminará el turno para el cliente " + Model.Cliente.Nombre + " en la fecha " + Model.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm") + ".";
+    ViewBag.Subtitle = "Estas seguro de que deseas eliminar este turno?";
+    ViewBag.DeleteDescription = "Esta accion no se puede deshacer. Se eliminara el turno para el cliente " + (Model.Cliente != null ? Model.Cliente.Nombre : "Desconocido") + " en la fecha " + Model.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm") + ".";
     ViewBag.FormAction = Url.Action("DeleteConfirmed", new { id = Model.Id });
     ViewBag.CancelUrl = Url.Action("Index");
 }
 
-@Html.Partial("~/Views/Shared/Components/_DeleteLayout.cshtml")
+@Html.Partial("~/Views/Shared/Components/_DeleteLayout.cshtml", Model)

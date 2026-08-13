@@ -1,14 +1,21 @@
 @model IEnumerable<SelectListItem>
 @{
     string name = ViewBag.Name ?? "SelectedIds";
+    string containerId = ViewBag.ContainerId as string ?? "";
     var selectedIds = ViewBag.SelectedIds as List<int> ?? new List<int>();
+    var colors = ViewBag.Colors as Dictionary<int, string> ?? new Dictionary<int, string>();
 }
 
-<div class="jk-checkbox-group">
+<div class="jk-checkbox-group" id="@containerId">
     @foreach (var item in Model)
     {
+        var itemId = int.Parse(item.Value);
         <label class="jk-checkbox-item">
-            <input type="checkbox" name="@name" value="@item.Value" @(selectedIds.Contains(int.Parse(item.Value)) ? "checked" : "") />
+            <input type="checkbox" name="@name" value="@item.Value" @(selectedIds.Contains(itemId) ? "checked" : "") />
+            @if (colors.ContainsKey(itemId))
+            {
+                <span class="jk-checkbox-swatch" style="background-color: @colors[itemId];"></span>
+            }
             <span class="jk-checkbox-label">@item.Text</span>
         </label>
     }

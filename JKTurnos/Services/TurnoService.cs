@@ -56,9 +56,12 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
-        public DateTime CalcularFin(DateTime inicio, int servicioId)
+        public DateTime CalcularFin(DateTime inicio, int? servicioId)
         {
-            var servicio = _servicioRepo.GetById(servicioId);
+            if (!servicioId.HasValue)
+                return inicio.AddMinutes(30); // Duración por defecto si no hay servicio
+
+            var servicio = _servicioRepo.GetById(servicioId.Value);
             if (servicio == null)
                 throw new ArgumentException("Servicio no encontrado.");
 

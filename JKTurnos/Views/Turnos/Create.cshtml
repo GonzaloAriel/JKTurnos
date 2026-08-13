@@ -9,13 +9,24 @@
 
     <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.ServicioId)">@Html.DisplayNameFor(m => m.ServicioId)</label>
-        @Html.DropDownListFor(m => m.ServicioId, Model.Servicios, "Seleccione un servicio", new { @class = "jk-input", id = "ServicioId" })
+        <div class="jk-flex jk-gap-8">
+            @Html.DropDownListFor(m => m.ServicioId, Model.Servicios, "Seleccione un servicio (opcional)", new { @class = "jk-input jk-flex-1", id = "ServicioId" })
+            <button type="button" class="jk-btn jk-btn-icon" data-jk-open-drawer="drawer-quick-servicio" title="Crear servicio" aria-label="Crear servicio">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
         @Html.ValidationMessageFor(m => m.ServicioId, "", new { @class = "jk-field-error" })
     </div>
 
     <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.RecursoId)">@Html.DisplayNameFor(m => m.RecursoId)</label>
-        @Html.DropDownListFor(m => m.RecursoId, Model.Recursos, "Seleccione un recurso", new { @class = "jk-input", id = "RecursoId" })
+        <div class="jk-flex jk-gap-8">
+            @Html.DropDownListFor(m => m.RecursoId, Model.Recursos, "Seleccione un recurso", new { @class = "jk-input jk-flex-1", id = "RecursoId" })
+            <button type="button" class="jk-btn jk-btn-icon" data-jk-open-drawer="drawer-quick-recurso" title="Crear recurso" aria-label="Crear recurso">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+        <small class="jk-help-text">El recurso es la persona, sala o equipamiento que realizara el servicio.</small>
         @Html.ValidationMessageFor(m => m.RecursoId, "", new { @class = "jk-field-error" })
     </div>
 
@@ -43,43 +54,54 @@
 
 @Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
 
+@Html.Partial("~/Views/Shared/Components/_ServiceQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-servicio" },
+        { "SelectId", "ServicioId" },
+        { "ToastMessage", "Servicio creado correctamente" }
+    })
+
+@Html.Partial("~/Views/Shared/Components/_RecursoQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-recurso" },
+        { "SelectId", "RecursoId" },
+        { "ToastMessage", "Recurso creado correctamente" }
+    })
+
 @section scripts {
     <script>
-        document.getElementById('ServicioId').addEventListener('change', function() {
-            var servicioId = this.value;
-            var recursoDdl = document.getElementById('RecursoId');
-            var currentRecurso = recursoDdl.value;
+        (function () {
+            'use strict';
 
-            recursoDdl.innerHTML = '<option value="">Cargando...</option>';
+            function loadRecursos(servicioId) {
+                var recursoDdl = document.getElementById('RecursoId');
+                if (!recursoDdl) return;
 
-            fetch('@Url.Action("GetRecursosPorServicio", "Turnos")' + '?servicioId=' + servicioId)
-                .then(response => response.json())
-                .then(data => {
-                    recursoDdl.innerHTML = '<option value="">Seleccione un recurso</option>';
-                    data.forEach(r => {
-                        let selected = (r.Id == currentRecurso) ? 'selected' : '';
-                        recursoDdl.innerHTML += `<option value="${r.Id}" ${selected}>${r.Nombre}</option>`;
+                var url = servicioId
+                    ? '@Url.Action("GetRecursosPorServicio", "Turnos")' + '?servicioId=' + servicioId
+                    : '@Url.Action("GetRecursos", "Turnos")';
+
+                recursoDdl.innerHTML = '<option value="">Cargando...</option>';
+
+                fetch(url)
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        recursoDdl.innerHTML = '<option value="">Seleccione un recurso</option>';
+                        data.forEach(function (r) {
+                            var option = document.createElement('option');
+                            option.value = r.Id;
+                            option.textContent = r.Nombre;
+                            recursoDdl.appendChild(option);
+                        });
                     });
-                });
-        });
+            }
 
-        document.getElementById('RecursoId').addEventListener('change', function() {
-            var recursoId = this.value;
             var servicioDdl = document.getElementById('ServicioId');
-            var currentServicio = servicioDdl.value;
-
-            servicioDdl.innerHTML = '<option value="">Cargando...</option>';
-
-            fetch('@Url.Action("GetServiciosPorRecurso", "Turnos")' + '?recursoId=' + recursoId)
-                .then(response => response.json())
-                .then(data => {
-                    servicioDdl.innerHTML = '<option value="">Seleccione un servicio</option>';
-                    data.forEach(s => {
-                        let selected = (s.Id == currentServicio) ? 'selected' : '';
-                        servicioDdl.innerHTML += `<option value="${s.Id}" ${selected}>${s.Nombre}</option>`;
-                    });
+            if (servicioDdl) {
+                servicioDdl.addEventListener('change', function () {
+                    loadRecursos(this.value);
                 });
-        });
+            }
+        })();
     </script>
 }
-

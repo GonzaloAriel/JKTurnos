@@ -13,9 +13,8 @@ namespace JKTurnos.Models.ViewModels
         [Display(Name = "Cliente")]
         public int ClienteId { get; set; }
 
-        [Required(ErrorMessage = "El servicio es obligatorio.")]
         [Display(Name = "Servicio")]
-        public int ServicioId { get; set; }
+        public int? ServicioId { get; set; }
 
         [Required(ErrorMessage = "El recurso es obligatorio.")]
         [Display(Name = "Recurso")]

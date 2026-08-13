@@ -1,32 +1,45 @@
-@model JKTurnos.Models.Entities.Servicio
+@model JKTurnos.Models.ViewModels.ServicioViewModel
 
 @helper FormContent() {
     <div class="jk-form-group">
-        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">@Html.DisplayNameFor(m => m.Nombre)</label>
-        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "Nombre del servicio" })
-        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+        <label class="jk-label" for="@Html.IdFor(m => m.Servicio.Nombre)">@Html.DisplayNameFor(m => m.Servicio.Nombre)</label>
+        <small class="jk-help-text">Puede ser un servicio profesional (ej: Corte) o un lapso de tiempo (ej: Alquiler Cancha 1h).</small>
+        @Html.TextBoxFor(m => m.Servicio.Nombre, new { @class = "jk-input", placeholder = "Ej: Corte o Alquiler Cancha 1h" })
+        @Html.ValidationMessageFor(m => m.Servicio.Nombre, "", new { @class = "jk-field-error" })
     </div>
 
     <div class="jk-form-group">
-        <label class="jk-label" for="@Html.IdFor(m => m.Descripcion)">@Html.DisplayNameFor(m => m.Descripcion)</label>
-        @Html.TextAreaFor(m => m.Descripcion, new { @class = "jk-textarea", placeholder = "Descripcion del servicio", rows = 3 })
-        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "jk-field-error" })
+        <label class="jk-label" for="@Html.IdFor(m => m.Servicio.Descripcion)">@Html.DisplayNameFor(m => m.Servicio.Descripcion)</label>
+        @Html.TextAreaFor(m => m.Servicio.Descripcion, new { @class = "jk-textarea", placeholder = "Descripcion del servicio", rows = 3 })
+        @Html.ValidationMessageFor(m => m.Servicio.Descripcion, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label">Recursos que pueden prestarlo</label>
+        @Html.Partial("~/Views/Shared/Components/_CheckboxList.cshtml", Model.TodosLosRecursos, new ViewDataDictionary { { "Name", "RecursoIds" }, { "SelectedIds", Model.RecursoIds }, { "ContainerId", "recursos-checkbox-group" }, { "Colors", ViewBag.RecursoColors } })
+        <br />
+        <p class="jk-small text-secondary">
+            No ves el recurso que necesitas?
+            <br />
+            <button type="button" class="jk-btn jk-btn-ghost jk-btn-sm jk-mt-8" data-jk-open-drawer="drawer-quick-recurso">
+                <i class="bi bi-plus-lg"></i> Crear recurso
+            </button>
+        </p>
     </div>
 
     <div class="row">
         <div class="col-md-6">
             <div class="jk-form-group">
-                <label class="jk-label" for="@Html.IdFor(m => m.DuracionMinutos)">Duracion (minutos)</label>
-                @Html.TextBoxFor(m => m.DuracionMinutos, new { @class = "jk-input", type = "number", placeholder = "60" })
-                @Html.ValidationMessageFor(m => m.DuracionMinutos, "", new { @class = "jk-field-error" })
+                <label class="jk-label" for="@Html.IdFor(m => m.Servicio.DuracionMinutos)">Duracion (minutos)</label>
+                @Html.TextBoxFor(m => m.Servicio.DuracionMinutos, new { @class = "jk-input", type = "number", placeholder = "60" })
+                @Html.ValidationMessageFor(m => m.Servicio.DuracionMinutos, "", new { @class = "jk-field-error" })
             </div>
         </div>
         <div class="col-md-6">
-
             <div class="jk-form-group">
-                <label class="jk-label" for="@Html.IdFor(m => m.Precio)">@Html.DisplayNameFor(m => m.Precio)</label>
-                @Html.TextBoxFor(m => m.Precio, new { @class = "jk-input", type = "number", step = "0.01", placeholder = "0.00" })
-                @Html.ValidationMessageFor(m => m.Precio, "", new { @class = "jk-field-error" })
+                <label class="jk-label" for="@Html.IdFor(m => m.Servicio.Precio)">@Html.DisplayNameFor(m => m.Servicio.Precio)</label>
+                @Html.TextBoxFor(m => m.Servicio.Precio, new { @class = "jk-input", type = "number", step = "0.01", placeholder = "0.00" })
+                @Html.ValidationMessageFor(m => m.Servicio.Precio, "", new { @class = "jk-field-error" })
             </div>
         </div>
     </div>
@@ -42,3 +55,9 @@
 }
 
 @Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
+
+@Html.Partial("~/Views/Shared/Components/_RecursoQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-recurso" },
+        { "ContainerId", "recursos-checkbox-group" }
+    })

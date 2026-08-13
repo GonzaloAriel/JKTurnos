@@ -22,6 +22,30 @@ namespace JKTurnos.Controllers
             _servicioService = new ServicioService();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult QuickCreate(Recurso model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(m => m.Value.Errors.Count > 0)
+                    .ToDictionary(m => m.Key, m => m.Value.Errors.Select(e => e.ErrorMessage).FirstOrDefault());
+
+                return Json(new { success = false, errors = errors });
+            }
+
+            _service.Create(model);
+
+            return Json(new
+            {
+                success = true,
+                id = model.Id,
+                nombre = model.Nombre,
+                color = model.Color ?? "#2563EB"
+            });
+        }
+
         public ActionResult Index()
         {
             var recursos = _service.GetAll();

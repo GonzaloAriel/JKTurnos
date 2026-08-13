@@ -1,0 +1,29 @@
+@model dynamic
+
+<div class="jk-delete-layout">
+    <div class="jk-page-header">
+        <h1>@ViewBag.Title</h1>
+        @if (ViewBag.Subtitle != null)
+        {
+            <p>@ViewBag.Subtitle</p>
+        }
+    </div>
+
+    <div class="jk-delete-description">
+        <p>@ViewBag.DeleteDescription</p>
+    </div>
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "jk-form", action = ViewBag.FormAction }))
+    {
+        @Html.AntiForgeryToken()
+        
+        <div class="jk-form-actions">
+            <button type="submit" class="jk-btn jk-btn-danger">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
+            <a href="@ViewBag.CancelUrl" class="jk-btn jk-btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    }
+</div>

@@ -37,6 +37,13 @@ namespace JKTurnos.Controllers
             return Json(recursos, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetRecursos()
+        {
+            var recursos = _recursoService.GetAll()
+                .Select(r => new { r.Id, r.Nombre });
+            return Json(recursos, JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetServiciosPorRecurso(int recursoId)
         {
             var servicioIds = _recursoServicioService.GetServicioIdsPorRecurso(recursoId);
@@ -104,7 +111,7 @@ namespace JKTurnos.Controllers
 
             _turnoService.Crear(turno);
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Agenda");
         }
 
         // GET: Turnos/Edit/5

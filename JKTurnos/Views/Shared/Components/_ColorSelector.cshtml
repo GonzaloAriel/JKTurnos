@@ -22,6 +22,7 @@
 
 @{
     var colorValue = ViewData["color"] as string ?? "";
+    var fieldName = ViewData["FieldName"] as string ?? "Recurso.Color";
 }
 
 <style>
@@ -157,7 +158,7 @@
 </style>
 
 <div class="jk-color-selector">
-    @Html.Hidden("Recurso.Color", colorValue, new { @class = "jk-color-hidden" })
+    @Html.Hidden(fieldName, colorValue, new { @class = "jk-color-hidden" })
 
     <button type="button"
             class="jk-color-trigger"

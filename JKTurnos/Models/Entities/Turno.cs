@@ -8,7 +8,7 @@ namespace JKTurnos.Models.Entities
 
         public int ClienteId { get; set; }
 
-        public int ServicioId { get; set; }
+        public int? ServicioId { get; set; }
 
         public int RecursoId { get; set; }
 
