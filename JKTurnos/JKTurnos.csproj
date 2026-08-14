@@ -537,6 +537,7 @@
     <Content Include="Views\Turnos\Edit.cshtml" />
     <Content Include="Views\Turnos\Index.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaGrid.cshtml" />
+    <Content Include="Views\Shared\Components\_AgendaMobile.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaToolbar.cshtml" />
     <Content Include="Views\Shared\Components\_CheckboxList.cshtml" />
     <Content Include="Views\Shared\Components\_ColorSelector.cshtml" />

@@ -7,7 +7,9 @@
     'use strict';
 
     var agenda = document.querySelector('.jk-agenda');
-    var gridWrap = agenda && agenda.querySelector('.jk-agenda-grid-wrap');
+    if (!agenda) return;
+
+    var gridWrap = agenda.querySelector('.jk-agenda-grid-wrap');
     if (!gridWrap) return;
 
     var detailUrl = agenda.getAttribute('data-turno-detail-url');
@@ -16,7 +18,8 @@
      * Turno Detail Drawer (V1)
      * Click / Enter / Space on a Time Block loads _TurnoDetailDrawer into the
      * drawer container via fetch and opens it. V2/V3 (state actions, economics)
-     * are registered in Docs/16 as future work.
+     * are registered in Docs/16 as future work. Open/close works for both the
+     * desktop grid blocks and the mobile accordion cards (_AgendaMobile).
      */
     var drawerId = 'drawer-turno-detalle';
     var drawer = document.getElementById(drawerId);
@@ -74,7 +77,7 @@
             }
         }
 
-        gridWrap.addEventListener('click', function (e) {
+        agenda.addEventListener('click', function (e) {
             var block = e.target.closest('.jk-agenda-time-block');
             if (block) {
                 openTurnoDetail(block);
@@ -86,36 +89,47 @@
             }
         });
 
-        gridWrap.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                var block = e.target.closest('.jk-agenda-time-block');
-                if (block) {
-                    e.preventDefault();
-                    openTurnoDetail(block);
-                    return;
+        if (gridWrap) {
+            gridWrap.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    var block = e.target.closest('.jk-agenda-time-block');
+                    if (block) {
+                        e.preventDefault();
+                        openTurnoDetail(block);
+                        return;
+                    }
                 }
-            }
 
-            var step = 80;
-            switch (e.key) {
-                case 'ArrowLeft':
-                    gridWrap.scrollLeft -= step;
-                    e.preventDefault();
-                    break;
-                case 'ArrowRight':
-                    gridWrap.scrollLeft += step;
-                    e.preventDefault();
-                    break;
-                case 'ArrowUp':
-                    gridWrap.scrollTop -= step;
-                    e.preventDefault();
-                    break;
-                case 'ArrowDown':
-                    gridWrap.scrollTop += step;
-                    e.preventDefault();
-                    break;
-            }
-        });
+                var step = 80;
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        gridWrap.scrollLeft -= step;
+                        e.preventDefault();
+                        break;
+                    case 'ArrowRight':
+                        gridWrap.scrollLeft += step;
+                        e.preventDefault();
+                        break;
+                    case 'ArrowUp':
+                        gridWrap.scrollTop -= step;
+                        e.preventDefault();
+                        break;
+                    case 'ArrowDown':
+                        gridWrap.scrollTop += step;
+                        e.preventDefault();
+                        break;
+                }
+            });
+
+            /*
+             * Focus trap for grid cells: Tab moves between cells,
+             * Shift+Tab moves backwards.
+             */
+            var cells = gridWrap.querySelectorAll('.jk-agenda-cell');
+            cells.forEach(function (cell) {
+                cell.setAttribute('tabindex', '-1');
+            });
+        }
 
         closeBtn.addEventListener('click', closeTurnoDetail);
         backdrop.addEventListener('click', closeTurnoDetail);
@@ -124,15 +138,6 @@
             if (e.key === 'Escape' && drawer.classList.contains('open')) {
                 closeTurnoDetail();
             }
-        });
-
-        /*
-         * Focus trap for grid cells: Tab moves between cells,
-         * Shift+Tab moves backwards.
-         */
-        var cells = gridWrap.querySelectorAll('.jk-agenda-cell');
-        cells.forEach(function (cell) {
-            cell.setAttribute('tabindex', '-1');
         });
     }
 

@@ -371,3 +371,116 @@
     font-size: var(--jk-text-base);
     color: var(--jk-text-tertiary);
 }
+
+/* ================================================================
+   MOBILE (< 768px)
+   AGENDA_UX seccion 11: el comportamiento responsive pertenece al
+   Layout. D-019: en mobile la grilla se oculta y se muestra el
+   acordeon por Recurso del partial _AgendaMobile (details/summary),
+   con los turnos del dia y los horarios libres por recurso. Sin JS.
+   ================================================================ */
+
+.jk-agenda-mobile {
+    display: none;
+}
+
+@media (max-width: 767px) {
+
+    .jk-agenda-grid-wrap {
+        display: none;
+    }
+
+    .jk-agenda-mobile {
+        display: block;
+    }
+
+    .jk-agenda-mobile-resource {
+        background: var(--jk-surface);
+        border: 1px solid var(--jk-border);
+        border-radius: var(--jk-radius-lg);
+        margin-bottom: var(--jk-space-12);
+        overflow: hidden;
+    }
+
+    .jk-agenda-mobile-resource-header {
+        display: flex;
+        align-items: center;
+        gap: var(--jk-space-8);
+        padding: var(--jk-space-12) var(--jk-space-16);
+        cursor: pointer;
+        list-style: none;
+        font-weight: var(--jk-weight-semibold);
+        color: var(--jk-text-primary);
+        user-select: none;
+    }
+
+    .jk-agenda-mobile-resource-header::-webkit-details-marker {
+        display: none;
+    }
+
+    .jk-agenda-mobile-resource[open] .jk-agenda-mobile-resource-header {
+        border-bottom: 1px solid var(--jk-border-light);
+    }
+
+    .jk-agenda-mobile-resource-name {
+        flex: 1;
+        font-size: var(--jk-text-base);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .jk-agenda-mobile-resource-count {
+        font-size: var(--jk-text-sm);
+        color: var(--jk-text-secondary);
+        background: var(--jk-bg);
+        border-radius: var(--jk-radius-sm);
+        padding: 2px var(--jk-space-8);
+    }
+
+    .jk-agenda-mobile-resource-chevron {
+        font-size: var(--jk-text-sm);
+        color: var(--jk-text-tertiary);
+        transition: transform var(--jk-transition-fast);
+    }
+
+    .jk-agenda-mobile-resource[open] .jk-agenda-mobile-resource-chevron {
+        transform: rotate(180deg);
+    }
+
+    .jk-agenda-mobile-resource-body {
+        padding: var(--jk-space-12) var(--jk-space-16);
+        display: flex;
+        flex-direction: column;
+        gap: var(--jk-space-8);
+    }
+
+    .jk-agenda-mobile-empty {
+        margin: 0;
+        color: var(--jk-text-tertiary);
+        font-size: var(--jk-text-sm);
+    }
+
+    .jk-agenda-mobile .jk-agenda-time-block {
+        margin: 0;
+        width: 100%;
+    }
+
+    .jk-agenda-mobile-free-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--jk-space-6);
+        margin-top: var(--jk-space-4);
+    }
+
+    .jk-agenda-mobile-free-slot {
+        font-size: var(--jk-text-sm);
+        color: var(--jk-success);
+        border: 1px dashed currentColor;
+        border-radius: var(--jk-radius-sm);
+        padding: 4px var(--jk-space-10);
+        line-height: 1.2;
+    }
+
+}

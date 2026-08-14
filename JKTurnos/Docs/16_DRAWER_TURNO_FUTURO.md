@@ -56,10 +56,10 @@ Objetivo: mostrar y operar el estado economico del turno en el Drawer, respetand
 
 No confundir con V2/V3 del Drawer. Es el plan priorizado para la Agenda movil. Bloqueado por P-003 (P0).
 
-P1 - Vista movil en tarjetas (un solo DOM):
-- NO duplicar markup: `_AgendaGrid` se reestructura por CSS Grid en `Content/Pages/jk-agenda.css` (media query max-width 767px) a timeline de un carril con columna de hora.
-- Altura proporcional a la duracion; banda = color de recurso (D-004/D-011); superposicion por horario con dot de recurso; clic/Enter abren el MISMO Drawer de detalle.
-- Sin JS de resize (la media query lo resuelve). Los estilos van en Pages, no en el DS (D-010). Solo un componente generico (`.jk-fab`) al DS.
+P1 - Vista movil (agenda por Recurso en tarjetas):
+- IMPLEMENTADO (2026-08-13) como acordeon por Recurso (`_AgendaMobile.cshtml`, `<details>/<summary>`, sin JS): cada recurso es una tarjeta desplegable; al expandir muestra sus turnos del dia (reutiliza `.jk-agenda-time-block` y el MISMO Drawer de detalle) y los HORARIOS LIBRES (franjas de 30 min desocupadas 08:00-19:30 fusionadas, chips "Libre HH:mm - HH:mm"). El primero nace expandido. En <768px la grilla desktop se oculta via media query (jk-agenda.css). Decision D-019 (reemplaza a D-018 en la vista movil).
+- El calculo de horarios libres vive hoy en la vista (coherente con "el controller entrega datos, la vista renderiza"). Cuando D-017 (quick-create) lo necesite se extrae a un metodo de servicio reutilizable.
+- Pendiente: confirmacion visual y de interaccion de TEAM LEAD (primer recurso expandido vs todos expandidos, friccion del accordion).
 
 P2 - FAB "Nuevo Turno":
 - El FAB (bottom-right) y el boton del PageHeader en Agenda DEBEN abrir un Drawer de Quick Create de Turno (D-017). NUNCA `/Turnos/Create`.

@@ -26,6 +26,9 @@ Implementar el Drawer de detalle del Time Block (D-003) en la Agenda en su V1 SO
 ## Decisiones nuevas
 - D-015: Drawer V1 solo lectura con slot de EstadoEconomico; seccion Pagos/Seña SIEMPRE visible (placeholder "Sin senia"); V2/V3 a futuro en Docs/16.
 - D-016: Drawer con contenedor fijo + fetch inyecta contenido; GetDetailDrawer en TurnosController; _Drawer.cshtml (RenderBody) no se reutiliza.
+- D-017: FAB y boton "Nuevo Turno" en Agenda abren un Drawer de Quick Create, NUNCA /Create; la implementacion del Drawer es posterior.
+- D-018: vista movil = grilla compacta (REEMPLAZADA por D-019).
+- D-019: vista movil = acordeon por Recurso (details/summary) + horarios libres por recurso; la grilla se oculta en <768px; reemplaza a D-018 en la vista movil.
 
 ## Reglas de negocio aplicadas
 - D-009: textos visibles sin acentos (documentacion y UI).
@@ -33,8 +36,9 @@ Implementar el Drawer de detalle del Time Block (D-003) en la Agenda en su V1 SO
 - D-005: el estado economico no se mezcla con el operativo (slot separado, seccion Pagos visible con placeholder).
 
 ## Pendientes
-1. P-003: Agenda no muestra turnos (posible mismatch de TenantId en Claims/TenantProvider).
-2. V2/V3 del Drawer: a futuro (Docs/16), no implementar sin confirmacion.
+1. P-003 CERRADO por TEAM LEAD (2026-08-13). Cierre registrado en 03_PROBLEMAS (RESUELTOS).
+2. P1 (vista movil) implementado: acordeon por Recurso con horarios libres (`_AgendaMobile.cshtml`, details/summary, D-019; reemplaza a D-018 en la vista movil). La grilla se oculta en <768px. El calculo de horarios libres vive en la vista (se extraera a servicio cuando D-017 lo necesite). Pendiente confirmacion visual de TEAM LEAD.
+3. P2 FAB "Nuevo Turno": pendiente. D-017: debe abrir un Drawer de Quick Create (implementacion del Drawer posterior), nunca /Create.
 
 ## Build
 - MSBuild Debug: 0 errores.

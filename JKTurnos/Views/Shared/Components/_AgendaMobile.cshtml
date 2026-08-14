@@ -1,0 +1,127 @@
+@*
+    JKTurnos - Agenda Mobile Component (tarjetas por Recurso + horarios libres)
+    Variante mobile (< 768px) de la Agenda: acordeon por Recurso usando
+    <details>/<summary> (sin JS obligatorio). Cada recurso lista sus turnos
+    del dia y los horarios libres (franjas de 30 min desocupadas 08:00-19:30
+    fusionadas en rangos continuos). D-019.
+    La grilla desktop sigue en _AgendaGrid (se oculta por media query).
+    El clic en un turno abre el mismo Drawer de detalle (jk-agenda.js).
+    El calculo de horarios libres vive en la vista; si D-017 (quick-create)
+    lo necesita se extrae a un servicio.
+*@
+
+@model JKTurnos.Models.ViewModels.AgendaViewModel
+@using JKTurnos.Models.Entities
+
+@{
+    var recursos = Model.Recursos != null ? Model.Recursos.OrderBy(r => r.Nombre).ToList() : new List<Recurso>();
+    var turnos = Model.Turnos != null ? Model.Turnos.OrderBy(t => t.FechaHoraInicio).ToList() : new List<Turno>();
+    var fecha = Model.Fecha;
+
+    var gridInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, 8, 0, 0);
+    var gridFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, 19, 30, 0);
+    int index = 0;
+}
+
+@if (recursos.Count == 0)
+{
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "collection" },
+            { "Title", "Necesitas agregar al menos un recurso" },
+            { "Description", "Sin recursos no puedes reservar turnos. Crea tu primer recurso para comenzar." },
+            { "ActionText", "Crear Recurso" },
+            { "ActionUrl", Url.Action("Create", "Recursos") }
+        })
+}
+else
+{
+    <div class="jk-agenda-mobile" role="list" aria-label="Agenda por recurso">
+        @foreach (var rec in recursos)
+        {
+            var turnosRec = turnos.Where(t => t.RecursoId == rec.Id).OrderBy(t => t.FechaHoraInicio).ToList();
+
+            // Horarios libres: franjas de 30 min desocupadas, fusionadas en rangos continuos.
+            var libres = new List<Tuple<DateTime, DateTime>>();
+            DateTime franjaStart = gridInicio;
+            DateTime? rangoStart = null;
+            while (franjaStart < gridFin)
+            {
+                var franjaEnd = franjaStart.AddMinutes(30);
+                bool ocupada = turnosRec.Any(t => t.FechaHoraInicio < franjaEnd && t.FechaHoraFin > franjaStart);
+                if (!ocupada)
+                {
+                    if (rangoStart == null)
+                    {
+                        rangoStart = franjaStart;
+                    }
+                }
+                else if (rangoStart != null)
+                {
+                    libres.Add(Tuple.Create(rangoStart.Value, franjaStart));
+                    rangoStart = null;
+                }
+                franjaStart = franjaEnd;
+            }
+            if (rangoStart != null)
+            {
+                libres.Add(Tuple.Create(rangoStart.Value, gridFin));
+            }
+
+            <details class="jk-agenda-mobile-resource" @(index == 0 ? "open" : "")>
+                <summary class="jk-agenda-mobile-resource-header" role="button" aria-label="@rec.Nombre, @turnosRec.Count turnos">
+                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb");"></span>
+                    <span class="jk-agenda-mobile-resource-name">@rec.Nombre</span>
+                    <span class="jk-agenda-mobile-resource-count" aria-hidden="true">@turnosRec.Count</span>
+                    <i class="bi bi-chevron-down jk-agenda-mobile-resource-chevron" aria-hidden="true"></i>
+                </summary>
+                <div class="jk-agenda-mobile-resource-body">
+                    @if (turnosRec.Count == 0)
+                    {
+                        <p class="jk-agenda-mobile-empty">Sin turnos por el momento</p>
+                    }
+                    else
+                    {
+                        foreach (var t in turnosRec)
+                        {
+                            var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Sin cliente";
+                            var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado";
+                            var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
+                            var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
+
+                            <div class="jk-agenda-time-block"
+                                 role="button"
+                                 tabindex="0"
+                                 data-turno-id="@t.Id"
+                                 style="--jk-block-color: @(rec.Color ?? "#2563eb");"
+                                 aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
+                                <div class="jk-agenda-time-block-band">
+                                    <span class="jk-agenda-time-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
+                                </div>
+                                <div class="jk-agenda-time-block-body">
+                                    <div class="jk-agenda-time-block-title">
+                                        <span class="jk-agenda-time-block-status" title="@estadoNombre" style="--jk-status-color: @(estadoColor ?? "#aeaeb2")"><i class="bi bi-circle-fill"></i></span>
+                                        <span class="jk-agenda-time-block-client">@clienteNombre</span>
+                                    </div>
+                                    <span class="jk-agenda-time-block-service">@servicioNombre</span>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    @if (libres.Count > 0)
+                    {
+                        <div class="jk-agenda-mobile-free-list" role="list" aria-label="Horarios libres">
+                            @foreach (var libre in libres)
+                            {
+                                <span class="jk-agenda-mobile-free-slot" role="listitem">Libre @libre.Item1.ToString("HH:mm") - @libre.Item2.ToString("HH:mm")</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </details>
+
+            index++;
+        }
+    </div>
+}
