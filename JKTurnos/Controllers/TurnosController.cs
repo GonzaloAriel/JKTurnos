@@ -82,7 +82,7 @@ namespace JKTurnos.Controllers
             return PartialView("~/Views/Shared/Components/_TurnoDetailDrawer.cshtml", model);
         }
 
-        public ActionResult Agenda()
+        public ActionResult Agenda(int? openRecursoId = null)
         {
             var hoy = DateTime.Today;
 
@@ -91,7 +91,8 @@ namespace JKTurnos.Controllers
                 Fecha = hoy,
                 Recursos = _recursoService.GetAll(),
                 Turnos = _turnoService.GetTurnosDelDia(hoy),
-                Estados = _estadoRepo.GetAll().ToList()
+                Estados = _estadoRepo.GetAll().ToList(),
+                OpenRecursoId = openRecursoId
             };
 
             var dayNames = new[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
@@ -140,7 +141,7 @@ namespace JKTurnos.Controllers
 
             _turnoService.Crear(turno);
 
-            return RedirectToAction("Agenda");
+            return RedirectToAction("Agenda", new { openRecursoId = model.RecursoId });
         }
 
         // GET: Turnos/Edit/5
