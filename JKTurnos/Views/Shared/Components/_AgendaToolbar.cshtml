@@ -42,16 +42,24 @@
 @if (recursos.Count > 0)
 {
     <div class="jk-agenda-filters" role="group" aria-label="Filtro de recursos">
-        <span class="jk-agenda-filter-label">Recursos:</span>
-        <div class="jk-agenda-filter-list">
-            @foreach (var rec in recursos)
-            {
-                <label class="jk-agenda-filter-item">
-                    <input type="checkbox" checked aria-checked="true" data-recurso-id="@rec.Id" />
-                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb")"></span>
-                    <span class="jk-agenda-resource-name">@rec.Nombre</span>
-                </label>
-            }
-        </div>
+        <details class="jk-agenda-filter-dropdown">
+            <summary class="jk-agenda-filter-trigger" role="button" aria-label="Filtro de recursos">
+                <i class="bi bi-funnel" aria-hidden="true"></i>
+                Recursos
+                <span class="jk-agenda-filter-count" aria-hidden="true">@recursos.Count</span>
+                <i class="bi bi-chevron-down jk-agenda-filter-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="jk-agenda-filter-list">
+                <span class="jk-agenda-filter-list-title">Mostrar recursos</span>
+                @foreach (var rec in recursos)
+                {
+                    <label class="jk-agenda-filter-item">
+                        <input type="checkbox" checked aria-checked="true" data-recurso-id="@rec.Id" />
+                        <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb")"></span>
+                        <span class="jk-agenda-resource-name">@rec.Nombre</span>
+                    </label>
+                }
+            </div>
+        </details>
     </div>
 }

@@ -141,4 +141,23 @@
         });
     }
 
+    /*
+     * Recursos filter dropdown -> oculta/muestra las tarjetas del acordeon
+     * (_AgendaMobile) segun el checkbox. Solo visible en mobile (< 768px).
+     * El filtro de la grilla desktop queda pendiente (Docs/16).
+     */
+    var filterList = document.querySelector('.jk-agenda-filter-list');
+    if (filterList) {
+        filterList.addEventListener('change', function (e) {
+            var input = e.target.closest('input[data-recurso-id]');
+            if (!input) return;
+
+            var id = input.getAttribute('data-recurso-id');
+            var cards = document.querySelectorAll('.jk-agenda-mobile-resource[data-recurso-id="' + id + '"]');
+            cards.forEach(function (card) {
+                card.hidden = !input.checked;
+            });
+        });
+    }
+
 })();

@@ -68,7 +68,7 @@ else
                 libres.Add(Tuple.Create(rangoStart.Value, gridFin));
             }
 
-            <details class="jk-agenda-mobile-resource" @(index == 0 ? "open" : "")>
+            <details class="jk-agenda-mobile-resource" data-recurso-id="@rec.Id" style="--jk-block-color: @(rec.Color ?? "#2563eb");" @(index == 0 ? "open" : "")>
                 <summary class="jk-agenda-mobile-resource-header" role="button" aria-label="@rec.Nombre, @turnosRec.Count turnos">
                     <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb");"></span>
                     <span class="jk-agenda-mobile-resource-name">@rec.Nombre</span>

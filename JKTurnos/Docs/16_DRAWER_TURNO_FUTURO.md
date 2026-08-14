@@ -52,19 +52,18 @@ Objetivo: mostrar y operar el estado economico del turno en el Drawer, respetand
 
 ---
 
-## Agenda movil y FAB (plan aprobado por TEAM LEAD, 2026-08-13)
+## Agenda movil (plan aprobado por TEAM LEAD, 2026-08-13)
 
-No confundir con V2/V3 del Drawer. Es el plan priorizado para la Agenda movil. Bloqueado por P-003 (P0).
+No confundir con V2/V3 del Drawer. Es el plan priorizado para la Agenda movil.
 
 P1 - Vista movil (agenda por Recurso en tarjetas):
-- IMPLEMENTADO (2026-08-13) como acordeon por Recurso (`_AgendaMobile.cshtml`, `<details>/<summary>`, sin JS): cada recurso es una tarjeta desplegable; al expandir muestra sus turnos del dia (reutiliza `.jk-agenda-time-block` y el MISMO Drawer de detalle) y los HORARIOS LIBRES (franjas de 30 min desocupadas 08:00-19:30 fusionadas, chips "Libre HH:mm - HH:mm"). El primero nace expandido. En <768px la grilla desktop se oculta via media query (jk-agenda.css). Decision D-019 (reemplaza a D-018 en la vista movil).
-- El calculo de horarios libres vive hoy en la vista (coherente con "el controller entrega datos, la vista renderiza"). Cuando D-017 (quick-create) lo necesite se extrae a un metodo de servicio reutilizable.
-- Pendiente: confirmacion visual y de interaccion de TEAM LEAD (primer recurso expandido vs todos expandidos, friccion del accordion).
+- CONSOLIDADO (2026-08-13, confirmacion visual de TEAM LEAD) como acordeon por Recurso (`_AgendaMobile.cshtml`, `<details>/<summary>`, sin JS): cada recurso es una tarjeta desplegable; al expandir muestra sus turnos del dia (reutiliza `.jk-agenda-time-block` y el MISMO Drawer de detalle) y los HORARIOS LIBRES (franjas de 30 min desocupadas 08:00-19:30 fusionadas, chips "Libre HH:mm - HH:mm"). El primero nace expandido. En <768px la grilla desktop se oculta via media query (jk-agenda.css). Fondo de cada tarjeta teñido suavemente con el color del recurso (color-mix + `--jk-block-color`). Decision D-019 (reemplaza a D-018 en la vista movil).
+- El filtro de recursos del toolbar es un dropdown profesionalizado (`<details>` en `_AgendaToolbar`, con titulo "Mostrar recursos" y filas alineadas). Decidido (2026-08-13): la opcion (a) — se CONECTA a las tarjetas del acordeon movil (JS oculta/muestra cada tarjeta segun su checkbox) y se OCULTA en desktop hasta definir el filtro de la grilla. El filtro de grilla queda pendiente (Docs/16 fuera de alcance).
+- El calculo de horarios libres vive hoy en la vista (coherente con "el controller entrega datos, la vista renderiza").
 
-P2 - FAB "Nuevo Turno":
-- El FAB (bottom-right) y el boton del PageHeader en Agenda DEBEN abrir un Drawer de Quick Create de Turno (D-017). NUNCA `/Turnos/Create`.
-- La implementacion del Drawer de creacion es un paso posterior; mientras tanto la accion queda pendiente (dejar sin accion, no loquear a /Create ni href="#").
-- Inspirado en AGENDA_UX seccion 7 (FAB) y regla responsive (seccion 11).
+P2 - FAB "Nuevo Turno" (ELIMINADO 2026-08-13):
+- El plan de un Drawer de Quick Create para el FAB y el boton del PageHeader (D-017) fue ELIMINADO por TEAM LEAD: sin relevancia por ahora. D-017 CANCELADA.
+- El boton "Nuevo Turno" del PageHeader de la Agenda navega a /Turnos/Create (como el resto del sistema).
 
 ---
 
@@ -73,4 +72,4 @@ P2 - FAB "Nuevo Turno":
 - Walk-in desde la Agenda.
 - Vista Semana y Mes (navegacion temporal).
 - Notificaciones y recordatorios al cliente.
-- Filtro de recursos en Bottom Sheet y navegacion temporal simplificada de mobile (resto de la seccion mobile de AGENDA_UX, iteracion posterior a P1/P2).
+- Navegacion temporal simplificada de mobile (resto de la seccion mobile de AGENDA_UX). El filtro de recursos se resolvio con un dropdown en el toolbar (2026-08-13), no Bottom Sheet.

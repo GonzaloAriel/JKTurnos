@@ -35,7 +35,7 @@
             <h2 class="section-title">Acciones rapidas</h2>
         </div>
         <div class="quick-actions">
-            <a href="#" class="quick-action-link">
+            <a href="@Url.Action("Create", "Turnos")" class="quick-action-link">
                 <i class="bi bi-plus-circle"></i>
                 Nuevo Turno
             </a>
@@ -43,7 +43,7 @@
                 <i class="bi bi-person-plus"></i>
                 Nuevo Cliente
             </a>
-            <a href="#" class="quick-action-link">
+            <a href="@Url.Action("Agenda", "Turnos")" class="quick-action-link">
                 <i class="bi bi-calendar3"></i>
                 Ver Agenda
             </a>
@@ -71,7 +71,7 @@
                         No tienes turnos agendados para hoy.
                         Crea tu primer turno para comenzar.
                     </p>
-                    <button class="jk-btn jk-btn-primary">Crear mi primer turno</button>
+                    <a href="@Url.Action("Create", "Turnos")" class="jk-btn jk-btn-primary">Crear mi primer turno</a>
                 </div>
             </div>
         </div>

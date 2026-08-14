@@ -32,7 +32,7 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-014 | El Servicio del Turno es OPCIONAL (ServicioId nullable). D-001 sigue vigente respecto al Recurso obligatorio | 2026-08-12 | VIGENTE |
 | D-015 | Drawer de detalle del Time Block V1 en solo lectura con slot de estado economico SIEMPRE visible ("Sin senia" como placeholder hasta V3). V2 (acciones de estado/reagendar/editar) y V3 (economico) a futuro en Docs/16 | 2026-08-13 | VIGENTE |
 | D-016 | El Drawer de detalle usa un contenedor fijo montado en Agenda.cshtml y el contenido se inyecta via fetch. GetDetailDrawer vive en TurnosController (no se crea AgendaController). `_Drawer.cshtml` (RenderBody) no se reutiliza | 2026-08-13 | VIGENTE |
-| D-017 | El FAB "Nuevo Turno" (movil) y el boton del PageHeader en Agenda usan un Drawer de Quick Create, NUNCA la pantalla /Create. La implementacion del Drawer de creacion es posterior; mientras tanto el boton se mantiene deshabilitado o pendiente, no apunta a /Create | 2026-08-13 | VIGENTE |
+| D-017 | (CANCELADA 2026-08-13) El FAB "Nuevo Turno" (movil) y el boton del PageHeader en Agenda usaban un Drawer de Quick Create, NUNCA /Create. El plan del Drawer de creacion fue ELIMINADO por TEAM LEAD (sin relevancia por ahora); el boton "Nuevo Turno" de la Agenda navega a /Turnos/Create | 2026-08-13 | CANCELADA |
 | D-018 | Vista movil de la Agenda = grilla COMPACTA multi-recurso (media query en jk-agenda.css), NO timeline de un carril: dos recursos con turnos a la misma hora se solaparian en columna unica sin reordenamiento JS | 2026-08-13 | REEMPLAZADA por D-019 |
 | D-019 | Vista movil de la Agenda = acordeon de tarjetas por Recurso (details/summary, sin JS) con turnos y horarios LIBRES por recurso. Reemplaza la grilla en <768px; la grilla desktop se oculta | 2026-08-13 | VIGENTE |
 
@@ -270,11 +270,11 @@ Decision: El FAB de mobile y el boton "Nuevo Turno" del PageHeader en la Agenda 
 
 Motivo: Regla de Agenda: "nunca cambiar de pantalla" y "el usuario no debe salir de la Agenda para operar su dia". Un FAB que mande a /Create repite el mismo defecto que el `href="#"` actual.
 
-Consecuencias: El Drawer de Quick Create de Turno es trabajo a futuro (depende de resolver P-003 primero; ver Docs/16). La implementacion del FAB visual (CSS) no necesita el Drawer: el boton se puede renderizar y quedarse sin accion hasta que exista el flujo.
+Consecuencias: El Drawer de Quick Create de Turno era trabajo a futuro (dependia de resolver P-003 primero; ver Docs/16). La implementacion del FAB visual (CSS) no necesita el Drawer: el boton se puede renderizar y quedarse sin accion hasta que exista el flujo.
 
 Reemplaza a: ninguna
 
-Estado: VIGENTE
+Estado: CANCELADA (2026-08-13, TEAM LEAD: "eliminamos p2, no tiene relevancia por ahora"). El plan del Drawer de Quick Create de la Agenda se descarta. El boton "Nuevo Turno" del PageHeader de la Agenda ahora navega a /Turnos/Create (antes era href="#").
 
 ### D-018
 
@@ -298,7 +298,7 @@ Decision: La vista movil de la Agenda (< 768px) se implementa como acordeon de t
 
 Motivo: evitar el scroll lateral y el solapamiento de columnas en movil (multi-recurso, turnos a la misma hora), priorizar el recurso como eje y mostrar disponibilidad (horarios libres) de forma explicita. El acordeon por recurso hace explícito lo que en la grilla era una celda vacia (sin logica).
 
-Consecuencias: `_AgendaMobile.cshtml` es una variante de render generada en el servidor (no reordena DOM con JS; la grilla queda oculta). NUEVA VARIANTE: ya no es "un DOM + media query" como D-018 (esta decision queda REEMPLAZADA en lo que respecta a la vista movil). El calculo de horarios libres hoy vive en la vista (coherente con "el controller entrega datos, la vista renderiza"); cuando D-017 (quick-create) lo necesite se extrae a un metodo de servicio reutilizable. El primer recurso nace expandido (primero del orden alfabetico), el resto colapsado.
+Consecuencias: `_AgendaMobile.cshtml` es una variante de render generada en el servidor (no reordena DOM con JS; la grilla queda oculta). NUEVA VARIANTE: ya no es "un DOM + media query" como D-018 (esta decision queda REEMPLAZADA en lo que respecta a la vista movil). El calculo de horarios libres vive en la vista (coherente con "el controller entrega datos, la vista renderiza"). El primer recurso nace expandido (primero del orden alfabetico), el resto colapsado.
 
 Reemplaza a: D-018 (en lo referente a la vista movil)
 

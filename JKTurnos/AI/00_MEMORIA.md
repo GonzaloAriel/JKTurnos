@@ -70,6 +70,8 @@ Modulo Turnos CRUD consolidado.
 
 Drawer de detalle del Time Block V1 (solo lectura, seccion Pagos/Seña visible) consolidado (2026-08-13, D-015/D-016). V2/V3 a futuro en Docs/16.
 
+Vista movil de Agenda P1 (acordeon por Recurso + horarios libres + filtro de recursos, D-019) consolidada por TEAM LEAD (2026-08-13). P2 FAB "Nuevo Turno" (Drawer de Quick Create, D-017) ELIMINADO (2026-08-13): sin relevancia por ahora; D-017 CANCELADA y el boton "Nuevo Turno" de la Agenda navega a /Turnos/Create.
+
 Referencia de la proxima etapa (Fase 3 del roadmap, Docs/02): Agenda, Turnos y Calendario. Time Blocks de Agenda con datos reales implementados y verificados visualmente (2026-08-11).
 
 ## Plan activo
@@ -78,7 +80,7 @@ Estado del ciclo: IMPLEMENTACION
 
 Registrar aqui unicamente el paso en curso. Actualizar bajo confirmacion del TEAM LEAD.
 
-Siguiente paso: P1 (vista movil) implementado como acordeon por Recurso con horarios libres (`_AgendaMobile.cshtml`, D-019; reemplaza a D-018 en la vista movil); pendiente confirmacion visual de TEAM LEAD. Luego P2 FAB "Nuevo Turno" (D-017): debe abrir un Drawer de Quick Create (implementacion del Drawer posterior; el calculo de horarios libres se extraera a servicio cuando quick-create lo necesite), nunca /Create. P-003 CERRADO por TEAM LEAD (2026-08-13). Drawer de detalle del Time Block V1 (solo lectura, seccion Pagos/Seña visible) CONSOLIDADO (D-015/D-016); V2 V3 y demas futuros en Docs/16.
+Siguiente paso: P1 (vista movil) CONSOLIDADO (acordeon por Recurso con horarios libres, `_AgendaMobile.cshtml`, D-019; confirmado por TEAM LEAD 2026-08-13). P2 FAB "Nuevo Turno" (D-017) ELIMINADO por TEAM LEAD (2026-08-13), sin relevancia por ahora; el boton "Nuevo Turno" de la Agenda va a /Turnos/Create. P-003 CERRADO por TEAM LEAD (2026-08-13). Drawer de detalle del Time Block V1 (solo lectura, seccion Pagos/Seña visible) CONSOLIDADO (D-015/D-016); V2 V3 y demas futuros en Docs/16.
 
 
 ## Fuentes de verdad
