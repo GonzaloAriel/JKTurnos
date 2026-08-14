@@ -64,7 +64,11 @@ Soft Delete obligatorio.
 
 ## Objetivo actual
 
+Vinculacion Recurso-Servicio implementada (N:M bidireccional con checkbox y drawers de quick-create) y quick-create de Servicio + Recurso integrado en el formulario de Crear Turno (Servicio opcional, D-014).
+
 Modulo Turnos CRUD consolidado.
+
+Drawer de detalle del Time Block V1 (solo lectura, seccion Pagos/Seña visible) consolidado (2026-08-13, D-015/D-016). V2/V3 a futuro en Docs/16.
 
 Referencia de la proxima etapa (Fase 3 del roadmap, Docs/02): Agenda, Turnos y Calendario. Time Blocks de Agenda con datos reales implementados y verificados visualmente (2026-08-11).
 
@@ -74,7 +78,7 @@ Estado del ciclo: IMPLEMENTACION
 
 Registrar aqui unicamente el paso en curso. Actualizar bajo confirmacion del TEAM LEAD.
 
-Siguiente paso: (a definir por TEAM LEAD) etapas de interaccion de Agenda: navegacion de fechas y Drawer del Time Block (D-003). Base ya implementada: grid con turnos reales, posicionamiento explicito (D-012), layout compacto para turnos de 30 min y visual banda/pastel/dot de estado (D-011).
+Siguiente paso: confirmar cierre de P-003 (parece resuelto, 2026-08-13) y aprobar el plan de Agenda movil. Plan aprobado por TEAM LEAD (2026-08-13): P0 resolver/confirmar P-003; P1 vista movil un-DOM (CSS Grid restructurado en jk-agenda.css, media query < 768px, timeline de un carril, altura proporcional, mismo Drawer); P2 FAB "Nuevo Turno" que abrira un Drawer de Quick Create (D-017 registrada; la implementacion del Drawer de creacion es posterior). Drawer de detalle del Time Block V1 (solo lectura, seccion Pagos/Seña visible) CONSOLIDADO (D-015/D-016); V2 V3 a futuro en Docs/16. Base ya implementada: grid con turnos reales, posicionamiento explicito (D-012), layout compacto para turnos de 30 min y visual banda/pastel/dot de estado (D-011).
 
 
 ## Fuentes de verdad
@@ -110,6 +114,8 @@ Docs/13_DER.md - modelo entidad-relacion oficial
 Docs/13_AGENDA_UX.md - manual de UX de la Agenda
 
 Docs/14_TURNO_LIFECYCLE.md - ciclo de vida del turno
+
+Docs/16_DRAWER_TURNO_FUTURO.md - Drawer de Time Block V2/V3 (trabajo futuro)
 
 Docs/JKTurnosDictionary.md - diccionario tecnico del proyecto
 

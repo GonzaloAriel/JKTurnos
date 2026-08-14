@@ -1,0 +1,92 @@
+@*
+    JKTurnos - Turno Detail Drawer Content
+    Contenido del Inspector Drawer del Time Block (V1, solo lectura).
+    Este partial se inyecta via fetch en el drawer contenedor montado en
+    Agenda.cshtml (jk-agenda.js). No renderiza el drawer completo:
+
+        fetch('@Url.Action("GetDetailDrawer", "Turnos")?id=' + id)
+            .then(r => r.text())
+            .then(html => body.innerHTML = html)
+
+    EstadoEconomico es un slot reservado para V3 (Docs/16): el espacio de
+    Pagos se muestra siempre, con estado economico real o placeholder
+    "Sin senia" hasta que exista el modelo de pagos.
+*@
+
+@model JKTurnos.Models.ViewModels.TurnoDetailViewModel
+
+<div class="jk-drawer-section">
+    <div class="jk-flex jk-flex-between">
+        <h4 class="jk-drawer-subtitle">@Model.ClienteNombre</h4>
+        <span class="jk-badge" style="--jk-status-color: @(Model.EstadoColor ?? "#aeaeb2");">
+            <i class="bi bi-circle-fill" style="color: @(Model.EstadoColor ?? "#aeaeb2");"></i> @Model.EstadoNombre
+        </span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ClienteTelefono) || !string.IsNullOrWhiteSpace(Model.ClienteEmail))
+    {
+        <p class="jk-small text-secondary jk-mt-4">
+            @Model.ClienteTelefono
+            @if (!string.IsNullOrWhiteSpace(Model.ClienteTelefono) && !string.IsNullOrWhiteSpace(Model.ClienteEmail))
+            {<text> · </text>}
+            @Model.ClienteEmail
+        </p>
+    }
+</div>
+
+<div class="jk-drawer-section">
+    <div class="jk-flex jk-flex-between">
+        <span class="jk-drawer-label">Servicio</span>
+        <span>@(Model.ServicioNombre ?? "Sin servicio")</span>
+    </div>
+
+    @if (Model.ServicioDuracionMinutos.HasValue)
+    {
+        <div class="jk-flex jk-flex-between jk-mt-4">
+            <span class="jk-drawer-label">Duracion</span>
+            <span>@Model.ServicioDuracionMinutos.Value min</span>
+        </div>
+    }
+
+    @if (Model.ServicioPrecio.HasValue)
+    {
+        <div class="jk-flex jk-flex-between jk-mt-4">
+            <span class="jk-drawer-label">Precio</span>
+            <span>@Model.ServicioPrecio.Value.ToString("0.00")</span>
+        </div>
+    }
+
+    <div class="jk-flex jk-flex-between jk-mt-4">
+        <span class="jk-drawer-label">Recurso</span>
+        <span class="jk-flex jk-gap-8">
+            <span class="jk-agenda-resource-dot" style="background-color: @(Model.RecursoColor ?? "#2563eb");"></span>
+            @Model.RecursoNombre
+        </span>
+    </div>
+</div>
+
+<div class="jk-drawer-section">
+    <div class="jk-flex jk-flex-between">
+        <span class="jk-drawer-label">Fecha y hora</span>
+        <span>@Model.FechaHoraInicio.ToString("dd/MM/yyyy")</span>
+    </div>
+    <div class="jk-flex jk-flex-between jk-mt-4">
+        <span class="jk-drawer-label">Horario</span>
+        <span>@Model.FechaHoraInicio.ToString("HH:mm") - @Model.FechaHoraFin.ToString("HH:mm")</span>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+{
+    <div class="jk-drawer-section">
+        <span class="jk-drawer-label">Observaciones</span>
+        <p class="jk-small jk-mt-4">@Model.Observaciones</p>
+    </div>
+}
+
+<div class="jk-drawer-section">
+    <div class="jk-flex jk-flex-between">
+        <span class="jk-drawer-label">Pagos</span>
+        <span>@(Model.EstadoEconomico ?? "Sin senia")</span>
+    </div>
+</div>

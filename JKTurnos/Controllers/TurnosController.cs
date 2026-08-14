@@ -53,6 +53,35 @@ namespace JKTurnos.Controllers
             return Json(servicios, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public ActionResult GetDetailDrawer(int id)
+        {
+            var turno = _turnoService.GetById(id);
+            if (turno == null)
+                return HttpNotFound();
+
+            var model = new TurnoDetailViewModel
+            {
+                Id = turno.Id,
+                ClienteNombre = turno.Cliente != null ? turno.Cliente.Nombre : "Sin cliente",
+                ClienteTelefono = turno.Cliente != null ? turno.Cliente.Telefono : null,
+                ClienteEmail = turno.Cliente != null ? turno.Cliente.Email : null,
+                ServicioNombre = turno.Servicio != null ? turno.Servicio.Nombre : null,
+                ServicioDuracionMinutos = turno.Servicio != null ? turno.Servicio.DuracionMinutos : (int?)null,
+                ServicioPrecio = turno.Servicio != null ? turno.Servicio.Precio : (decimal?)null,
+                RecursoNombre = turno.Recurso != null ? turno.Recurso.Nombre : "Sin recurso",
+                RecursoColor = turno.Recurso != null ? turno.Recurso.Color : null,
+                EstadoTurnoId = turno.EstadoTurnoId,
+                EstadoNombre = turno.EstadoTurno != null ? turno.EstadoTurno.Nombre : "Sin estado",
+                EstadoColor = turno.EstadoTurno != null ? turno.EstadoTurno.Color : null,
+                FechaHoraInicio = turno.FechaHoraInicio,
+                FechaHoraFin = turno.FechaHoraFin,
+                Observaciones = turno.Observaciones
+            };
+
+            return PartialView("~/Views/Shared/Components/_TurnoDetailDrawer.cshtml", model);
+        }
+
         public ActionResult Agenda()
         {
             var hoy = DateTime.Today;

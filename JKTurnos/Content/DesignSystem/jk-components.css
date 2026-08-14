@@ -616,6 +616,47 @@
     padding: var(--jk-space-24);
 }
 
+.jk-drawer-section {
+    padding: var(--jk-space-16) 0;
+    border-bottom: 1px solid var(--jk-border-light);
+}
+
+.jk-drawer-section:last-child {
+    border-bottom: none;
+}
+
+.jk-drawer-subtitle {
+    font-size: var(--jk-text-base);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+    margin: 0;
+}
+
+.jk-drawer-label {
+    font-size: var(--jk-text-sm);
+    color: var(--jk-text-secondary);
+}
+
+.jk-drawer-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--jk-space-8);
+    min-height: var(--jk-space-64);
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-sm);
+}
+
+.jk-drawer-loading::after {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--jk-border);
+    border-top-color: var(--jk-accent);
+    border-radius: 50%;
+    animation: jk-spin 0.6s linear infinite;
+}
+
 /* ================================================================
    MODAL
    ================================================================ */

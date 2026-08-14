@@ -28,6 +28,11 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-010 | CSS unico del DS v2 (Content/DesignSystem): sin estilos inline | 2026-07-19 | VIGENTE |
 | D-011 | Visual de Time Block: banda + fondo pastel del color del recurso; estado = punto; compacto para 30 min | 2026-08-11 | VIGENTE |
 | D-012 | Grid de Agenda con posicionamiento explicito; franjas de 30 min; rango 08:00-19:30 | 2026-08-11 | VIGENTE |
+| D-013 | Vinculacion Recurso-Servicio N:M editada con checkbox desde ambos CRUDs; creacion rapida de la entidad relacionada en Drawer (POST ajax QuickCreate) SIEMPRE fuera del form principal | 2026-08-12 | VIGENTE |
+| D-014 | El Servicio del Turno es OPCIONAL (ServicioId nullable). D-001 sigue vigente respecto al Recurso obligatorio | 2026-08-12 | VIGENTE |
+| D-015 | Drawer de detalle del Time Block V1 en solo lectura con slot de estado economico SIEMPRE visible ("Sin senia" como placeholder hasta V3). V2 (acciones de estado/reagendar/editar) y V3 (economico) a futuro en Docs/16 | 2026-08-13 | VIGENTE |
+| D-016 | El Drawer de detalle usa un contenedor fijo montado en Agenda.cshtml y el contenido se inyecta via fetch. GetDetailDrawer vive en TurnosController (no se crea AgendaController). `_Drawer.cshtml` (RenderBody) no se reutiliza | 2026-08-13 | VIGENTE |
+| D-017 | El FAB "Nuevo Turno" (movil) y el boton del PageHeader en Agenda usan un Drawer de Quick Create, NUNCA la pantalla /Create. La implementacion del Drawer de creacion es posterior; mientras tanto el boton se mantiene deshabilitado o pendiente, no apunta a /Create | 2026-08-13 | VIGENTE |
 
 ## Detalle
 
@@ -194,6 +199,76 @@ Decision: Todos los items del CSS Grid de la Agenda (corner, resource headers, h
 Motivo: El auto-placement del grid esquivaba los time blocks creando huecos que desplazaban filas/columnas (turnos simultaneos deformados y horas mal distribuidas).
 
 Consecuencias: No usar auto-placement en la grilla de Agenda. El rango (gridInicio/gridFin), el tamano de franja (franjaMinutos) y las filas se definen en _AgendaGrid.cshtml.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-013
+
+Fecha: 2026-08-12
+
+Decision: La vinculacion Recurso-Servicio es una relacion N:M que se edita con checkbox desde ambos CRUDs (Recursos y Servicios). La creacion rapida de una entidad relacionada (Servicio desde Recurso, Recurso desde Servicio o ambos desde un Turno) se hace en un Drawer con POST ajax (QuickCreate + anti-forgery) que devuelve JSON; el item creado se agrega checked (checkbox) o seleccionado (select). El drawer se renderiza SIEMPRE fuera del form principal.
+
+Motivo: Evitar pantallas intermedias y formularios anidados: un drawer anidado dentro del form principal postea campos sueltos y rompe la validacion del form.
+
+Consecuencias: Los componentes `_ServiceQuickCreateDrawer` y `_RecursoQuickCreateDrawer` tienen doble modo: `ContainerId` (agrega checkbox al listado, uso en CRUDs) o `SelectId` (agrega `<option>` al select y la selecciona, uso en Turnos/Create). Los `QuickCreate` viven en los controllers de la entidad creada y asignan TenantId via BaseRepository.Add.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-014
+
+Fecha: 2026-08-12
+
+Decision: El Servicio de un Turno es OPCIONAL (ServicioId nullable, migracion `TurnoServicioOpcional`). El Recurso sigue siendo obligatorio (D-001).
+
+Motivo: El negocio permite turnos sin servicio especfico (ej: "pasar a saludar" o uso del espacio). No debe exigirse un servicio para agendar.
+
+Consecuencias: `TurnoViewModel.ServicioId` es `int?`. El dropdown de servicio muestra placeholder "(opcional)". El filtro de recursos por servicio carga la lista completa cuando no hay servicio (endpoint `TurnosController.GetRecursos()`), sin recargar la pagina.
+
+Reemplaza a: la parte de D-001 que exigia Servicio obligatorio (el resto de D-001 sigue vigente)
+
+Estado: VIGENTE
+
+### D-015
+
+Fecha: 2026-08-13
+
+Decision: El Drawer de detalle del Time Block en la Agenda es V1 SOLO LECTURA (sin acciones de estado). Incluye el slot `TurnoDetailViewModel.EstadoEconomico` como reserva: la seccion de Pagos se muestra SIEMPRE, con el estado economico real o el placeholder "Sin senia" hasta que exista el modelo de pagos (V3). Las iteraciones V2 (acciones de estado, reagendar, editar, auditoria) y V3 (estado economico / senia / pago) quedan a FUTURO y se registran en Docs/16_DRAWER_TURNO_FUTURO.md.
+
+Motivo: Entregar el inspector de turno primero en lectura sin acoplar la UI a modelos que todavia no existen (estado economico), dejando el espacio de la senia visible para que el diseno del Drawer no cambie al llegar el modelo. El alcance V1 fue aprobado por el TEAM LEAD.
+
+Consecuencias: `_TurnoDetailDrawer.cshtml` no contiene botones de accion. `Docs/16_DRAWER_TURNO_FUTURO.md` es la unica fuente de V2/V3. No implementar V2/V3 hasta confirmacion del TEAM LEAD.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-016
+
+Fecha: 2026-08-13
+
+Decision: El Drawer de detalle se implementa con un contenedor fijo montado en Agenda.cshtml (`#drawer-turno-detalle` + backdrop + toast) y el contenido se inyecta via fetch desde jk-agenda.js hacia `TurnosController.GetDetailDrawer(int id)`, que devuelve el partial `_TurnoDetailDrawer`. NO se crea un AgendaController (la Agenda vive en TurnosController). El componente `_Drawer.cshtml` (basado en `@RenderBody()`) no se reutiliza para esto.
+
+Motivo: `@RenderBody()` solo funciona con body inline en el render del servidor; inyectar contenido por fetch no tiene body para acoplar. Mantener el controller existente evita duplicar routing y autorizacion.
+
+Consecuencias: La apertura es por click / Enter / Space sobre `.jk-agenda-time-block` (delegacion en jk-agenda.js), con `data-turno-detail-url` en el contenedor. Al cerrar se vacia el body y se devuelve el foco.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-017
+
+Fecha: 2026-08-13
+
+Decision: El FAB de mobile y el boton "Nuevo Turno" del PageHeader en la Agenda deben abrir un Drawer de Quick Create de Turno (flujo desde la Agenda), NUNCA navegar a `/Turnos/Create` (pantalla nueva, contradice D-002/D-003). Mientras no exista el Drawer de creacion, la accion queda pendiente (el boton no debe apuntar a /Create ni ser un link muerto activo).
+
+Motivo: Regla de Agenda: "nunca cambiar de pantalla" y "el usuario no debe salir de la Agenda para operar su dia". Un FAB que mande a /Create repite el mismo defecto que el `href="#"` actual.
+
+Consecuencias: El Drawer de Quick Create de Turno es trabajo a futuro (depende de resolver P-003 primero; ver Docs/16). La implementacion del FAB visual (CSS) no necesita el Drawer: el boton se puede renderizar y quedarse sin accion hasta que exista el flujo.
 
 Reemplaza a: ninguna
 

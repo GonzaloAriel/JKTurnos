@@ -8,7 +8,8 @@
     ViewBag.PrimaryActionIcon = "plus-lg";
 }
 
-<div class="jk-agenda" role="application" aria-label="Agenda de turnos">
+<div class="jk-agenda" role="application" aria-label="Agenda de turnos"
+     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")">
 
     @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
 
@@ -17,6 +18,24 @@
     @Html.Partial("~/Views/Shared/Components/_AgendaGrid.cshtml")
 
 </div>
+
+@*
+    Drawer de detalle del Time Block (V1, solo lectura).
+    El contenido de _TurnoDetailDrawer se inyecta aqui via fetch desde
+    jk-agenda.js. V2/V3: acciones de estado y economico (Docs/16).
+*@
+<div class="jk-drawer-backdrop" id="drawer-turno-detalle-backdrop"></div>
+<div class="jk-drawer" id="drawer-turno-detalle" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-detalle-title">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-turno-detalle-title">Detalle del turno</h3>
+        <button type="button" class="jk-drawer-close" id="drawer-turno-detalle-close" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body" id="drawer-turno-detalle-body"></div>
+</div>
+
+@Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-agenda" } })
 
 @section PageStyles {
     <link href="~/Content/Pages/jk-agenda.css" rel="stylesheet" />

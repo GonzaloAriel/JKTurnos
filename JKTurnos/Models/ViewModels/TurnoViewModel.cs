@@ -26,6 +26,7 @@ namespace JKTurnos.Models.ViewModels
         [Required(ErrorMessage = "La fecha y hora de inicio son obligatorias.")]
         [Display(Name = "Inicio")]
         [DataType(DataType.DateTime)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime FechaHoraInicio { get; set; }
 
         [Display(Name = "Fin")]
