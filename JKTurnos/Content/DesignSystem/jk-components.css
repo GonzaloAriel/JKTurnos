@@ -861,6 +861,26 @@
     margin-top: var(--jk-space-4);
 }
 
+.jk-form-error {
+    padding: var(--jk-space-12) var(--jk-space-16);
+    border: 1px solid color-mix(in srgb, var(--jk-danger) 30%, transparent);
+    border-radius: var(--jk-radius-sm);
+    background: color-mix(in srgb, var(--jk-danger) 6%, white);
+    color: var(--jk-danger);
+    font-size: var(--jk-text-sm);
+    margin-bottom: var(--jk-space-16);
+}
+
+.jk-form-error ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
 .jk-field-success {
     font-size: var(--jk-text-sm);
     color: var(--jk-success);

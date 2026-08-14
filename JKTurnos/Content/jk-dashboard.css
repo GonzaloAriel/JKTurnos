@@ -119,6 +119,20 @@
     margin: 0;
 }
 
+.mi-dia-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--jk-accent) 8%, white);
+    color: var(--jk-accent);
+    font-size: 0.8rem;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
 .mi-dia-date {
     font-size: 0.82rem;
     color: var(--jk-text-muted);
@@ -168,40 +182,114 @@
     line-height: 1.5;
 }
 
-/* Mi Dia - With Appointments */
-.mi-dia-appointment {
+/* Mi Dia - Lanes por Recurso */
+.mi-dia-lanes {
     display: flex;
+    flex-direction: column;
     gap: 14px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--jk-border);
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--jk-border) transparent;
 }
 
-.mi-dia-appointment:last-child {
-    border-bottom: none;
+.mi-dia-lane {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.mi-dia-appointment-time {
-    font-size: 0.82rem;
+.mi-dia-lane-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.mi-dia-lane-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--jk-block-color);
+    flex-shrink: 0;
+}
+
+.mi-dia-lane-name {
+    font-size: 0.78rem;
     font-weight: 600;
     color: var(--jk-text-main);
-    min-width: 52px;
-    padding-top: 2px;
 }
 
-.mi-dia-appointment-info {
-    flex: 1;
-}
-
-.mi-dia-appointment-title {
-    font-size: 0.9rem;
+.mi-dia-lane-count {
+    font-size: 0.7rem;
     font-weight: 600;
-    color: var(--jk-text-main);
-    margin-bottom: 2px;
-}
-
-.mi-dia-appointment-desc {
-    font-size: 0.82rem;
     color: var(--jk-text-muted);
+    background: var(--jk-border-light);
+    border-radius: var(--jk-radius-full);
+    padding: 1px 7px;
+    line-height: 1.4;
+}
+
+.mi-dia-lane-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--jk-border) transparent;
+}
+
+.mi-dia-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    height: 32px;
+    padding: 0 10px;
+    background: color-mix(in srgb, var(--jk-block-color) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--jk-block-color) 22%, transparent);
+    border-radius: var(--jk-radius-sm);
+    text-decoration: none;
+    color: var(--jk-text-main);
+    transition: box-shadow var(--jk-transition-fast), transform var(--jk-transition-fast);
+}
+
+.mi-dia-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow-sm);
+    color: var(--jk-text-main);
+}
+
+.mi-dia-chip-status {
+    color: var(--jk-status-color);
+    font-size: 0.5rem;
+    line-height: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.mi-dia-chip-time {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--jk-text-main);
+    font-variant-numeric: tabular-nums;
+}
+
+.mi-dia-chip-client {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--jk-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+
+@media (max-width: 767.98px) {
+    .mi-dia-lanes {
+        max-height: none;
+    }
 }
 
 /* ===== RESUMEN / KPIs ===== */

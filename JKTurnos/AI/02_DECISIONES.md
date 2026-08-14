@@ -35,6 +35,8 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-017 | (CANCELADA 2026-08-13) El FAB "Nuevo Turno" (movil) y el boton del PageHeader en Agenda usaban un Drawer de Quick Create, NUNCA /Create. El plan del Drawer de creacion fue ELIMINADO por TEAM LEAD (sin relevancia por ahora); el boton "Nuevo Turno" de la Agenda navega a /Turnos/Create | 2026-08-13 | CANCELADA |
 | D-018 | Vista movil de la Agenda = grilla COMPACTA multi-recurso (media query en jk-agenda.css), NO timeline de un carril: dos recursos con turnos a la misma hora se solaparian en columna unica sin reordenamiento JS | 2026-08-13 | REEMPLAZADA por D-019 |
 | D-019 | Vista movil de la Agenda = acordeon de tarjetas por Recurso (details/summary, sin JS) con turnos y horarios LIBRES por recurso. Reemplaza la grilla en <768px; la grilla desktop se oculta | 2026-08-13 | VIGENTE |
+| D-020 | Command Center "Mi dia" = carriles por Recurso con chips compactos (dot de estado + hora de inicio + cliente). Color pastel del recurso; el recurso NO se repite en el chip. Scroll horizontal por carril y vertical en la seccion. Clic navega a /Turnos/Agenda | 2026-08-14 | VIGENTE |
+| D-021 | KPI "Ingresos" del Command Center = PROYECCION del dia (suma de Servicio.Precio de los turnos del dia excluyendo "Cancelado"); no usa pagos reales (modelo economico V3 a futuro, D-005). Ocupacion = minutos ocupados / 690 (08:00-19:30) | 2026-08-14 | VIGENTE |
 
 ## Detalle
 
@@ -301,6 +303,34 @@ Motivo: evitar el scroll lateral y el solapamiento de columnas en movil (multi-r
 Consecuencias: `_AgendaMobile.cshtml` es una variante de render generada en el servidor (no reordena DOM con JS; la grilla queda oculta). NUEVA VARIANTE: ya no es "un DOM + media query" como D-018 (esta decision queda REEMPLAZADA en lo que respecta a la vista movil). El calculo de horarios libres vive en la vista (coherente con "el controller entrega datos, la vista renderiza"). El primer recurso nace expandido (primero del orden alfabetico), el resto colapsado.
 
 Reemplaza a: D-018 (en lo referente a la vista movil)
+
+Estado: VIGENTE
+
+### D-020
+
+Fecha: 2026-08-14
+
+Decision: La seccion "Mi dia" del Command Center agrupa los turnos del dia en CARRILES por Recurso (uno por recurso, apilados). Cada carril tiene un encabezado (dot de color del recurso + nombre + contador) y una fila horizontal de chips compactos (dot de estado + hora de inicio + cliente). El color pastel del chip deriva del color del recurso (`--jk-block-color`, D-011/D-004); el recurso NO se repite dentro del chip porque el carril ya lo identifica. Si un carril desborda en ancho hace scroll horizontal; la seccion tiene max-height 360px con scroll vertical (mobile libera el max-height). El clic en un chip navega a /Turnos/Agenda. El titulo "Mi dia" lleva un icono de sol (acorde a la estetica del sistema).
+
+Motivo: un dia con muchos turnos debe leerse de un vistazo sin repetir datos (el recurso en cada chip ocupaba espacio y no agregaba informacion al estar agrupado); el carril por recurso mantiene la identidad visual de la Agenda sin duplicar la grilla.
+
+Consecuencias: el chip muestra solo hora de inicio (no rango) y cliente. El estado se indica unicamente como punto (D-004). Reemplaza al diseno previo de mini-cards en grilla (descartado por TEAM LEAD).
+
+Reemplaza a: el diseno inicial de "mini-cards Time Block" en grilla (descartado)
+
+Estado: VIGENTE
+
+### D-021
+
+Fecha: 2026-08-14
+
+Decision: El KPI "Ingresos" del Command Center es una PROYECCION del dia: suma de `Servicio.Precio` de los turnos del dia (fecha actual) excluyendo los de `EstadoTurno` "Cancelado". No se usa "pagos registrados" porque el modelo economico (seña/pago) no existe todavia (V3, D-005). La ocupacion se calcula como minutos ocupados / jornada (690 min, rango 08:00-19:30 de D-012) con tope 100%.
+
+Motivo: mostrar valor de negocio sin acoplar la UI a un modelo de pagos inexistente; coherente con D-005 (estado economico independiente del operativo).
+
+Consecuencias: cuando exista V3, el KPI debera recalcularse sobre pagos reales o mantener proyeccion (segun TEAM LEAD). El calculo vive en `HomeService.GetHomeData` (`MinutosJornada = 690`); `TurnosDelDia` incluye todos los turnos del dia (aun cancelados) para la lista "Mi dia".
+
+Reemplaza a: ninguna
 
 Estado: VIGENTE
 

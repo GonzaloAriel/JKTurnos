@@ -139,7 +139,16 @@ namespace JKTurnos.Controllers
                 Observaciones = model.Observaciones
             };
 
-            _turnoService.Crear(turno);
+            try
+            {
+                _turnoService.Crear(turno);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                PopulateDropdowns(model);
+                return View(model);
+            }
 
             return RedirectToAction("Agenda", new { openRecursoId = model.RecursoId });
         }
@@ -190,7 +199,16 @@ namespace JKTurnos.Controllers
             turno.FechaHoraFin = model.FechaHoraFin;
             turno.Observaciones = model.Observaciones;
 
-            _turnoService.Update(turno);
+            try
+            {
+                _turnoService.Update(turno);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                PopulateDropdowns(model);
+                return View(model);
+            }
 
             return RedirectToAction("Index");
         }
