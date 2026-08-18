@@ -45,8 +45,25 @@ namespace JKTurnos.Migrations
                     Nombre = "Administrador",
                     Email = adminEmail,
                     PasswordHash = PasswordHasher.Hash("123456"),
-                    Role = "Admin",
+                    Role = Roles.Admin,
                     TenantId = tenant.Id,
+                    CreatedAt = DateTime.Now,
+                    IsActive = true
+                });
+            }
+
+            // 2b. ADMIN GLOBAL (plataforma, sin tenant: TenantId = 0)
+            var globalEmail = "global@jkturnos.com";
+
+            if (!context.Users.Any(x => x.Email == globalEmail))
+            {
+                context.Users.Add(new User
+                {
+                    Nombre = "Administrador Global",
+                    Email = globalEmail,
+                    PasswordHash = PasswordHasher.Hash("123456"),
+                    Role = Roles.AdminGlobal,
+                    TenantId = 0,
                     CreatedAt = DateTime.Now,
                     IsActive = true
                 });

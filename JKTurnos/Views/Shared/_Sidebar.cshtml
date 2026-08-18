@@ -1,3 +1,4 @@
+@using RolesConst = JKTurnos.Models.Entities.Roles
 <nav id="sidebar"
      class="jk-sidebar d-flex flex-column"
      role="navigation"
@@ -60,7 +61,38 @@
                 <i class="bi bi-person-badge"></i>
                 <span>Recursos</span>
             </a>
+            @if (User.IsInRole(RolesConst.Admin))
+            {
+                <a href="@Url.Action("Index", "Usuarios")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-person-gear"></i>
+                    <span>Usuarios</span>
+                </a>
+            }
         </div>
+
+        @if (User.IsInRole(RolesConst.AdminGlobal))
+        {
+            <div class="jk-nav-group">
+                <span class="jk-nav-label">Sistema</span>
+                <a href="@Url.Action("Index", "Tenants")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Tenants" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Tenants" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-building"></i>
+                    <span>Tenants</span>
+                </a>
+                <a href="@Url.Action("Index", "Usuarios")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-person-gear"></i>
+                    <span>Usuarios</span>
+                </a>
+            </div>
+        }
 
         <div class="jk-nav-group">
             <span class="jk-nav-label">Configuracion</span>

@@ -1,0 +1,156 @@
+@using RolesConst = JKTurnos.Models.Entities.Roles
+@model List<JKTurnos.Models.Entities.User>
+
+@helper ListContent() {
+    bool esAdminGlobal = User.IsInRole(RolesConst.AdminGlobal);
+
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        @if (esAdminGlobal)
+                        {
+                            <th>Tenant</th>
+                        }
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.Email</td>
+                            <td><span class="jk-badge">@item.Role</span></td>
+                            @if (esAdminGlobal)
+                            {
+                                <td>
+                                    @if (item.TenantId == 0)
+                                    {
+                                        <span>Global</span>
+                                    }
+                                    else
+                                    {
+                                        var dict = ViewBag.TenantNombres as System.Collections.Generic.Dictionary<int, string>;
+                                        @(dict != null && dict.ContainsKey(item.TenantId) ? dict[item.TenantId] : item.TenantId.ToString())
+                                    }
+                                </td>
+                            }
+                            <td>
+                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                    new ViewDataDictionary {
+                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                        { "ItemName", item.Nombre },
+                                        { "Compact", false }
+                                    })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@item.Nombre</strong>
+                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                        new ViewDataDictionary {
+                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                            { "ItemName", item.Nombre },
+                            { "Compact", true }
+                        })
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-envelope"></i> @item.Email
+                </div>
+                <div class="jk-small jk-mt-4">
+                    <span class="jk-badge">@item.Role</span>
+                    @if (esAdminGlobal && item.TenantId != 0)
+                    {
+                        var dict = ViewBag.TenantNombres as System.Collections.Generic.Dictionary<int, string>;
+                        <span>@(dict != null && dict.ContainsKey(item.TenantId) ? dict[item.TenantId] : item.TenantId.ToString())</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+        <div class="jk-form-group jk-filter-field">
+            <label class="jk-label" for="tenantId">Tenant</label>
+            <select id="tenantId" name="tenantId" class="jk-select">
+                <option value="">Todos los tenants</option>
+                @foreach (var tenant in (ViewBag.Tenants as List<SelectListItem>) ?? new List<SelectListItem>())
+                {
+                    var esSeleccionado = ViewBag.TenantFiltro != null && ((int)ViewBag.TenantFiltro).ToString() == tenant.Value;
+                    <option value="@tenant.Value" @(esSeleccionado ? "selected" : "")>@tenant.Text</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-funnel"></i> Filtrar
+        </button>
+
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </a>
+    </form>
+}
+
+@helper EmptyContent() {
+    bool esAdminGlobal = User.IsInRole(RolesConst.AdminGlobal);
+    bool hayFiltro = ViewBag.TenantFiltro != null;
+
+    string icon = "person-lines-fill";
+    string title = "No tienes usuarios";
+    string description = "Crea el primer usuario para comenzar.";
+    string actionText = "Crear Usuario";
+    string actionUrl = Url.Action("Create");
+
+    if (hayFiltro)
+    {
+        icon = "search";
+        title = "Sin resultados";
+        description = "No hay usuarios que coincidan con el filtro.";
+        actionText = "Ver todos los usuarios";
+        actionUrl = Url.Action("Index");
+    }
+
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", icon },
+            { "Title", title },
+            { "Description", description },
+            { "ActionText", actionText },
+            { "ActionUrl", actionUrl }
+        })
+}
+
+@{
+    ViewBag.Title = "Usuarios";
+    ViewBag.Subtitle = "Administra los usuarios del sistema";
+    ViewBag.PrimaryAction = Url.Action("Create");
+    ViewBag.PrimaryActionLabel = "Nuevo Usuario";
+
+    if (User.IsInRole(RolesConst.AdminGlobal))
+    {
+        ViewBag.ToolbarContent = FilterContent();
+    }
+
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")

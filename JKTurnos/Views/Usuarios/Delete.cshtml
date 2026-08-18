@@ -1,0 +1,28 @@
+@using JKTurnos.Models.Entities
+@model JKTurnos.Models.Entities.User
+
+@{
+    ViewBag.Title = "Eliminar Usuario";
+    ViewBag.Subtitle = "Confirma la baja del usuario";
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="jk-card jk-mt-24">
+    <p>¿Estas seguro que deseas eliminar al usuario <strong>@Model.Nombre</strong> (<span>@Model.Email</span>)?</p>
+
+    @using (Html.BeginForm("DeleteConfirmed", "Usuarios", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.Id)
+
+        <div class="jk-flex jk-gap-12 jk-mt-16">
+            <button type="submit" class="jk-btn jk-btn-danger">
+                <i class="bi bi-trash"></i> Si, eliminar
+            </button>
+            <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+                Cancelar
+            </a>
+        </div>
+    }
+</div>

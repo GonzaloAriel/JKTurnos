@@ -1,0 +1,31 @@
+@model JKTurnos.Models.Entities.Tenant
+
+@helper FormContent() {
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.CreatedAt)
+    @Html.HiddenFor(m => m.IsActive)
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">@Html.DisplayNameFor(m => m.Nombre)</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "Nombre del negocio" })
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Subdominio)">@Html.DisplayNameFor(m => m.Subdominio)</label>
+        @Html.TextBoxFor(m => m.Subdominio, new { @class = "jk-input", placeholder = "ej: peluqueria-azul" })
+        <small class="jk-small text-secondary">Identificador unico del negocio en la plataforma.</small>
+        @Html.ValidationMessageFor(m => m.Subdominio, "", new { @class = "jk-field-error" })
+    </div>
+}
+
+@{
+    ViewBag.Title = "Editar Tenant";
+    ViewBag.Subtitle = "Actualiza los datos del negocio";
+    ViewBag.SubmitText = "Actualizar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

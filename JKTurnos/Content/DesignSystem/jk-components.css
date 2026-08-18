@@ -1131,6 +1131,16 @@
     min-width: 150px;
 }
 
+.jk-filter-field {
+    margin-bottom: 0;
+}
+
+.jk-filter-field .jk-input,
+.jk-filter-field .jk-select {
+    width: 100%;
+    min-width: 150px;
+}
+
 @media (max-width: 767.98px) {
     .jk-filter-bar .jk-search,
     .jk-filter-bar .jk-date-filter,
@@ -1139,7 +1149,8 @@
         max-width: none;
     }
 
-    .jk-date-filter-field {
+    .jk-date-filter-field,
+    .jk-filter-field {
         flex: 1 1 100%;
     }
 }

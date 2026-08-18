@@ -1,0 +1,47 @@
+@model JKTurnos.Models.Entities.Tenant
+
+@helper FormContent() {
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">@Html.DisplayNameFor(m => m.Nombre)</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "Nombre del negocio" })
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Subdominio)">@Html.DisplayNameFor(m => m.Subdominio)</label>
+        @Html.TextBoxFor(m => m.Subdominio, new { @class = "jk-input", placeholder = "ej: peluqueria-azul" })
+        <small class="jk-small text-secondary">Identificador unico del negocio en la plataforma.</small>
+        @Html.ValidationMessageFor(m => m.Subdominio, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-mt-24">
+        <h3 class="jk-card-title">Administrador del tenant</h3>
+        <p class="jk-small text-secondary jk-mt-4">Si completas el email se crea el primer Administrador del negocio.</p>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="adminNombre">Nombre</label>
+        <input type="text" class="jk-input" id="adminNombre" name="adminNombre" placeholder="Nombre del administrador" />
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="adminEmail">Email</label>
+        <input type="email" class="jk-input" id="adminEmail" name="adminEmail" placeholder="admin@negocio.com" />
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="adminPassword">Password</label>
+        <input type="password" class="jk-input" id="adminPassword" name="adminPassword" placeholder="Password de acceso" />
+    </div>
+}
+
+@{
+    ViewBag.Title = "Nuevo Tenant";
+    ViewBag.Subtitle = "Alta de un negocio en la plataforma";
+    ViewBag.SubmitText = "Guardar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

@@ -1,0 +1,62 @@
+@using RolesConst = JKTurnos.Models.Entities.Roles
+@model JKTurnos.Models.ViewModels.UsuarioViewModel
+
+@helper FormContent() {
+    bool esAdminGlobal = User.IsInRole(RolesConst.AdminGlobal);
+
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">@Html.DisplayNameFor(m => m.Nombre)</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "Nombre completo" })
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Email)">@Html.DisplayNameFor(m => m.Email)</label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "jk-input", placeholder = "usuario@negocio.com" })
+        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Password)">Cambiar password</label>
+        @Html.PasswordFor(m => m.Password, new { @class = "jk-input", placeholder = "Dejar vacio para mantener el actual" })
+        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "jk-field-error" })
+    </div>
+
+    if (esAdminGlobal)
+    {
+        <div class="jk-form-group">
+            <label class="jk-label" for="@Html.IdFor(m => m.Role)">Rol</label>
+            @Html.DropDownListFor(m => m.Role, Model.Roles, new { @class = "jk-input" })
+            @Html.ValidationMessageFor(m => m.Role, "", new { @class = "jk-field-error" })
+        </div>
+
+        <div class="jk-form-group">
+            <label class="jk-label" for="@Html.IdFor(m => m.TenantId)">Tenant</label>
+            @Html.DropDownListFor(m => m.TenantId, Model.Tenants, "Seleccione un tenant", new { @class = "jk-input" })
+            @Html.ValidationMessageFor(m => m.TenantId, "", new { @class = "jk-field-error" })
+        </div>
+    }
+    else
+    {
+        @Html.Hidden("Role", RolesConst.User)
+        @Html.Hidden("TenantId", (object)ViewBag.TenantId)
+
+        <div class="jk-form-group">
+            <label class="jk-label">Rol</label>
+            <input type="text" class="jk-input" value="@RolesConst.User" disabled />
+        </div>
+    }
+}
+
+@{
+    ViewBag.Title = "Editar Usuario";
+    ViewBag.Subtitle = "Actualiza los datos del usuario";
+    ViewBag.SubmitText = "Actualizar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

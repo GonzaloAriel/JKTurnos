@@ -146,6 +146,10 @@ namespace JKTurnos.Services
                     turno.EstadoTurnoId = pendiente.Id;
             }
 
+            if (turno.EstadoTurnoId == 0)
+                throw new InvalidOperationException(
+                    "No hay estados de turno configurados. Contacte al administrador.");
+
             _repo.Add(turno);
         }
 

@@ -73,3 +73,14 @@ NOTA (2026-08-14): D-020 y D-021 fueron tomadas por el Command Center (ver AI/02
 
 ---
 ESTADO: PLAN GUARDADO. NO IMPLEMENTADO. Esperando confirmacion del TEAM LEAD para iniciar.
+
+## Actualizacion (2026-08-18) — IMPLEMENTADO Y CONSOLIDADO por TEAM LEAD
+
+Fases 0-2 completas segun este plan + reparacion de BD:
+
+- Fase 0: `Models/Entities/Roles.cs`, `Data/GlobalRepository.cs`, seed `global@jkturnos.com` (AdminGlobal, TenantId=0) en `Migrations/Configuration.cs`, helpers `CurrentRole/IsAdminGlobal/IsAdmin` en `BaseController`.
+- Fase 1: `Services/UserService.cs` y `Services/TenantService.cs`.
+- Fase 2: `Models/ViewModels/UsuarioViewModel.cs`, `Controllers/TenantsController.cs`, `Controllers/UsuariosController.cs`, vistas `Views/Tenants/{Index,Create,Edit,Delete}.cshtml` y `Views/Usuarios/{Index,Create,Edit,Delete}.cshtml`, sidebar (Sistema + Usuarios), csproj.
+- Reparacion de BD (necesaria): `__MigrationHistory` tenia ContextKey `JKTurnos.Data.JKContext` (EF usa `JKTurnos.Migrations.Configuration`) y Model vacio -> corregido + regenerado; eliminado el FK `Users.TenantId -> Tenants` (D-023) para permitir `TenantId=0`; `global@jkturnos.com` creado directamente en la BD. `Update-Database` consistente.
+- Extras consolidados: alta de tenant siembra Estados de Turno base + ConfiguracionTenant (D-024); guard en `TurnoService.Crear`; creada `Views/Recursos/Delete.cshtml`.
+- Decisiones D-022, D-023 y D-024 registradas en `AI/02_DECISIONES.md`. Estado en `AI/01_ESTADO.md`.

@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Web.Mvc;
 using JKTurnos.Infrastructure;
+using JKTurnos.Models.Entities;
 
 namespace JKTurnos.Controllers
 {
@@ -29,6 +30,34 @@ namespace JKTurnos.Controllers
 
                 return int.Parse(claim.Value);
             }
+        }
+
+        protected string CurrentRole
+        {
+            get
+            {
+                var identity =
+                    User.Identity as ClaimsIdentity;
+
+                if (identity == null)
+                    return null;
+
+                var claim =
+                    identity.FindFirst(
+                        ClaimTypes.Role);
+
+                return claim != null ? claim.Value : null;
+            }
+        }
+
+        protected bool IsAdminGlobal
+        {
+            get { return CurrentRole == Roles.AdminGlobal; }
+        }
+
+        protected bool IsAdmin
+        {
+            get { return CurrentRole == Roles.Admin; }
         }
 
         protected override void OnActionExecuting(

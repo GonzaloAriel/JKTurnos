@@ -37,6 +37,9 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-019 | Vista movil de la Agenda = acordeon de tarjetas por Recurso (details/summary, sin JS) con turnos y horarios LIBRES por recurso. Reemplaza la grilla en <768px; la grilla desktop se oculta | 2026-08-13 | VIGENTE |
 | D-020 | Command Center "Mi dia" = carriles por Recurso con chips compactos (dot de estado + hora de inicio + cliente). Color pastel del recurso; el recurso NO se repite en el chip. Scroll horizontal por carril y vertical en la seccion. Clic navega a /Turnos/Agenda | 2026-08-14 | VIGENTE |
 | D-021 | KPI "Ingresos" del Command Center = PROYECCION del dia (suma de Servicio.Precio de los turnos del dia excluyendo "Cancelado"); no usa pagos reales (modelo economico V3 a futuro, D-005). Ocupacion = minutos ocupados / 690 (08:00-19:30) | 2026-08-14 | VIGENTE |
+| D-022 | Acceso global de plataforma: GlobalRepository filtra solo IsActive (sin TenantId); Add NO asigna TenantId. Uso exclusivo de servicios de plataforma; AdminGlobal (TenantId=0) no ve datos de negocio via BaseRepository | 2026-08-18 | VIGENTE |
+| D-023 | Roles como constantes (Roles.cs) + [Authorize(Roles=...)]; sin tabla de permisos. AdminGlobal = TenantId 0 (sin tenant), sin FK Users.TenantId->Tenants | 2026-08-18 | VIGENTE |
+| D-024 | Un tenant nuevo nace operativo: TenantService.Create siembra Estados de Turno base (Pendiente/Confirmado/Atendido) + ConfiguracionTenant. TurnoService.Crear con guard si no hay estados | 2026-08-18 | VIGENTE |
 
 ## Detalle
 
@@ -329,6 +332,48 @@ Decision: El KPI "Ingresos" del Command Center es una PROYECCION del dia: suma d
 Motivo: mostrar valor de negocio sin acoplar la UI a un modelo de pagos inexistente; coherente con D-005 (estado economico independiente del operativo).
 
 Consecuencias: cuando exista V3, el KPI debera recalcularse sobre pagos reales o mantener proyeccion (segun TEAM LEAD). El calculo vive en `HomeService.GetHomeData` (`MinutosJornada = 690`); `TurnosDelDia` incluye todos los turnos del dia (aun cancelados) para la lista "Mi dia".
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-022
+
+Fecha: 2026-08-18
+
+Decision: Los datos de plataforma (Tenants, cuentas) se acceden SOLO via `GlobalRepository<TEntity>` (`Data/GlobalRepository.cs`), que filtra unicamente por `IsActive` (sin TenantId) y cuyo `Add` NO asigna TenantId (lo setea el llamador). Uso exclusivo de servicios de plataforma (`TenantService`, y la via global de `UserService`). Un AdminGlobal (claim `TenantId = 0`) no pertenece a ningun negocio: a traves de `BaseRepository` obtiene siempre vacio (aislamiento deseado, blinda los modulos operativos).
+
+Motivo: D-008 (soft delete + aislamiento por tenant) aplica a entidades de negocio; las entidades de plataforma no pertenecen a un tenant y `BaseRepository.Add` sobrescribe `TenantId` con el tenant actual.
+
+Consecuencias: Los services de plataforma usan `GlobalRepository` y setean `TenantId` explicitamente. `Tenant` no implementa `ITenantEntity` (no puede usar `BaseRepository`).
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-023
+
+Fecha: 2026-08-18
+
+Decision: `Role` sigue siendo string; los roles viven como constantes en `Models/Entities/Roles.cs` (`AdminGlobal`, `Admin`, `User`) usadas con `[Authorize(Roles = ...)]` y `User.IsInRole(...)` en vistas. Sin tabla de permisos (RBAC completo a futuro). `AuthService.SignIn` emite `ClaimTypes.Role` y `"TenantId"`. `AdminGlobal` = `TenantId 0` (sin tenant): se elimino la navegacion `User.Tenant` y el FK `Users.TenantId -> Tenants.Id` para permitir `TenantId = 0`.
+
+Motivo: distinguir cuentas de plataforma de cuentas de negocio sin mezclar el aislamiento por tenant.
+
+Consecuencias: `UsuariosController` autoriza `AdminGlobal,Admin` y adapta dropdowns por rol (Admin solo crea rol `User` en su tenant; AdminGlobal elige Tenant y Rol libre). El login del AdminGlobal funciona con `TenantId=0`.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-024
+
+Fecha: 2026-08-18
+
+Decision: Al crear un tenant, `TenantService.Create` siembra automaticamente los Estados de Turno base (Pendiente #ffc107, Confirmado #0d6efd, Atendido #198754) y la `ConfiguracionTenant` del negocio. `TurnoService.Crear` tiene guard defensivo: si no existe un estado "Pendiente" lanza un error claro en vez del FK.
+
+Motivo: sin estados base un tenant nuevo no puede crear turnos (el form postea `EstadoTurnoId=0` y choca con `FK_Turnoes_EstadoTurnoes`); los estados no tienen CRUD propio y solo el seed demo los creaba para "local".
+
+Consecuencias: el alta de tenant via CRUD queda operable al instante. Clientes/Servicios/Recursos de un tenant nuevo nacen en blanco (se crean aparte).
 
 Reemplaza a: ninguna
 
