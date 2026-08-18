@@ -1,0 +1,51 @@
+@model JKTurnos.Models.Entities.ConfiguracionTenant
+
+@helper FormContent() {
+    <div class="jk-form-group">
+        <label class="jk-label" for="NombreComercial">Nombre comercial</label>
+        @Html.TextBoxFor(m => m.NombreComercial, new { @class = "jk-input", placeholder = "Nombre de tu negocio", id = "NombreComercial" })
+        @Html.ValidationMessageFor(m => m.NombreComercial, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="Telefono">Telefono</label>
+        @Html.TextBoxFor(m => m.Telefono, new { @class = "jk-input", placeholder = "ej: 351-555-1234", id = "Telefono" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="Email">Email de contacto</label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "jk-input", placeholder = "contacto@negocio.com", id = "Email" })
+        <small class="jk-small text-secondary">Aparece en las comunicaciones con tus clientes.</small>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="Direccion">Direccion</label>
+        @Html.TextBoxFor(m => m.Direccion, new { @class = "jk-input", placeholder = "Calle y numero", id = "Direccion" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="LogoUrl">Logo (URL)</label>
+        @Html.TextBoxFor(m => m.LogoUrl, new { @class = "jk-input", placeholder = "https://tu-sitio.com/logo.png", id = "LogoUrl" })
+        <small class="jk-small text-secondary">Se muestra en el menu lateral y en la bienvenida.</small>
+    </div>
+
+    <div class="jk-note">
+        <strong>Como subir tu logo gratis:</strong><br />
+        1. Entra a un servicio de alojamiento de imagenes gratuito (por ejemplo postimages.org o imgbb.com).<br />
+        2. Subi la imagen del logo y copia la URL directa (el enlace que termina en .png, .jpg o .gif).<br />
+        3. Pegala en el campo de arriba y guarda.<br />
+        Tamanio recomendado: 100x100 px (cuadrado), menor a 1MB.<br />
+        Si la imagen no aparece, verifica que sea una URL directa y no un enlace a una pagina web.
+    </div>
+}
+
+@{
+    ViewBag.Title = "Datos del negocio";
+    ViewBag.Subtitle = "Nombre, contacto y datos generales";
+    ViewBag.SubmitText = "Guardar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

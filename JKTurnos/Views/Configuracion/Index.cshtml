@@ -1,0 +1,87 @@
+@model List<JKTurnos.Models.Entities.EstadoTurno>
+
+@{
+    ViewBag.Title = "Configuracion";
+    ViewBag.Subtitle = "Ajusta los datos y el funcionamiento de tu negocio";
+
+    var config = ViewBag.Configuracion as JKTurnos.Models.Entities.ConfiguracionTenant;
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<!-- ===== DATOS DEL NEGOCIO ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Datos del negocio</h3>
+        <a href="@Url.Action("DatosNegocio")" class="jk-btn jk-btn-sm jk-btn-ghost">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+    </div>
+
+    @if (config != null && !string.IsNullOrWhiteSpace(config.NombreComercial))
+    {
+        <div class="jk-grid">
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Nombre comercial</p>
+                <p class="jk-mt-4">@config.NombreComercial</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Telefono</p>
+                <p class="jk-mt-4">@(string.IsNullOrWhiteSpace(config.Telefono) ? "-" : config.Telefono)</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Email de contacto</p>
+                <p class="jk-mt-4">@(string.IsNullOrWhiteSpace(config.Email) ? "-" : config.Email)</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Direccion</p>
+                <p class="jk-mt-4">@(string.IsNullOrWhiteSpace(config.Direccion) ? "-" : config.Direccion)</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Logo</p>
+                <p class="jk-mt-4">@(string.IsNullOrWhiteSpace(config.LogoUrl) ? "-" : config.LogoUrl)</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">Todavia no cargaste los datos de tu negocio. Cargalos con el boton Editar.</p>
+    }
+</div>
+
+<!-- ===== ESTADOS DE TURNO ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Estados de turno</h3>
+        <a href="@Url.Action("EstadoCrear")" class="jk-btn jk-btn-sm jk-btn-primary">
+            <i class="bi bi-plus-lg"></i> Nuevo Estado
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div>
+            @foreach (var estado in Model)
+            {
+                <div class="jk-flex-between jk-list-row">
+                    <span class="jk-flex jk-gap-8">
+                        <span class="jk-color-dot" style="background-color:@estado.Color"></span>
+                        @estado.Nombre
+                    </span>
+                    <span class="jk-flex jk-gap-8">
+                        <a href="@Url.Action("EstadoEditar", new { id = estado.Id })" class="jk-btn jk-btn-icon" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="@Url.Action("EstadoEliminar", new { id = estado.Id })" class="jk-btn jk-btn-icon" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </span>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">No tenes estados de turno. Agrega el primero con "Nuevo Estado".</p>
+    }
+</div>

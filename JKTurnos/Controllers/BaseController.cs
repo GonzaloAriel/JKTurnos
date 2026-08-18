@@ -68,6 +68,20 @@ namespace JKTurnos.Controllers
             ViewBag.UserName =
                 User.Identity.Name;
 
+            var config =
+                new Services.ConfiguracionService()
+                    .GetConfiguracion();
+
+            ViewBag.ConfiguracionLogo =
+                config != null
+                    ? config.LogoUrl
+                    : null;
+
+            ViewBag.ConfiguracionNombre =
+                config != null
+                    ? config.NombreComercial
+                    : null;
+
             base.OnActionExecuting(filterContext);
         }
     }

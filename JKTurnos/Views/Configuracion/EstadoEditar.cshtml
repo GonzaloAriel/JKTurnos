@@ -1,0 +1,29 @@
+@model JKTurnos.Models.Entities.EstadoTurno
+
+@helper FormContent() {
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="Nombre">Nombre del estado</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "ej: En espera", id = "Nombre" })
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+        <small class="jk-small text-secondary">Aparece en los turnos y en la agenda.</small>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="Color">Color</label>
+        <input type="color" id="Color" name="Color" class="jk-input" value="@Model.Color" />
+        <small class="jk-small text-secondary">Se usa para identificar este estado en la agenda.</small>
+    </div>
+}
+
+@{
+    ViewBag.Title = "Editar Estado";
+    ViewBag.Subtitle = "Actualiza el nombre o el color del estado";
+    ViewBag.SubmitText = "Actualizar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

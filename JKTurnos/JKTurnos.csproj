@@ -168,6 +168,7 @@
     <Compile Include="Controllers\TurnosController.cs" />
     <Compile Include="Controllers\UsuariosController.cs" />
     <Compile Include="Controllers\TenantsController.cs" />
+    <Compile Include="Controllers\ConfiguracionController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\GlobalRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
     <Compile Include="Services\TenantService.cs" />
+    <Compile Include="Services\ConfiguracionService.cs" />
     <Compile Include="Services\TurnoService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
@@ -327,6 +329,11 @@
     <Content Include="Views\Shared\Components\_TableActions.cshtml" />
     <Content Include="Views\Shared\Components\_FormLayout.cshtml" />
     <Content Include="Views\Shared\Components\_FormActions.cshtml" />
+    <Content Include="Views\Configuracion\DatosNegocio.cshtml" />
+    <Content Include="Views\Configuracion\EstadoCrear.cshtml" />
+    <Content Include="Views\Configuracion\EstadoEditar.cshtml" />
+    <Content Include="Views\Configuracion\EstadoEliminar.cshtml" />
+    <Content Include="Views\Configuracion\Index.cshtml" />
     <Content Include="Views\Recursos\Create.cshtml" />
     <Content Include="Views\Recursos\Delete.cshtml" />
     <Content Include="Views\Recursos\Edit.cshtml" />

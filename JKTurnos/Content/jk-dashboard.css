@@ -50,6 +50,32 @@
     margin-right: 6px;
 }
 
+/* ===== WELCOME BRAND ===== */
+.welcome-brand {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 8px;
+}
+
+.welcome-brand-logo {
+    width: 120px;
+    height: 120px;
+    max-width: 120px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+@media (max-width: 575.98px) {
+    .welcome-section {
+        text-align: center;
+    }
+
+    .welcome-brand {
+        justify-content: center;
+    }
+}
+
 /* ===== QUICK ACTIONS ===== */
 .quick-actions {
     display: grid;

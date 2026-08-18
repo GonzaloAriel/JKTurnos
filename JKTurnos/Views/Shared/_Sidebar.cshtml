@@ -6,7 +6,16 @@
      data-collapsed="false">
     <div class="jk-sidebar-header">
         <a href="@Url.Action("Index", "Home")" class="jk-sidebar-brand">
-            <i class="bi bi-calendar-check jk-sidebar-brand-icon"></i>
+            @if (!string.IsNullOrWhiteSpace(ViewBag.ConfiguracionLogo))
+            {
+                <img src="@ViewBag.ConfiguracionLogo"
+                     alt="Logo del negocio"
+                     class="jk-sidebar-brand-logo" />
+            }
+            else
+            {
+                <i class="bi bi-calendar-check jk-sidebar-brand-icon"></i>
+            }
             <span class="jk-sidebar-name">JKTurnos</span>
         </a>
         <span class="jk-sidebar-subtitle">Asistente de tiempo</span>
@@ -94,13 +103,19 @@
             </div>
         }
 
-        <div class="jk-nav-group">
-            <span class="jk-nav-label">Configuracion</span>
-            <a href="#" class="jk-nav-item" data-sidebar-item>
-                <i class="bi bi-gear"></i>
-                <span>Negocio</span>
-            </a>
-        </div>
+        @if (User.IsInRole(RolesConst.Admin))
+        {
+            <div class="jk-nav-group">
+                <span class="jk-nav-label">Configuracion</span>
+                <a href="@Url.Action("Index", "Configuracion")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Configuracion" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Configuracion" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-gear"></i>
+                    <span>Negocio</span>
+                </a>
+            </div>
+        }
     </div>
 
     <div class="jk-sidebar-footer">

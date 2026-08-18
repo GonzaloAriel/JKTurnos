@@ -150,6 +150,14 @@
     flex-shrink: 0;
 }
 
+.jk-sidebar-brand-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--jk-radius);
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
 .jk-sidebar-name {
     font-size: var(--jk-text-md);
     font-weight: var(--jk-weight-bold);
