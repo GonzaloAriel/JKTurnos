@@ -70,7 +70,7 @@ namespace JKTurnos.Services
             if (user == null)
                 return null;
 
-            if (CurrentRole == Roles.Admin && user.TenantId != CurrentTenantId)
+            if (CurrentRole == Roles.Admin && (user.TenantId != CurrentTenantId || user.Role != Roles.User))
                 return null;
 
             return user;
@@ -122,11 +122,13 @@ namespace JKTurnos.Services
 
             if (CurrentRole == Roles.Admin)
             {
-                if (existente.Role == Roles.AdminGlobal || existente.TenantId != CurrentTenantId)
+                if (existente.Role != Roles.User || existente.TenantId != CurrentTenantId)
                     throw new UnauthorizedAccessException("No puede modificar este usuario.");
 
-                user.TenantId = CurrentTenantId;
-                user.Role = Roles.User;
+                existente.Nombre = user.Nombre;
+                existente.Email = user.Email;
+                existente.Role = Roles.User;
+                existente.TenantId = CurrentTenantId;
             }
             else if (CurrentRole == Roles.AdminGlobal)
             {
@@ -135,16 +137,20 @@ namespace JKTurnos.Services
 
                 if (user.Role != Roles.Admin && user.Role != Roles.User && user.Role != Roles.AdminGlobal)
                     throw new ArgumentException("Rol invalido.");
+
+                existente.Nombre = user.Nombre;
+                existente.Email = user.Email;
+                existente.Role = user.Role;
+                existente.TenantId = user.TenantId;
             }
 
-            if (_repo.GetAll().Any(u => u.Email == user.Email && u.Id != user.Id))
+            if (_repo.GetAll().Any(u => u.Email == existente.Email && u.Id != existente.Id))
                 throw new InvalidOperationException("Ya existe un usuario con ese email.");
 
-            user.PasswordHash = !string.IsNullOrWhiteSpace(password)
-                ? PasswordHasher.Hash(password)
-                : existente.PasswordHash;
+            if (!string.IsNullOrWhiteSpace(password))
+                existente.PasswordHash = PasswordHasher.Hash(password);
 
-            _repo.Update(user);
+            _repo.Update(existente);
         }
 
         public void Delete(int id)
@@ -172,6 +178,24 @@ namespace JKTurnos.Services
 
             if (string.IsNullOrWhiteSpace(newPassword))
                 throw new ArgumentException("El password es obligatorio.");
+
+            user.PasswordHash = PasswordHasher.Hash(newPassword);
+            _repo.Update(user);
+        }
+
+        public void CambiarMiPassword(int userId, string currentPassword, string newPassword)
+        {
+            var user = _repo.GetById(userId);
+
+            if (user == null)
+                throw new InvalidOperationException("Usuario no encontrado.");
+
+            if (string.IsNullOrEmpty(user.PasswordHash) ||
+                !PasswordHasher.Verify(currentPassword ?? "", user.PasswordHash))
+                throw new ArgumentException("La contrasena actual es incorrecta.");
+
+            if (string.IsNullOrWhiteSpace(newPassword))
+                throw new ArgumentException("El nuevo password es obligatorio.");
 
             user.PasswordHash = PasswordHasher.Hash(newPassword);
             _repo.Update(user);

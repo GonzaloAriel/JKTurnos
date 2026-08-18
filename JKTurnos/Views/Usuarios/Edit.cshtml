@@ -18,12 +18,6 @@
         @Html.ValidationMessageFor(m => m.Email, "", new { @class = "jk-field-error" })
     </div>
 
-    <div class="jk-form-group">
-        <label class="jk-label" for="@Html.IdFor(m => m.Password)">Cambiar password</label>
-        @Html.PasswordFor(m => m.Password, new { @class = "jk-input", placeholder = "Dejar vacio para mantener el actual" })
-        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "jk-field-error" })
-    </div>
-
     if (esAdminGlobal)
     {
         <div class="jk-form-group">

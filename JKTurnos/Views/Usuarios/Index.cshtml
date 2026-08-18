@@ -3,6 +3,7 @@
 
 @helper ListContent() {
     bool esAdminGlobal = User.IsInRole(RolesConst.AdminGlobal);
+    bool esAdmin = User.IsInRole(RolesConst.Admin);
 
     <div class="jk-hide-mobile">
         <div class="jk-table-wrap">
@@ -41,13 +42,22 @@
                                 </td>
                             }
                             <td>
-                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
-                                    new ViewDataDictionary {
-                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
-                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
-                                        { "ItemName", item.Nombre },
-                                        { "Compact", false }
-                                    })
+                                @if (!esAdmin || item.Role == RolesConst.User)
+                                {
+                                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                        new ViewDataDictionary {
+                                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                            { "ItemName", item.Nombre },
+                                            { "Compact", false }
+                                        })
+                                    if (item.Id != (int)ViewBag.CurrentUserId)
+                                    {
+                                        <a class="jk-btn jk-btn-sm jk-btn-ghost" href="@Url.Action("ResetPassword", new { id = item.Id })" aria-label="Resetear contrasena de @item.Nombre">
+                                            <i class="bi bi-key"></i> Resetear
+                                        </a>
+                                    }
+                                }
                             </td>
                         </tr>
                     }
@@ -62,13 +72,24 @@
             <div class="jk-card jk-card-compact">
                 <div class="jk-flex-between">
                     <strong>@item.Nombre</strong>
-                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
-                        new ViewDataDictionary {
-                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
-                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
-                            { "ItemName", item.Nombre },
-                            { "Compact", true }
-                        })
+                    <div class="jk-flex jk-gap-8">
+                        @if (!esAdmin || item.Role == RolesConst.User)
+                        {
+                            if (item.Id != (int)ViewBag.CurrentUserId)
+                            {
+                                <a class="jk-btn jk-btn-sm jk-btn-ghost" href="@Url.Action("ResetPassword", new { id = item.Id })" aria-label="Resetear contrasena de @item.Nombre">
+                                    <i class="bi bi-key"></i>
+                                </a>
+                            }
+                            @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                new ViewDataDictionary {
+                                    { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                    { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                    { "ItemName", item.Nombre },
+                                    { "Compact", true }
+                                })
+                        }
+                    </div>
                 </div>
                 <div class="jk-mt-8 jk-small">
                     <i class="bi bi-envelope"></i> @item.Email

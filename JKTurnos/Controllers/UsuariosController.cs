@@ -44,6 +44,7 @@ namespace JKTurnos.Controllers
         {
             var usuarios = _service.GetAll(tenantId);
             ViewBag.TenantFiltro = tenantId;
+            ViewBag.CurrentUserId = UserId;
 
             if (IsAdminGlobal)
             {
@@ -184,6 +185,86 @@ namespace JKTurnos.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        // GET: Usuarios/ResetPassword/5
+        public ActionResult ResetPassword(int id)
+        {
+            var user = _service.GetById(id);
+
+            if (user == null)
+                return HttpNotFound();
+
+            return View(user);
+        }
+
+        // POST: Usuarios/ResetPassword/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ResetPassword(int id, string password, string confirmar)
+        {
+            var user = _service.GetById(id);
+
+            if (user == null)
+                return HttpNotFound();
+
+            if (id == UserId)
+                ModelState.AddModelError("", "Usa 'Cambiar mi contrasena' para modificar tu propia contrasena.");
+
+            if (string.IsNullOrWhiteSpace(password))
+                ModelState.AddModelError("password", "El password es obligatorio.");
+            else if (password != confirmar)
+                ModelState.AddModelError("confirmar", "Los passwords no coinciden.");
+
+            if (!ModelState.IsValid)
+                return View(user);
+
+            try
+            {
+                _service.ResetPassword(id, password);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(user);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // GET: Usuarios/MiPassword
+        public ActionResult MiPassword()
+        {
+            return View();
+        }
+
+        // POST: Usuarios/MiPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult MiPassword(string passwordActual, string nuevoPassword, string confirmar)
+        {
+            if (string.IsNullOrWhiteSpace(passwordActual))
+                ModelState.AddModelError("passwordActual", "La contrasena actual es obligatoria.");
+
+            if (string.IsNullOrWhiteSpace(nuevoPassword))
+                ModelState.AddModelError("nuevoPassword", "El nuevo password es obligatorio.");
+            else if (nuevoPassword != confirmar)
+                ModelState.AddModelError("confirmar", "Los passwords no coinciden.");
+
+            if (!ModelState.IsValid)
+                return View();
+
+            try
+            {
+                _service.CambiarMiPassword(UserId, passwordActual, nuevoPassword);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View();
+            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

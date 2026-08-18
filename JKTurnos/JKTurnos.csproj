@@ -344,6 +344,8 @@
     <Content Include="Views\Usuarios\Delete.cshtml" />
     <Content Include="Views\Usuarios\Edit.cshtml" />
     <Content Include="Views\Usuarios\Index.cshtml" />
+    <Content Include="Views\Usuarios\MiPassword.cshtml" />
+    <Content Include="Views\Usuarios\ResetPassword.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaGrid.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaGridSemanal.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaMobile.cshtml" />
