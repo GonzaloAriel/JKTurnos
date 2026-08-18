@@ -18,7 +18,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.FechaHoraInicio.ToString("dd/MM HH:mm")</td>
+                            <td>@item.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</td>
                             <td>@(item.Servicio != null ? item.Servicio.Nombre : "Reservado")</td>
                             <td>@(item.Recurso != null ? item.Recurso.Nombre : "Sin recurso")</td>
@@ -38,17 +38,96 @@
             </table>
         </div>
     </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</strong>
+                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                        new ViewDataDictionary {
+                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                            { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
+                            { "Compact", true }
+                        })
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-clock"></i> @item.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")
+                </div>
+                <div class="jk-small jk-mt-4">
+                    <i class="bi bi-tag"></i> @(item.Servicio != null ? item.Servicio.Nombre : "Reservado")
+                </div>
+                <div class="jk-small jk-mt-4">
+                    <i class="bi bi-person-badge"></i> @(item.Recurso != null ? item.Recurso.Nombre : "Sin recurso")
+                </div>
+                <div class="jk-mt-8">
+                    <span class="jk-badge">@(item.EstadoTurno != null ? item.EstadoTurno.Nombre : "Sin estado")</span>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 @helper EmptyContent() {
+    bool hayFiltros = !string.IsNullOrWhiteSpace(ViewBag.Busqueda as string)
+        || ViewBag.FechaInicio != null
+        || ViewBag.FechaFin != null;
+
+    string icon = "calendar";
+    string title = "No tienes turnos hoy";
+    string description = "Crea tu primer turno para comenzar a gestionar tu agenda.";
+    string actionText = "Crear Turno";
+    string actionUrl = Url.Action("Create");
+
+    if (hayFiltros)
+    {
+        icon = "search";
+        title = "Sin resultados";
+        description = "No hay turnos que coincidan con la busqueda o el rango de fechas.";
+        actionText = "Ver turnos de hoy";
+        actionUrl = Url.Action("Index");
+    }
+
     @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
         new ViewDataDictionary {
-            { "Icon", "calendar" },
-            { "Title", "No tienes turnos" },
-            { "Description", "Crea tu primer turno para comenzar a gestionar tu agenda." },
-            { "ActionText", "Crear Turno" },
-            { "ActionUrl", Url.Action("Create") }
+            { "Icon", icon },
+            { "Title", title },
+            { "Description", description },
+            { "ActionText", actionText },
+            { "ActionUrl", actionUrl }
         })
+}
+
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+        @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
+            new ViewDataDictionary {
+                { "Name", "busqueda" },
+                { "Id", "search-turnos" },
+                { "Value", ViewBag.Busqueda },
+                { "Placeholder", "Buscar por cliente, servicio o recurso..." }
+            })
+
+        @Html.Partial("~/Views/Shared/Components/_DateFilter.cshtml",
+            new ViewDataDictionary {
+                { "InicioName", "fechaInicio" },
+                { "FinName", "fechaFin" },
+                { "InicioValue", ViewBag.FechaInicio },
+                { "FinValue", ViewBag.FechaFin },
+                { "InicioLabel", "Desde" },
+                { "FinLabel", "Hasta" }
+            })
+
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Hoy
+        </a>
+    </form>
 }
 
 @{
@@ -56,8 +135,7 @@
     ViewBag.Subtitle = "Administra tus turnos";
     ViewBag.PrimaryAction = Url.Action("Create");
     ViewBag.PrimaryActionLabel = "Nuevo Turno";
-    ViewBag.SearchPlaceholder = "Buscar turnos...";
-    ViewBag.SearchId = "search-turnos";
+    ViewBag.ToolbarContent = FilterContent();
 
     ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
 }

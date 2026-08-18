@@ -15,9 +15,16 @@
 
     @Html.Partial("~/Views/Shared/Components/_AgendaToolbar.cshtml")
 
-    @Html.Partial("~/Views/Shared/Components/_AgendaGrid.cshtml")
+    @if (Model.Vista == "semana")
+    {
+        @Html.Partial("~/Views/Shared/Components/_AgendaGridSemanal.cshtml")
+    }
+    else
+    {
+        @Html.Partial("~/Views/Shared/Components/_AgendaGrid.cshtml")
 
-    @Html.Partial("~/Views/Shared/Components/_AgendaMobile.cshtml")
+        @Html.Partial("~/Views/Shared/Components/_AgendaMobile.cshtml")
+    }
 
 </div>
 

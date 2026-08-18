@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using JKTurnos.Models.Entities;
 using JKTurnos.Services;
 
@@ -15,9 +16,10 @@ namespace JKTurnos.Controllers
         }
 
         // GET: Clientes
-        public ActionResult Index()
+        public ActionResult Index(string busqueda = null)
         {
-            var clientes = _service.GetAll();
+            var clientes = _service.GetFiltrados(busqueda);
+            ViewBag.Busqueda = busqueda;
             return View(clientes);
         }
 
@@ -25,6 +27,29 @@ namespace JKTurnos.Controllers
         public ActionResult Create()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult QuickCreate(Cliente model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(m => m.Value.Errors.Count > 0)
+                    .ToDictionary(m => m.Key, m => m.Value.Errors.Select(e => e.ErrorMessage).FirstOrDefault());
+
+                return Json(new { success = false, errors = errors });
+            }
+
+            _service.Create(model);
+
+            return Json(new
+            {
+                success = true,
+                id = model.Id,
+                nombre = model.Nombre
+            });
         }
 
         // POST: Clientes/Create

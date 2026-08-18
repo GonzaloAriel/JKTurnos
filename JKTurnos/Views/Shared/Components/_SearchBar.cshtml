@@ -6,14 +6,28 @@
             { "Placeholder", "Buscar clientes..." },
             { "Id", "search-clientes" }
         })
+
+    Para busqueda en formularios GET (filtrado server-side), pasar Name y Value:
+    @Html.Partial("~/Views/Shared/Components/_SearchBar.cshtml",
+        new ViewDataDictionary {
+            { "Placeholder", "Buscar..." },
+            { "Id", "search-turnos" },
+            { "Name", "busqueda" },
+            { "Value", Request.QueryString["busqueda"] }
+        })
 *@
 
 @{
     string placeholder = ViewBag.Placeholder ?? "Buscar...";
     string id = ViewBag.Id ?? "jk-search";
+    string name = ViewBag.Name as string;
+    string value = ViewBag.Value as string ?? "";
 }
 
 <div class="jk-search">
     <i class="bi bi-search"></i>
-    <input type="text" id="@id" placeholder="@placeholder" />
+    <input type="text" id="@id"
+           @if (!string.IsNullOrEmpty(name)) { <text>name="@name"</text> }
+           value="@value"
+           placeholder="@placeholder" />
 </div>

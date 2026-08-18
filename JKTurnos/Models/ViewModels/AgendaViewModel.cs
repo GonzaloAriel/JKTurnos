@@ -8,6 +8,8 @@ namespace JKTurnos.Models.ViewModels
     {
         public DateTime Fecha { get; set; }
 
+        public string Vista { get; set; }
+
         public IEnumerable<Recurso> Recursos { get; set; }
 
         public IEnumerable<Turno> Turnos { get; set; }

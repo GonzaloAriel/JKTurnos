@@ -1095,3 +1095,51 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
     background: var(--jk-surface);
 }
+
+/* ================================================================
+   FILTERS
+   ================================================================ */
+
+.jk-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--jk-space-12);
+}
+
+.jk-filter-bar .jk-search {
+    flex: 1 1 220px;
+    max-width: 320px;
+}
+
+.jk-filter-bar .jk-btn {
+    flex-shrink: 0;
+}
+
+.jk-date-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--jk-space-12);
+}
+
+.jk-date-filter-field {
+    margin-bottom: 0;
+}
+
+.jk-date-filter-field .jk-input {
+    width: 100%;
+    min-width: 150px;
+}
+
+@media (max-width: 767.98px) {
+    .jk-filter-bar .jk-search,
+    .jk-filter-bar .jk-date-filter,
+    .jk-filter-bar .jk-btn {
+        width: 100%;
+        max-width: none;
+    }
+
+    .jk-date-filter-field {
+        flex: 1 1 100%;
+    }
+}

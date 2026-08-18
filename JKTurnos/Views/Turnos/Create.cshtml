@@ -3,7 +3,12 @@
 @helper FormContent() {
     <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.ClienteId)">@Html.DisplayNameFor(m => m.ClienteId)</label>
-        @Html.DropDownListFor(m => m.ClienteId, Model.Clientes, "Seleccione un cliente", new { @class = "jk-input" })
+        <div class="jk-flex jk-gap-8">
+            @Html.DropDownListFor(m => m.ClienteId, Model.Clientes, "Seleccione un cliente", new { @class = "jk-input jk-flex-1", id = "ClienteId" })
+            <button type="button" class="jk-btn jk-btn-icon" data-jk-open-drawer="drawer-quick-cliente" title="Crear cliente" aria-label="Crear cliente">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
         @Html.ValidationMessageFor(m => m.ClienteId, "", new { @class = "jk-field-error" })
     </div>
 
@@ -66,6 +71,13 @@
         { "DrawerId", "drawer-quick-recurso" },
         { "SelectId", "RecursoId" },
         { "ToastMessage", "Recurso creado correctamente" }
+    })
+
+@Html.Partial("~/Views/Shared/Components/_ClienteQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-cliente" },
+        { "SelectId", "ClienteId" },
+        { "ToastMessage", "Cliente creado correctamente" }
     })
 
 @section scripts {

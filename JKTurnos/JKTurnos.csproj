@@ -329,11 +329,15 @@
     <Content Include="Views\Turnos\Edit.cshtml" />
     <Content Include="Views\Turnos\Index.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaGrid.cshtml" />
+    <Content Include="Views\Shared\Components\_AgendaGridSemanal.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaMobile.cshtml" />
     <Content Include="Views\Shared\Components\_AgendaToolbar.cshtml" />
     <Content Include="Views\Shared\Components\_CheckboxList.cshtml" />
+    <Content Include="Views\Shared\Components\_ClienteQuickCreateDrawer.cshtml" />
     <Content Include="Views\Shared\Components\_ColorSelector.cshtml" />
+    <Content Include="Views\Shared\Components\_DateFilter.cshtml" />
     <Content Include="Views\Shared\Components\_RecursoQuickCreateDrawer.cshtml" />
+    <Content Include="Views\Shared\Components\_SearchFilter.cshtml" />
     <Content Include="Views\Shared\Components\_ServiceQuickCreateDrawer.cshtml" />
   </ItemGroup>
   <ItemGroup>

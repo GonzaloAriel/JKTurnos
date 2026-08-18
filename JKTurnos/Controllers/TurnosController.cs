@@ -82,30 +82,66 @@ namespace JKTurnos.Controllers
             return PartialView("~/Views/Shared/Components/_TurnoDetailDrawer.cshtml", model);
         }
 
-        public ActionResult Agenda(int? openRecursoId = null)
+        public ActionResult Agenda(DateTime? fecha = null, string vista = null, int? openRecursoId = null)
         {
             var hoy = DateTime.Today;
+            var fechaSeleccionada = (fecha ?? hoy).Date;
+            var vistaNormalizada = vista == "semana" ? "semana" : "dia";
+
+            var dayNames = new[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
+            var monthNames = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
 
             var model = new AgendaViewModel
             {
-                Fecha = hoy,
+                Fecha = fechaSeleccionada,
+                Vista = vistaNormalizada,
                 Recursos = _recursoService.GetAll(),
-                Turnos = _turnoService.GetTurnosDelDia(hoy),
                 Estados = _estadoRepo.GetAll().ToList(),
                 OpenRecursoId = openRecursoId
             };
 
-            var dayNames = new[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
-            var monthNames = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
-            ViewBag.CurrentDateDisplay = dayNames[(int)hoy.DayOfWeek] + " " + hoy.Day + " " + monthNames[hoy.Month - 1] + ", " + hoy.Year;
+            if (vistaNormalizada == "semana")
+            {
+                int diff = ((int)DayOfWeek.Monday - (int)fechaSeleccionada.DayOfWeek + 7) % 7;
+                var lunes = fechaSeleccionada.AddDays(diff);
+                var domingo = lunes.AddDays(6);
+
+                model.Turnos = _turnoService.GetTurnosEnRango(lunes, domingo);
+
+                if (lunes.Month == domingo.Month && lunes.Year == domingo.Year)
+                {
+                    ViewBag.CurrentDateDisplay = lunes.Day + " - " + domingo.Day + " " + monthNames[lunes.Month - 1] + ", " + lunes.Year;
+                }
+                else if (lunes.Year == domingo.Year)
+                {
+                    ViewBag.CurrentDateDisplay = lunes.Day + " " + monthNames[lunes.Month - 1] + " - " + domingo.Day + " " + monthNames[domingo.Month - 1] + ", " + domingo.Year;
+                }
+                else
+                {
+                    ViewBag.CurrentDateDisplay = lunes.Day + " " + monthNames[lunes.Month - 1] + " " + lunes.Year + " - " + domingo.Day + " " + monthNames[domingo.Month - 1] + " " + domingo.Year;
+                }
+            }
+            else
+            {
+                model.Turnos = _turnoService.GetTurnosDelDia(fechaSeleccionada);
+                ViewBag.CurrentDateDisplay = dayNames[(int)fechaSeleccionada.DayOfWeek] + " " + fechaSeleccionada.Day + " " + monthNames[fechaSeleccionada.Month - 1] + ", " + fechaSeleccionada.Year;
+            }
+
+            ViewBag.Vista = vistaNormalizada;
+            ViewBag.FechaNavegacion = fechaSeleccionada;
 
             return View(model);
         }
 
         // GET: Turnos
-        public ActionResult Index()
+        public ActionResult Index(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null)
         {
-            var turnos = _turnoService.GetAll();
+            var turnos = _turnoService.GetFiltrados(busqueda, fechaInicio, fechaFin);
+
+            ViewBag.Busqueda = busqueda;
+            ViewBag.FechaInicio = fechaInicio;
+            ViewBag.FechaFin = fechaFin;
+
             return View(turnos);
         }
 

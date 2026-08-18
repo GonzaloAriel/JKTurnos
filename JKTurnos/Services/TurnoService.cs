@@ -41,6 +41,39 @@ namespace JKTurnos.Services
                         .FirstOrDefault(x => x.Id == id);
         }
 
+        public List<Turno> GetFiltrados(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        {
+            var query = _repo.GetAll()
+                             .Include(t => t.Cliente)
+                             .Include(t => t.Servicio)
+                             .Include(t => t.Recurso)
+                             .Include(t => t.EstadoTurno);
+
+            var desde = DateTime.Today;
+            var hasta = DateTime.Today.AddDays(1);
+
+            if (fechaInicio.HasValue || fechaFin.HasValue)
+            {
+                desde = (fechaInicio ?? fechaFin).Value.Date;
+                hasta = (fechaFin ?? fechaInicio).Value.Date.AddDays(1);
+            }
+
+            query = query.Where(t => t.FechaHoraInicio >= desde
+                                     && t.FechaHoraInicio < hasta);
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var termino = busqueda.Trim();
+
+                query = query.Where(t =>
+                    (t.Cliente != null && t.Cliente.Nombre.Contains(termino)) ||
+                    (t.Servicio != null && t.Servicio.Nombre.Contains(termino)) ||
+                    (t.Recurso != null && t.Recurso.Nombre.Contains(termino)));
+            }
+
+            return query.OrderBy(t => t.FechaHoraInicio).ToList();
+        }
+
         public List<Turno> GetTurnosDelDia(DateTime fecha)
         {
             var inicioDelDia = fecha.Date;
@@ -52,6 +85,21 @@ namespace JKTurnos.Services
                         .Include(t => t.Recurso)
                         .Include(t => t.EstadoTurno)
                         .Where(t => t.FechaHoraInicio < finDelDia && t.FechaHoraFin > inicioDelDia)
+                        .OrderBy(t => t.FechaHoraInicio)
+                        .ToList();
+        }
+
+        public List<Turno> GetTurnosEnRango(DateTime desde, DateTime hasta)
+        {
+            var inicio = desde.Date;
+            var fin = hasta.Date.AddDays(1);
+
+            return _repo.GetAll()
+                        .Include(t => t.Cliente)
+                        .Include(t => t.Servicio)
+                        .Include(t => t.Recurso)
+                        .Include(t => t.EstadoTurno)
+                        .Where(t => t.FechaHoraInicio < fin && t.FechaHoraFin > inicio)
                         .OrderBy(t => t.FechaHoraInicio)
                         .ToList();
         }

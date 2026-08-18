@@ -67,14 +67,51 @@
 }
 
 @helper EmptyContent() {
+    bool hayFiltros = !string.IsNullOrWhiteSpace(ViewBag.Busqueda as string);
+
+    string icon = "people";
+    string title = "No tienes clientes";
+    string description = "Crea tu primer cliente para comenzar a gestionar tus turnos.";
+    string actionText = "Crear Cliente";
+    string actionUrl = Url.Action("Create");
+
+    if (hayFiltros)
+    {
+        icon = "search";
+        title = "Sin resultados";
+        description = "No hay clientes que coincidan con la busqueda.";
+        actionText = "Ver todos los clientes";
+        actionUrl = Url.Action("Index");
+    }
+
     @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
         new ViewDataDictionary {
-            { "Icon", "people" },
-            { "Title", "No tienes clientes" },
-            { "Description", "Crea tu primer cliente para comenzar a gestionar tus turnos." },
-            { "ActionText", "Crear Cliente" },
-            { "ActionUrl", Url.Action("Create") }
+            { "Icon", icon },
+            { "Title", title },
+            { "Description", description },
+            { "ActionText", actionText },
+            { "ActionUrl", actionUrl }
         })
+}
+
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+        @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
+            new ViewDataDictionary {
+                { "Name", "busqueda" },
+                { "Id", "search-clientes" },
+                { "Value", ViewBag.Busqueda },
+                { "Placeholder", "Buscar por nombre, telefono o email..." }
+            })
+
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </a>
+    </form>
 }
 
 @{
@@ -82,8 +119,7 @@
     ViewBag.Subtitle = "Administra tus clientes";
     ViewBag.PrimaryAction = Url.Action("Create");
     ViewBag.PrimaryActionLabel = "Nuevo Cliente";
-    ViewBag.SearchPlaceholder = "Buscar clientes...";
-    ViewBag.SearchId = "search-clientes";
+    ViewBag.ToolbarContent = FilterContent();
 
     ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
 }

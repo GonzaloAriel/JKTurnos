@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -46,9 +47,19 @@ namespace JKTurnos.Controllers
             });
         }
 
-        public ActionResult Index()
+        public ActionResult Index(string busqueda = null, TipoRecurso? tipo = null)
         {
-            var recursos = _service.GetAll();
+            var recursos = _service.GetFiltrados(busqueda, tipo);
+            ViewBag.Busqueda = busqueda;
+            ViewBag.Tipo = tipo;
+            ViewBag.Tipos = Enum.GetValues(typeof(TipoRecurso))
+                .Cast<TipoRecurso>()
+                .Select(t => new SelectListItem
+                {
+                    Value = ((int)t).ToString(),
+                    Text = t.ToString()
+                })
+                .ToList();
             return View(recursos);
         }
 

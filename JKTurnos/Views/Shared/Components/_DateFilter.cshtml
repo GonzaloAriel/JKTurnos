@@ -1,0 +1,38 @@
+@*
+    JKTurnos - Date Filter Component
+    Rango de fechas (desde/hasta) para formularios GET (filtrado server-side).
+    Debe usarse DENTRO de un <form method="get">.
+
+    Uso:
+    @Html.Partial("~/Views/Shared/Components/_DateFilter.cshtml",
+        new ViewDataDictionary {
+            { "InicioName", "fechaInicio" },
+            { "FinName", "fechaFin" },
+            { "InicioValue", ViewBag.FechaInicio },
+            { "FinValue", ViewBag.FechaFin },
+            { "InicioLabel", "Desde" },
+            { "FinLabel", "Hasta" }
+        })
+*@
+
+@{
+    string inicioName = ViewBag.InicioName ?? "fechaInicio";
+    string finName = ViewBag.FinName ?? "fechaFin";
+    DateTime? inicio = ViewBag.InicioValue as DateTime?;
+    DateTime? fin = ViewBag.FinValue as DateTime?;
+    string inicioValue = inicio.HasValue ? inicio.Value.ToString("yyyy-MM-dd") : "";
+    string finValue = fin.HasValue ? fin.Value.ToString("yyyy-MM-dd") : "";
+    string inicioLabel = ViewBag.InicioLabel ?? "Desde";
+    string finLabel = ViewBag.FinLabel ?? "Hasta";
+}
+
+<div class="jk-date-filter">
+    <div class="jk-form-group jk-date-filter-field">
+        <label class="jk-label" for="@inicioName">@inicioLabel</label>
+        <input type="date" class="jk-input" id="@inicioName" name="@inicioName" value="@inicioValue" />
+    </div>
+    <div class="jk-form-group jk-date-filter-field">
+        <label class="jk-label" for="@finName">@finLabel</label>
+        <input type="date" class="jk-input" id="@finName" name="@finName" value="@finValue" />
+    </div>
+</div>

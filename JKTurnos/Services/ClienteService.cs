@@ -21,6 +21,24 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
+        public List<Cliente> GetFiltrados(string busqueda = null)
+        {
+            var query = _repo.GetAll();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var termino = busqueda.Trim();
+
+                query = query.Where(c =>
+                    (c.Nombre != null && c.Nombre.Contains(termino)) ||
+                    (c.Telefono != null && c.Telefono.Contains(termino)) ||
+                    (c.Email != null && c.Email.Contains(termino)));
+            }
+
+            return query.OrderBy(c => c.Nombre)
+                        .ToList();
+        }
+
         public Cliente GetById(int id)
         {
             return _repo.GetById(id);

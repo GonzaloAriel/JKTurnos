@@ -1,0 +1,22 @@
+@*
+    JKTurnos - Search Filter Component
+    Input de busqueda para formularios GET (filtrado server-side).
+    Debe usarse DENTRO de un <form method="get">.
+
+    Uso:
+    @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
+        new ViewDataDictionary {
+            { "Name", "busqueda" },
+            { "Id", "search-turnos" },
+            { "Value", ViewBag.Busqueda },
+            { "Placeholder", "Buscar turnos..." }
+        })
+*@
+
+@Html.Partial("~/Views/Shared/Components/_SearchBar.cshtml",
+    new ViewDataDictionary {
+        { "Placeholder", ViewBag.Placeholder ?? "Buscar..." },
+        { "Id", ViewBag.Id ?? "jk-search" },
+        { "Name", ViewBag.Name ?? "busqueda" },
+        { "Value", ViewBag.Value ?? "" }
+    })

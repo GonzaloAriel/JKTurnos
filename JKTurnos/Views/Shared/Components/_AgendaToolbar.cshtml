@@ -8,33 +8,45 @@
 
 @{
     string dateDisplay = ViewBag.CurrentDateDisplay ?? "";
+    string vista = ViewBag.Vista as string ?? "dia";
+    DateTime fechaNavegacion = ViewBag.FechaNavegacion != null ? (DateTime)ViewBag.FechaNavegacion : DateTime.Today;
+    int delta = vista == "semana" ? 7 : 1;
     var recursos = Model.Recursos != null ? Model.Recursos.ToList() : new List<Recurso>();
+
+    string fechaStr = fechaNavegacion.ToString("yyyy-MM-dd");
+    string hoyStr = DateTime.Today.ToString("yyyy-MM-dd");
+
+    string urlAnterior = Url.Action("Agenda", "Turnos", new { fecha = fechaNavegacion.AddDays(-delta).ToString("yyyy-MM-dd"), vista = vista });
+    string urlSiguiente = Url.Action("Agenda", "Turnos", new { fecha = fechaNavegacion.AddDays(delta).ToString("yyyy-MM-dd"), vista = vista });
+    string urlHoy = Url.Action("Agenda", "Turnos", new { fecha = hoyStr, vista = vista });
+    string urlDia = Url.Action("Agenda", "Turnos", new { fecha = fechaStr, vista = "dia" });
+    string urlSemana = Url.Action("Agenda", "Turnos", new { fecha = fechaStr, vista = "semana" });
 }
 
 <div class="jk-agenda-toolbar" role="toolbar" aria-label="Navegacion de agenda">
     <div class="jk-agenda-toolbar-left">
         <div class="jk-agenda-nav">
-            <button class="jk-btn-icon" aria-label="Dia anterior" type="button">
+            <a href="@urlAnterior" class="jk-btn-icon" aria-label="Anterior">
                 <i class="bi bi-chevron-left"></i>
-            </button>
-            <button class="jk-btn jk-btn-ghost jk-agenda-today-btn" type="button">
+            </a>
+            <a href="@urlHoy" class="jk-btn jk-btn-ghost jk-agenda-today-btn">
                 Hoy
-            </button>
-            <button class="jk-btn-icon" aria-label="Dia siguiente" type="button">
+            </a>
+            <a href="@urlSiguiente" class="jk-btn-icon" aria-label="Siguiente">
                 <i class="bi bi-chevron-right"></i>
-            </button>
+            </a>
             <span class="jk-agenda-date-label" aria-live="polite">@dateDisplay</span>
         </div>
     </div>
 
     <div class="jk-agenda-toolbar-right">
         <div class="jk-agenda-view-toggle" role="tablist" aria-label="Vista de agenda">
-            <button class="jk-btn jk-btn-sm jk-agenda-view-btn active" role="tab" aria-selected="true" type="button">
+            <a href="@urlDia" class="jk-btn jk-btn-sm jk-agenda-view-btn@(vista == "dia" ? " active" : "")" role="tab" aria-selected="@(vista == "dia" ? "true" : "false")">
                 Dia
-            </button>
-            <button class="jk-btn jk-btn-sm jk-btn-ghost jk-agenda-view-btn" role="tab" aria-selected="false" type="button">
+            </a>
+            <a href="@urlSemana" class="jk-btn jk-btn-sm jk-btn-ghost jk-agenda-view-btn@(vista == "semana" ? " active" : "")" role="tab" aria-selected="@(vista == "semana" ? "true" : "false")">
                 Semana
-            </button>
+            </a>
         </div>
     </div>
 </div>

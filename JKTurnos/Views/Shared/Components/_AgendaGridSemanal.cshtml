@@ -1,0 +1,140 @@
+@*
+    JKTurnos - Agenda Weekly Grid Component
+    Vista semanal tipo calendario: 7 columnas (Lun a Dom) con eje de tiempo
+    08:00-19:30 (franjas de 30 min). Los turnos se posicionan por hora/duracion,
+    se pintan con el color del recurso (borde izquierdo) y las superposiciones
+    dentro de un mismo dia se resuelven en carriles (lanes) para que queden
+    lado a lado. Click en un turno abre el drawer de detalle; click en el
+    encabezado del dia navega a la vista Dia de esa fecha.
+*@
+
+@model JKTurnos.Models.ViewModels.AgendaViewModel
+@using JKTurnos.Models.Entities
+@using System.Linq
+
+@{
+    var recursos = Model.Recursos != null ? Model.Recursos.ToList() : new List<Recurso>();
+    var turnos = Model.Turnos != null ? Model.Turnos.ToList() : new List<Turno>();
+    var colorRecurso = recursos.ToDictionary(r => r.Id, r => r.Color ?? "#2563eb");
+
+    int diff = ((int)DayOfWeek.Monday - (int)Model.Fecha.DayOfWeek + 7) % 7;
+    var lunes = Model.Fecha.AddDays(diff);
+    var dayNames = new[] { "Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom" };
+
+    double pxPorHora = 48;
+    double pxPorMinuto = pxPorHora / 60.0;
+    int bodyHeight = (int)(11.5 * pxPorHora);
+
+    var turnosPorDia = new Dictionary<int, List<Turno>>();
+    for (int i = 0; i < 7; i++)
+    {
+        var dia = lunes.AddDays(i);
+        turnosPorDia[i] = turnos
+            .Where(t => t.FechaHoraInicio.Date == dia.Date)
+            .OrderBy(t => t.FechaHoraInicio)
+            .ToList();
+    }
+}
+
+<div class="jk-agenda-week" role="grid" aria-label="Grilla semanal">
+    @for (int i = 0; i < 7; i++)
+    {
+        var dia = lunes.AddDays(i);
+        var lista = turnosPorDia[i];
+        int n = lista.Count;
+        bool esHoy = dia.Date == DateTime.Today;
+        string fechaStr = dia.ToString("yyyy-MM-dd");
+
+        var laneIdx = new int[n];
+        int totalLanes = 0;
+
+        if (n > 0)
+        {
+            var laneEnds = new List<DateTime>();
+            for (int a = 0; a < n; a++)
+            {
+                int assigned = -1;
+                for (int l = 0; l < laneEnds.Count; l++)
+                {
+                    if (laneEnds[l] <= lista[a].FechaHoraInicio)
+                    {
+                        assigned = l;
+                        laneEnds[l] = lista[a].FechaHoraFin;
+                        break;
+                    }
+                }
+                if (assigned < 0)
+                {
+                    assigned = laneEnds.Count;
+                    laneEnds.Add(lista[a].FechaHoraFin);
+                }
+                laneIdx[a] = assigned;
+            }
+            totalLanes = laneEnds.Count;
+        }
+
+        var inicioDia = new DateTime(dia.Year, dia.Month, dia.Day, 8, 0, 0);
+        var finDia = new DateTime(dia.Year, dia.Month, dia.Day, 19, 30, 0);
+
+        <div class="jk-agenda-week-day@(esHoy ? " is-today" : "")" role="gridcell">
+            <a class="jk-agenda-week-day-header"
+               href="@Url.Action("Agenda", "Turnos", new { fecha = fechaStr, vista = "dia" })"
+               title="Ver el dia @dayNames[i] @dia.Day">
+                <span class="jk-agenda-week-day-name">@dayNames[i]</span>
+                <span class="jk-agenda-week-day-number">@dia.Day</span>
+            </a>
+
+            <div class="jk-agenda-week-day-body" style="height: @(bodyHeight)px;">
+                @if (n == 0)
+                {
+                    <span class="jk-agenda-week-day-empty">Sin turnos</span>
+                }
+                else
+                {
+                    for (int a = 0; a < n; a++)
+                    {
+                        var t = lista[a];
+                        var inicio = t.FechaHoraInicio < inicioDia ? inicioDia : t.FechaHoraInicio;
+                        var fin = t.FechaHoraFin > finDia ? finDia : t.FechaHoraFin;
+                        if (inicio >= finDia || fin <= inicio) { continue; }
+
+                        double topPx = (inicio - inicioDia).TotalMinutes * pxPorMinuto;
+                        double heightPx = Math.Max(24, (fin - inicio).TotalMinutes * pxPorMinuto);
+                        double widthPct = totalLanes > 0 ? 100.0 / totalLanes : 100.0;
+                        double leftPct = laneIdx[a] * widthPct;
+
+                        var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Sin cliente";
+                        var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado";
+                        var recursoColor = colorRecurso.ContainsKey(t.RecursoId) ? colorRecurso[t.RecursoId] : "#2563eb";
+                        var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
+                        var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
+
+                        <div class="jk-agenda-week-block"
+                             role="button"
+                             tabindex="0"
+                             data-turno-id="@t.Id"
+                             style="top: @topPx.ToString("0.##")px; height: @heightPx.ToString("0.##")px; left: @leftPct.ToString("0.##")%; width: @widthPct.ToString("0.##")%; --jk-block-color: @recursoColor;"
+                             aria-label="Turno de @clienteNombre, @servicioNombre, @t.FechaHoraInicio.ToString("HH:mm")">
+                            <div class="jk-agenda-week-block-band">
+                                <span class="jk-agenda-week-block-status" title="@estadoNombre" style="--jk-status-color: @(estadoColor ?? "#aeaeb2")"><i class="bi bi-circle-fill"></i></span>
+                                <span class="jk-agenda-week-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
+                            </div>
+                            <div class="jk-agenda-week-block-title">@clienteNombre</div>
+                            <div class="jk-agenda-week-block-service">@servicioNombre</div>
+                        </div>
+                    }
+                }
+
+                @if (esHoy)
+                {
+                    var ahora = DateTime.Now;
+                    if (ahora >= inicioDia && ahora <= finDia)
+                    {
+                        double nowTop = (ahora - inicioDia).TotalMinutes * pxPorMinuto;
+                        <div class="jk-agenda-week-now-line" style="top: @nowTop.ToString("0.##")px;" aria-hidden="true"></div>
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>

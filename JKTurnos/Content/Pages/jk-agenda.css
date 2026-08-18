@@ -599,3 +599,183 @@
     }
 
 }
+
+/* ================================================================
+   WEEKLY GRID
+   Vista semanal tipo calendario: 7 columnas (Lun a Dom) con eje de
+   tiempo 08:00-19:30. Los turnos son bloques posicionados por hora,
+   coloreados por recurso (borde izquierdo) y en carriles (lanes)
+   cuando se superponen dentro de un mismo dia. En pantallas angostas
+   la grilla scrollea horizontalmente en vez de apilar las columnas.
+   ================================================================ */
+
+.jk-agenda-week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(160px, 1fr));
+    gap: var(--jk-space-8);
+    overflow-x: auto;
+    padding-bottom: var(--jk-space-4);
+    align-items: start;
+}
+
+.jk-agenda-week-day {
+    display: flex;
+    flex-direction: column;
+    background: var(--jk-surface);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    overflow: hidden;
+    min-width: 160px;
+}
+
+.jk-agenda-week-day.is-today {
+    border-color: var(--jk-accent);
+}
+
+.jk-agenda-week-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--jk-space-8);
+    padding: var(--jk-space-8) var(--jk-space-12);
+    background: var(--jk-bg);
+    border-bottom: 1px solid var(--jk-border-light);
+    flex-shrink: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--jk-transition-fast);
+}
+
+.jk-agenda-week-day-header:hover {
+    background: var(--jk-accent-light);
+}
+
+.jk-agenda-week-day.is-today .jk-agenda-week-day-header {
+    background: var(--jk-accent-light);
+}
+
+.jk-agenda-week-day-name {
+    font-size: var(--jk-text-xs);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.jk-agenda-week-day-number {
+    font-size: var(--jk-text-base);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+}
+
+.jk-agenda-week-day.is-today .jk-agenda-week-day-number {
+    color: var(--jk-accent);
+}
+
+.jk-agenda-week-day-body {
+    position: relative;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 47px,
+        var(--jk-border-light) 47px,
+        var(--jk-border-light) 48px
+    );
+}
+
+.jk-agenda-week-day-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--jk-text-sm);
+    color: var(--jk-text-tertiary);
+}
+
+.jk-agenda-week-block {
+    --jk-block-bg: color-mix(in srgb, var(--jk-block-color) 14%, transparent);
+    position: absolute;
+    background: var(--jk-block-bg);
+    border-left: 3px solid var(--jk-block-color);
+    border-radius: var(--jk-radius-sm);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    padding: 2px var(--jk-space-6);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    transition: box-shadow var(--jk-transition-fast), z-index var(--jk-transition-fast);
+}
+
+.jk-agenda-week-block:hover {
+    box-shadow: var(--jk-shadow);
+    z-index: 2;
+}
+
+.jk-agenda-week-block:focus-visible {
+    outline: 2px solid var(--jk-accent);
+    outline-offset: -1px;
+    z-index: 2;
+}
+
+.jk-agenda-week-block-band {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-6);
+    min-width: 0;
+}
+
+.jk-agenda-week-block-status {
+    color: var(--jk-status-color);
+    font-size: 8px;
+    line-height: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.jk-agenda-week-block-hour {
+    font-size: 10px;
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-secondary);
+    white-space: nowrap;
+}
+
+.jk-agenda-week-block-title {
+    font-size: 11px;
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jk-agenda-week-block-service {
+    font-size: 10px;
+    color: var(--jk-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jk-agenda-week-now-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--jk-danger);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.jk-agenda-week-now-line::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--jk-danger);
+}

@@ -52,9 +52,11 @@ namespace JKTurnos.Controllers
             });
         }
 
-        public ActionResult Index()
+        public ActionResult Index(string busqueda = null)
         {
-            return View(_service.GetAll());
+            var servicios = _service.GetFiltrados(busqueda);
+            ViewBag.Busqueda = busqueda;
+            return View(servicios);
         }
 
         public ActionResult Create()

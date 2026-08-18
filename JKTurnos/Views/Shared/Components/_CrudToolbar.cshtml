@@ -6,16 +6,29 @@
     Usage:
     @Html.Partial("~/Views/Shared/Components/_CrudToolbar.cshtml")
 
-    Depends on ViewBag.SearchPlaceholder and ViewBag.SearchId.
+    Depends on ViewBag.SearchPlaceholder and ViewBag.SearchId
+    (el search se renderiza solo si ViewBag.SearchId esta seteado).
+
+    Para filtros especificos del modulo (ej. formulario GET), usar
+    ViewBag.ToolbarContent: se renderiza despues del search.
 *@
 
 @{
+    string searchId = ViewBag.SearchId as string;
     string searchPlaceholder = ViewBag.SearchPlaceholder ?? "Buscar...";
-    string searchId = ViewBag.SearchId ?? "search";
+    var toolbarContent = ViewBag.ToolbarContent;
 }
 
-@Html.Partial("~/Views/Shared/Components/_SearchBar.cshtml",
-    new ViewDataDictionary {
-        { "Placeholder", searchPlaceholder },
-        { "Id", searchId }
-    })
+@if (!string.IsNullOrEmpty(searchId))
+{
+    @Html.Partial("~/Views/Shared/Components/_SearchBar.cshtml",
+        new ViewDataDictionary {
+            { "Placeholder", searchPlaceholder },
+            { "Id", searchId }
+        })
+}
+
+@if (toolbarContent != null)
+{
+    @toolbarContent
+}

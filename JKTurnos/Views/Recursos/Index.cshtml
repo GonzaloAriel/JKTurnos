@@ -1,3 +1,4 @@
+@using JKTurnos.Models.Entities
 @model List<JKTurnos.Models.Entities.Recurso>
 
 @helper ListContent() {
@@ -64,14 +65,67 @@
 }
 
 @helper EmptyContent() {
+    bool hayFiltros = !string.IsNullOrWhiteSpace(ViewBag.Busqueda as string)
+        || ViewBag.Tipo != null;
+
+    string icon = "person-badge";
+    string title = "No tienes recursos";
+    string description = "Define los recursos de tu negocio para comenzar a asignar turnos.";
+    string actionText = "Crear Recurso";
+    string actionUrl = Url.Action("Create");
+
+    if (hayFiltros)
+    {
+        icon = "search";
+        title = "Sin resultados";
+        description = "No hay recursos que coincidan con los filtros.";
+        actionText = "Ver todos los recursos";
+        actionUrl = Url.Action("Index");
+    }
+
     @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
         new ViewDataDictionary {
-            { "Icon", "person-badge" },
-            { "Title", "No tienes recursos" },
-            { "Description", "Define los recursos de tu negocio para comenzar a asignar turnos." },
-            { "ActionText", "Crear Recurso" },
-            { "ActionUrl", Url.Action("Create") }
+            { "Icon", icon },
+            { "Title", title },
+            { "Description", description },
+            { "ActionText", actionText },
+            { "ActionUrl", actionUrl }
         })
+}
+
+@helper FilterContent() {
+    TipoRecurso? tipoFiltro = ViewBag.Tipo as TipoRecurso?;
+    List<SelectListItem> tipos = ViewBag.Tipos as List<SelectListItem> ?? new List<SelectListItem>();
+
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+        @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
+            new ViewDataDictionary {
+                { "Name", "busqueda" },
+                { "Id", "search-recursos" },
+                { "Value", ViewBag.Busqueda },
+                { "Placeholder", "Buscar por nombre, descripcion o color..." }
+            })
+
+        <div class="jk-form-group jk-filter-field">
+            <label class="jk-label" for="tipo">Tipo</label>
+            <select id="tipo" name="tipo" class="jk-select">
+                <option value="">Todos los tipos</option>
+                @foreach (var tipo in tipos)
+                {
+                    var esSeleccionado = tipoFiltro.HasValue && ((int)tipoFiltro.Value).ToString() == tipo.Value;
+                    <option value="@tipo.Value" @(esSeleccionado ? "selected" : "")>@tipo.Text</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </a>
+    </form>
 }
 
 @{
@@ -79,8 +133,7 @@
     ViewBag.Subtitle = "Administra los recursos de tu negocio";
     ViewBag.PrimaryAction = Url.Action("Create");
     ViewBag.PrimaryActionLabel = "Nuevo Recurso";
-    ViewBag.SearchPlaceholder = "Buscar recursos...";
-    ViewBag.SearchId = "search-recursos";
+    ViewBag.ToolbarContent = FilterContent();
 
     ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
 }

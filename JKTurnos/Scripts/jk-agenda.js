@@ -10,8 +10,6 @@
     if (!agenda) return;
 
     var gridWrap = agenda.querySelector('.jk-agenda-grid-wrap');
-    if (!gridWrap) return;
-
     var detailUrl = agenda.getAttribute('data-turno-detail-url');
 
     /*
@@ -78,7 +76,7 @@
         }
 
         agenda.addEventListener('click', function (e) {
-            var block = e.target.closest('.jk-agenda-time-block');
+            var block = e.target.closest('.jk-agenda-time-block, .jk-agenda-week-block');
             if (block) {
                 openTurnoDetail(block);
                 return;
@@ -128,6 +126,23 @@
             var cells = gridWrap.querySelectorAll('.jk-agenda-cell');
             cells.forEach(function (cell) {
                 cell.setAttribute('tabindex', '-1');
+            });
+        }
+
+        /*
+         * Weekly grid keyboard: Enter/Space opens the turno detail drawer
+         * from a week block (same behavior as the day grid time blocks).
+         */
+        var weekWrap = agenda.querySelector('.jk-agenda-week');
+        if (weekWrap) {
+            weekWrap.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    var block = e.target.closest('.jk-agenda-week-block');
+                    if (block) {
+                        e.preventDefault();
+                        openTurnoDetail(block);
+                    }
+                }
             });
         }
 
