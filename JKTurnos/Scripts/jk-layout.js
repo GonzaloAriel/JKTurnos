@@ -1,4 +1,4 @@
-/* 
+﻿/* 
    JKTurnos - Layout Scripts
    Vanilla JS. Sidebar: Desktop collapse, Tablet expand, Mobile drawer.
    Dependencies: None (jQuery not required).

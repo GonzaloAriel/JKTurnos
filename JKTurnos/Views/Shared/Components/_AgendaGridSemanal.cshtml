@@ -1,4 +1,4 @@
-@*
+﻿@*
     JKTurnos - Agenda Weekly Grid Component
     Vista semanal tipo calendario: 7 columnas (Lun a Dom) con eje de tiempo
     08:00-19:30 (franjas de 30 min). Los turnos se posicionan por hora/duracion,
@@ -118,6 +118,9 @@
                             <div class="jk-agenda-week-block-band">
                                 <span class="jk-agenda-week-block-status" title="@estadoNombre" style="--jk-status-color: @(estadoColor ?? "#aeaeb2")"><i class="bi bi-circle-fill"></i></span>
                                 <span class="jk-agenda-week-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
+                                <button type="button" class="jk-agenda-time-block-pago" data-turno-id="@t.Id" title="Registrar pago" aria-label="Registrar pago de @clienteNombre">
+                                    <i class="bi bi-cash-coin"></i>
+                                </button>
                             </div>
                             <div class="jk-agenda-week-block-title">@clienteNombre</div>
                             <div class="jk-agenda-week-block-service">@servicioNombre</div>

@@ -1,4 +1,4 @@
-@using JKTurnos.Models.Entities
+﻿@using JKTurnos.Models.Entities
 @model JKTurnos.Models.Entities.User
 
 @{
@@ -9,7 +9,7 @@
 @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
 
 <div class="jk-card jk-mt-24">
-    <p>¿Estas seguro que deseas eliminar al usuario <strong>@Model.Nombre</strong> (<span>@Model.Email</span>)?</p>
+    <p>Estas seguro que deseas eliminar al usuario <strong>@Model.Nombre</strong> (<span>@Model.Email</span>)?</p>
 
     @using (Html.BeginForm("DeleteConfirmed", "Usuarios", FormMethod.Post))
     {

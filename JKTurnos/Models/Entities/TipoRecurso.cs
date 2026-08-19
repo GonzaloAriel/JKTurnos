@@ -1,4 +1,4 @@
-namespace JKTurnos.Models.Entities
+﻿namespace JKTurnos.Models.Entities
 {
     public enum TipoRecurso
     {

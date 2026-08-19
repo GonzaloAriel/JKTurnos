@@ -1,4 +1,4 @@
-@model JKTurnos.Models.ViewModels.AgendaViewModel
+﻿@model JKTurnos.Models.ViewModels.AgendaViewModel
 
 @{
     ViewBag.Title = "Mi Agenda";
@@ -9,7 +9,8 @@
 }
 
 <div class="jk-agenda" role="application" aria-label="Agenda de turnos"
-     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")">
+     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
+     data-open-turno-id="@(ViewBag.OpenTurnoId ?? "")">
 
     @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
 
@@ -34,7 +35,8 @@
     jk-agenda.js. V2/V3: acciones de estado y economico (Docs/16).
 *@
 <div class="jk-drawer-backdrop" id="drawer-turno-detalle-backdrop"></div>
-<div class="jk-drawer" id="drawer-turno-detalle" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-detalle-title">
+<div class="jk-drawer" id="drawer-turno-detalle" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-detalle-title"
+     data-registrar-pago-url="@Url.Action("RegistrarPago", "Turnos")">
     <div class="jk-drawer-header">
         <h3 class="jk-drawer-title" id="drawer-turno-detalle-title">Detalle del turno</h3>
         <button type="button" class="jk-drawer-close" id="drawer-turno-detalle-close" aria-label="Cerrar">

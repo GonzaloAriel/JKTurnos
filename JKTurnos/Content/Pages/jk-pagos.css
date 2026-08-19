@@ -1,0 +1,42 @@
+﻿/* JKTurnos - Pagos (listado) page styles */
+
+.jk-turno-busqueda {
+    position: relative;
+}
+
+.jk-autocomplete {
+    position: absolute;
+    top: calc(100% + var(--jk-space-4));
+    left: 0;
+    right: 0;
+    z-index: 30;
+    list-style: none;
+    margin: 0;
+    padding: var(--jk-space-4) 0;
+    background: var(--jk-surface, #ffffff);
+    border: 1px solid var(--jk-border, #e5e7eb);
+    border-radius: var(--jk-radius);
+    box-shadow: var(--jk-shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.1));
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.jk-autocomplete-item {
+    padding: var(--jk-space-8) var(--jk-space-12);
+    cursor: pointer;
+    font-size: var(--jk-text-sm);
+}
+
+.jk-autocomplete-item:hover {
+    background: var(--jk-border-light, #f0f0f0);
+}
+
+.jk-autocomplete-empty {
+    padding: var(--jk-space-8) var(--jk-space-12);
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-sm);
+}
+
+.jk-pago-register .jk-card-header {
+    margin-bottom: var(--jk-space-16);
+}

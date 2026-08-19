@@ -1,4 +1,4 @@
-@*
+﻿@*
     JKTurnos - Turno Detail Drawer Content
     Contenido del Inspector Drawer del Time Block (V1, solo lectura).
     Este partial se inyecta via fetch en el drawer contenedor montado en
@@ -87,6 +87,70 @@
 <div class="jk-drawer-section">
     <div class="jk-flex jk-flex-between">
         <span class="jk-drawer-label">Pagos</span>
-        <span>@(Model.EstadoEconomico ?? "Sin senia")</span>
+        <span class="jk-flex jk-flex-wrap jk-gap-8">
+            @if (Model.ServicioPrecio.HasValue)
+            {
+                <span class="jk-small text-secondary">Precio: @Model.ServicioPrecio.Value.ToString("0.00")</span>
+            }
+            <span class="jk-badge">@Model.EstadoEconomico</span>
+        </span>
     </div>
+
+    @if (Model.Pagos != null && Model.Pagos.Count > 0)
+    {
+        <ul class="jk-pago-lista jk-mt-8">
+            @foreach (var pago in Model.Pagos)
+            {
+                <li class="jk-pago-item">
+                    <div class="jk-flex jk-flex-between">
+                        <strong>$ @pago.Monto.ToString("0.00")</strong>
+                        <span class="jk-small text-secondary">@pago.Fecha.ToString("dd/MM HH:mm")</span>
+                    </div>
+                    <div class="jk-small">@pago.TipoPago</div>
+                    @if (!string.IsNullOrWhiteSpace(pago.Observacion))
+                    {
+                        <div class="jk-small text-secondary">@pago.Observacion</div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(pago.UsuarioNombre))
+                    {
+                        <div class="jk-small text-secondary">por @pago.UsuarioNombre</div>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Model.PuedeEditarPagos)
+    {
+        <div class="jk-flex jk-gap-8 jk-mt-8">
+            <button type="button" class="jk-btn jk-btn-primary jk-btn-sm" data-pago-accion="Senia" data-turno-id="@Model.Id">Registrar senia</button>
+            <button type="button" class="jk-btn jk-btn-secondary jk-btn-sm" data-pago-accion="Pago" data-turno-id="@Model.Id">Registrar pago</button>
+        </div>
+
+        <form class="jk-pago-form jk-mt-8" data-turno-id="@Model.Id" hidden>
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="TurnoId" value="@Model.Id" />
+            <div class="jk-form-group">
+                <label class="jk-label">Monto</label>
+                <input type="number" name="Monto" class="jk-input" min="0.01" step="0.01" required />
+            </div>
+            <div class="jk-form-group">
+                <label class="jk-label">Tipo</label>
+                <select name="TipoPago" class="jk-select">
+                    <option value="PagoParcial">Pago parcial</option>
+                    <option value="PagoTotal">Pago total</option>
+                    <option value="Senia">Senia</option>
+                </select>
+            </div>
+            <div class="jk-form-group">
+                <label class="jk-label">Observacion</label>
+                <input type="text" name="Observacion" class="jk-input" />
+            </div>
+            <div class="jk-flex jk-gap-8">
+                <button type="submit" class="jk-btn jk-btn-primary jk-btn-sm">Guardar</button>
+                <button type="button" class="jk-btn jk-btn-ghost jk-btn-sm" data-pago-cancelar>Cancelar</button>
+            </div>
+            <p class="jk-field-error jk-pago-error jk-mt-8" hidden></p>
+        </form>
+    }
 </div>

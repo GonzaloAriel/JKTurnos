@@ -1,4 +1,4 @@
-@using RolesConst = JKTurnos.Models.Entities.Roles
+﻿@using RolesConst = JKTurnos.Models.Entities.Roles
 <nav id="sidebar"
      class="jk-sidebar d-flex flex-column"
      role="navigation"
@@ -69,6 +69,13 @@
                @(ViewContext.RouteData.Values["controller"].ToString() == "Recursos" ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-person-badge"></i>
                 <span>Recursos</span>
+            </a>
+            <a href="@Url.Action("Index", "Pagos")"
+               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Pagos" ? "active" : "")"
+               data-sidebar-item
+               @(ViewContext.RouteData.Values["controller"].ToString() == "Pagos" ? "aria-current=\"page\"" : "")>
+                <i class="bi bi-cash-coin"></i>
+                <span>Pagos</span>
             </a>
             @if (User.IsInRole(RolesConst.Admin))
             {

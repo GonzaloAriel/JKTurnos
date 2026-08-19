@@ -1,0 +1,281 @@
+﻿@model List<JKTurnos.Models.Entities.Pago>
+
+@helper TipoLabel(JKTurnos.Models.Entities.TipoPago tipo) {
+    switch (tipo)
+    {
+        case JKTurnos.Models.Entities.TipoPago.Senia:
+            <text>Seña</text>
+            break;
+        case JKTurnos.Models.Entities.TipoPago.PagoTotal:
+            <text>Pago total</text>
+            break;
+        default:
+            <text>Pago parcial</text>
+            break;
+    }
+}
+
+@helper EditarButton(JKTurnos.Models.Entities.Pago item) {
+    <button type="button" class="jk-btn jk-btn-sm jk-btn-ghost"
+            data-jk-open-drawer="drawer-pago-editar"
+            data-pago-id="@item.Id"
+            data-pago-monto="@item.Monto.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+            data-pago-tipo="@item.TipoPago"
+            data-pago-observacion="@item.Observacion"
+            aria-label="Editar pago de @(item.Monto.ToString("0.00"))">
+        <i class="bi bi-pencil"></i> Editar
+    </button>
+}
+
+@helper AnularButton(JKTurnos.Models.Entities.Pago item) {
+    <button type="button" class="jk-btn jk-btn-sm jk-btn-danger"
+            data-jk-open-drawer="drawer-pago-anular"
+            data-pago-id="@item.Id"
+            aria-label="Anular pago de @(item.Monto.ToString("0.00"))">
+        <i class="bi bi-x-circle"></i> Anular
+    </button>
+}
+
+@helper VerTurnoLink(JKTurnos.Models.Entities.Pago item) {
+    <button type="button" class="jk-btn jk-btn-sm jk-btn-ghost"
+            data-ver-turno="@item.TurnoId"
+            aria-label="Ver turno del pago">
+        <i class="bi bi-calendar-event"></i> Ver turno
+    </button>
+}
+
+@helper ListContent() {
+    var nombresUsuarios = ViewBag.NombresUsuarios as Dictionary<int, string>;
+
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Turno</th>
+                        <th class="jk-hide-tablet">Tipo</th>
+                        <th>Monto</th>
+                        <th class="jk-hide-tablet">Responsable</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var responsable = (nombresUsuarios != null && nombresUsuarios.ContainsKey(item.UsuarioId))
+                            ? nombresUsuarios[item.UsuarioId]
+                            : "-";
+
+                        <tr>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @(item.Turno.Cliente != null ? item.Turno.Cliente.Nombre : "Sin cliente")
+                                @if (item.Turno.Recurso != null)
+                                {
+                                    <span class="jk-small"> &middot; @item.Turno.Recurso.Nombre</span>
+                                }
+                            </td>
+                            <td class="jk-hide-tablet">@TipoLabel(item.TipoPago)</td>
+                            <td>$ @item.Monto.ToString("0.00")</td>
+                            <td class="jk-hide-tablet">@responsable</td>
+                            <td>
+                                <div class="jk-flex jk-gap-4">
+                                    @VerTurnoLink(item)
+                                    @EditarButton(item)
+                                    @AnularButton(item)
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            var responsable = (nombresUsuarios != null && nombresUsuarios.ContainsKey(item.UsuarioId))
+                ? nombresUsuarios[item.UsuarioId]
+                : "-";
+
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@(item.Turno.Cliente != null ? item.Turno.Cliente.Nombre : "Sin cliente")</strong>
+                    <strong>$ @item.Monto.ToString("0.00")</strong>
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-calendar-event"></i> @item.Fecha.ToString("dd/MM/yyyy HH:mm")
+                    @if (item.Turno.Recurso != null)
+                    {
+                        <text> &middot; @item.Turno.Recurso.Nombre</text>
+                    }
+                </div>
+                <div class="jk-mt-4 jk-small">
+                    <span class="jk-badge">@TipoLabel(item.TipoPago)</span>
+                </div>
+                <div class="jk-small jk-mt-4">Responsable: @responsable</div>
+                <div class="jk-flex jk-gap-4 jk-mt-8">
+                    @VerTurnoLink(item)
+                    @EditarButton(item)
+                    @AnularButton(item)
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@helper RegisterContent() {
+    <section class="jk-card jk-card-compact jk-pago-register"
+         data-buscar-turnos-url="@Url.Action("BuscarTurnos")">
+        <div class="jk-card-header">
+            <h2 class="jk-card-title">Registrar pago</h2>
+        </div>
+        <form method="post" action="@Url.Action("RegistrarPago")">
+            @Html.AntiForgeryToken()
+            <div class="jk-flex jk-flex-col jk-gap-12">
+                <div class="jk-form-group jk-turno-busqueda">
+                    <label class="jk-label" for="turnoBusqueda">Turno</label>
+                    <input type="text" id="turnoBusqueda" class="jk-input" placeholder="Buscar por cliente o recurso..." autocomplete="off" required />
+                    <input type="hidden" id="TurnoId" name="TurnoId" value="0" />
+                    <ul id="turnoResultados" class="jk-autocomplete" hidden></ul>
+                </div>
+                <div class="jk-flex jk-flex-wrap jk-gap-12">
+                    <div class="jk-form-group jk-flex-1">
+                        <label class="jk-label" for="Monto">Monto</label>
+                        <input type="number" name="Monto" id="Monto" class="jk-input" min="0.01" step="0.01" placeholder="0.00" required />
+                    </div>
+                    <div class="jk-form-group">
+                        <label class="jk-label" for="TipoPago">Tipo</label>
+                        <select id="TipoPago" name="TipoPago" class="jk-select">
+                            <option value="PagoParcial">Pago parcial</option>
+                            <option value="Senia">Seña</option>
+                            <option value="PagoTotal">Pago total</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="jk-form-group">
+                    <label class="jk-label" for="Observacion">Observacion</label>
+                    <input type="text" name="Observacion" id="Observacion" class="jk-input" placeholder="Opcional" maxlength="200" />
+                </div>
+                <div class="jk-flex jk-gap-8">
+                    <button type="submit" class="jk-btn jk-btn-primary">
+                        <i class="bi bi-cash-coin"></i> Registrar pago
+                    </button>
+                </div>
+            </div>
+        </form>
+    </section>
+}
+
+@helper EmptyContent() {
+    bool hayFiltros = !string.IsNullOrWhiteSpace(ViewBag.Busqueda as string)
+        || (ViewBag.FechaDesde as DateTime?).HasValue
+        || (ViewBag.FechaHasta as DateTime?).HasValue;
+
+    string icon = "cash-coin";
+    string title = "No hay pagos";
+    string description = "Registra un pago o una seña desde el detalle de un turno en tu agenda.";
+    string actionText = "";
+    string actionUrl = "";
+
+    if (hayFiltros)
+    {
+        icon = "search";
+        title = "Sin resultados";
+        description = "No hay pagos que coincidan con los filtros aplicados.";
+        actionText = "Ver todos los pagos";
+        actionUrl = Url.Action("Index");
+    }
+
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", icon },
+            { "Title", title },
+            { "Description", description },
+            { "ActionText", actionText },
+            { "ActionUrl", actionUrl }
+        })
+}
+
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+        @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
+            new ViewDataDictionary {
+                { "Name", "busqueda" },
+                { "Id", "search-pagos" },
+                { "Value", ViewBag.Busqueda },
+                { "Placeholder", "Buscar por cliente o recurso..." }
+            })
+
+        @Html.Partial("~/Views/Shared/Components/_DateFilter.cshtml",
+            new ViewDataDictionary {
+                { "InicioName", "fechaDesde" },
+                { "FinName", "fechaHasta" },
+                { "InicioValue", ViewBag.FechaDesde },
+                { "FinValue", ViewBag.FechaHasta },
+                { "InicioLabel", "Desde" },
+                { "FinLabel", "Hasta" }
+            })
+
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </a>
+    </form>
+}
+
+@helper ToastContent() {
+    <div class="jk-toast-container">
+        @if (TempData["PagoOk"] != null)
+        {
+            <div class="jk-toast jk-toast-success"><i class="bi bi-check-circle"></i> @TempData["PagoOk"]</div>
+        }
+        @if (TempData["PagoError"] != null)
+        {
+            <div class="jk-toast jk-toast-error"><i class="bi bi-x-circle"></i> @TempData["PagoError"]</div>
+        }
+    </div>
+}
+
+@{
+    ViewBag.Title = "Pagos";
+    ViewBag.Subtitle = "Cobros y senias registrados";
+    ViewBag.ToolbarContent = FilterContent();
+
+    ViewBag.PageContent = MvcHtmlString.Create(
+        ToastContent().ToString()
+        + RegisterContent().ToString()
+        + (Model.Any() ? ListContent().ToString() : EmptyContent().ToString()));
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")
+
+@Html.Partial("~/Views/Shared/Components/_PagoAccionesDrawer.cshtml")
+
+<div class="jk-drawer-backdrop" id="drawer-pago-turno-backdrop"></div>
+<div class="jk-drawer" id="drawer-pago-turno" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-pago-turno-title"
+     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
+     data-registrar-pago-url="@Url.Action("RegistrarPago", "Turnos")">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-pago-turno-title">Detalle del turno</h3>
+        <button type="button" class="jk-drawer-close" id="drawer-pago-turno-close" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body" id="drawer-pago-turno-body"></div>
+</div>
+
+@Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-pagos" } })
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-pagos.css" rel="stylesheet" />
+}
+
+@section scripts {
+    <script src="~/Scripts/jk-pagos.js"></script>
+}

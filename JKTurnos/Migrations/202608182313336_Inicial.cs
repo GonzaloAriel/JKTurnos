@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class InitialCreate : DbMigration
+    public partial class Inicial : DbMigration
     {
         public override void Up()
         {
@@ -87,12 +87,30 @@
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
+                "dbo.RecursoServicios",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        TenantId = c.Int(nullable: false),
+                        RecursoId = c.Int(nullable: false),
+                        ServicioId = c.Int(nullable: false),
+                        CreatedAt = c.DateTime(nullable: false),
+                        UpdatedAt = c.DateTime(),
+                        IsActive = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Recursoes", t => t.RecursoId, cascadeDelete: true)
+                .ForeignKey("dbo.Servicios", t => t.ServicioId, cascadeDelete: true)
+                .Index(t => t.RecursoId)
+                .Index(t => t.ServicioId);
+            
+            CreateTable(
                 "dbo.Servicios",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
                         TenantId = c.Int(nullable: false),
-                        Nombre = c.String(),
+                        Nombre = c.String(nullable: false),
                         Descripcion = c.String(),
                         Precio = c.Decimal(nullable: false, precision: 18, scale: 2),
                         DuracionMinutos = c.Int(nullable: false),
@@ -109,7 +127,8 @@
                         Id = c.Int(nullable: false, identity: true),
                         TenantId = c.Int(nullable: false),
                         ClienteId = c.Int(nullable: false),
-                        ServicioId = c.Int(nullable: false),
+                        ServicioId = c.Int(),
+                        RecursoId = c.Int(nullable: false),
                         EstadoTurnoId = c.Int(nullable: false),
                         FechaHoraInicio = c.DateTime(nullable: false),
                         FechaHoraFin = c.DateTime(nullable: false),
@@ -121,9 +140,11 @@
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Clientes", t => t.ClienteId, cascadeDelete: true)
                 .ForeignKey("dbo.EstadoTurnoes", t => t.EstadoTurnoId, cascadeDelete: true)
-                .ForeignKey("dbo.Servicios", t => t.ServicioId, cascadeDelete: true)
+                .ForeignKey("dbo.Recursoes", t => t.RecursoId)
+                .ForeignKey("dbo.Servicios", t => t.ServicioId)
                 .Index(t => t.ClienteId)
                 .Index(t => t.ServicioId)
+                .Index(t => t.RecursoId)
                 .Index(t => t.EstadoTurnoId);
             
             CreateTable(
@@ -140,27 +161,30 @@
                         UpdatedAt = c.DateTime(),
                         IsActive = c.Boolean(nullable: false),
                     })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Tenants", t => t.TenantId, cascadeDelete: true)
-                .Index(t => t.TenantId);
+                .PrimaryKey(t => t.Id);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.Users", "TenantId", "dbo.Tenants");
             DropForeignKey("dbo.Turnoes", "ServicioId", "dbo.Servicios");
+            DropForeignKey("dbo.Turnoes", "RecursoId", "dbo.Recursoes");
             DropForeignKey("dbo.Turnoes", "EstadoTurnoId", "dbo.EstadoTurnoes");
             DropForeignKey("dbo.Turnoes", "ClienteId", "dbo.Clientes");
+            DropForeignKey("dbo.RecursoServicios", "ServicioId", "dbo.Servicios");
+            DropForeignKey("dbo.RecursoServicios", "RecursoId", "dbo.Recursoes");
             DropForeignKey("dbo.ConfiguracionTenants", "TenantId", "dbo.Tenants");
-            DropIndex("dbo.Users", new[] { "TenantId" });
             DropIndex("dbo.Turnoes", new[] { "EstadoTurnoId" });
+            DropIndex("dbo.Turnoes", new[] { "RecursoId" });
             DropIndex("dbo.Turnoes", new[] { "ServicioId" });
             DropIndex("dbo.Turnoes", new[] { "ClienteId" });
+            DropIndex("dbo.RecursoServicios", new[] { "ServicioId" });
+            DropIndex("dbo.RecursoServicios", new[] { "RecursoId" });
             DropIndex("dbo.ConfiguracionTenants", new[] { "TenantId" });
             DropTable("dbo.Users");
             DropTable("dbo.Turnoes");
             DropTable("dbo.Servicios");
+            DropTable("dbo.RecursoServicios");
             DropTable("dbo.Recursoes");
             DropTable("dbo.EstadoTurnoes");
             DropTable("dbo.Tenants");

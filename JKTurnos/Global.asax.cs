@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -20,10 +20,11 @@ namespace JKTurnos
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Database.SetInitializer(
-            //     new MigrateDatabaseToLatestVersion<JKContext, Configuration>()
-            // );
-            Database.SetInitializer<JKContext>(null);
+            // Al publicar, la app actualiza sola la base de datos: aplica las
+            // migraciones pendientes y ejecuta el Seed (idempotente).
+            Database.SetInitializer(
+                new MigrateDatabaseToLatestVersion<JKContext, Configuration>()
+            );
         }
     }
 }

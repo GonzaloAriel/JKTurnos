@@ -1,4 +1,4 @@
-@*
+﻿@*
     JKTurnos - Agenda Mobile Component (tarjetas por Recurso + horarios libres)
     Variante mobile (< 768px) de la Agenda: acordeon por Recurso usando
     <details>/<summary> (sin JS obligatorio). Cada recurso lista sus turnos
@@ -97,6 +97,9 @@ else
                                  aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                                 <div class="jk-agenda-time-block-band">
                                     <span class="jk-agenda-time-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
+                                    <button type="button" class="jk-agenda-time-block-pago" data-turno-id="@t.Id" title="Registrar pago" aria-label="Registrar pago de @clienteNombre">
+                                        <i class="bi bi-cash-coin"></i>
+                                    </button>
                                 </div>
                                 <div class="jk-agenda-time-block-body">
                                     <div class="jk-agenda-time-block-title">

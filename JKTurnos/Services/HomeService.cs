@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using JKTurnos.Models.ViewModels;
 
@@ -8,6 +8,7 @@ namespace JKTurnos.Services
     {
         private readonly TurnoService _turnoService;
         private readonly ClienteService _clienteService;
+        private readonly PagoService _pagoService;
 
         // Jornada laboral estandar de la Agenda (D-012): 08:00 - 19:30
         private const int MinutosJornada = 690;
@@ -16,6 +17,7 @@ namespace JKTurnos.Services
         {
             _turnoService = new TurnoService();
             _clienteService = new ClienteService();
+            _pagoService = new PagoService();
         }
 
         public HomeViewModel GetHomeData(DateTime fecha)
@@ -36,7 +38,8 @@ namespace JKTurnos.Services
             return new HomeViewModel
             {
                 TurnosHoy = activos.Count,
-                IngresosHoy = activos.Sum(t => t.Servicio != null ? t.Servicio.Precio : 0),
+                // D-029: ingresos reales = suma de pagos cobrados en el dia.
+                IngresosHoy = _pagoService.GetIngresosDelDia(fecha),
                 Ocupacion = ocupacion,
                 Clientes = _clienteService.GetAll().Count,
                 TurnosDelDia = turnosDelDia

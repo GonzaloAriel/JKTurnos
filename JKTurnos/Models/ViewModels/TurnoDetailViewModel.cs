@@ -1,10 +1,11 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace JKTurnos.Models.ViewModels
 {
-    // V1: Drawer de detalle de Time Block (solo lectura).
-    // EstadoEconomico es un slot reservado para V3 (Docs/16): se renderiza
-    // solo si tiene contenido. No existe modelo de pagos todavia.
+    // V3: Drawer de detalle de Time Block con estado economico (D-028).
+    // EstadoEconomico es el slot de V1; se puebla con el estado calculado
+    // desde los Pagos del turno.
     public class TurnoDetailViewModel
     {
         public int Id { get; set; }
@@ -29,7 +30,11 @@ namespace JKTurnos.Models.ViewModels
 
         public string Observaciones { get; set; }
 
-        // V3: estado economico (senia/pago). Null cuando no hay modelo todavia.
+        // V3: estado economico (senia/pago) calculado desde los Pagos.
         public string EstadoEconomico { get; set; }
+
+        public List<PagoItemViewModel> Pagos { get; set; }
+        public decimal MontoAcumulado { get; set; }
+        public bool PuedeEditarPagos { get; set; }
     }
 }

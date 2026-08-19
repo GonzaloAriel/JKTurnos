@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using JKTurnos.Models.Entities;
@@ -16,6 +17,7 @@ namespace JKTurnos.Controllers
         private readonly ServicioService _servicioService;
         private readonly RecursoService _recursoService;
         private readonly RecursoServicioService _recursoServicioService;
+        private readonly PagoService _pagoService;
         private readonly BaseRepository<EstadoTurno> _estadoRepo;
 
         public TurnosController()
@@ -25,6 +27,7 @@ namespace JKTurnos.Controllers
             _servicioService = new ServicioService();
             _recursoService = new RecursoService();
             _recursoServicioService = new RecursoServicioService();
+            _pagoService = new PagoService();
             _estadoRepo = new BaseRepository<EstadoTurno>();
         }
 
@@ -60,6 +63,10 @@ namespace JKTurnos.Controllers
             if (turno == null)
                 return HttpNotFound();
 
+            var pagos = _pagoService.GetPagos(id);
+            var precios = turno.Servicio != null ? turno.Servicio.Precio : (decimal?)null;
+            var nombresUsuarios = _pagoService.GetNombresUsuarios(pagos.Select(p => p.UsuarioId));
+
             var model = new TurnoDetailViewModel
             {
                 Id = turno.Id,
@@ -68,7 +75,7 @@ namespace JKTurnos.Controllers
                 ClienteEmail = turno.Cliente != null ? turno.Cliente.Email : null,
                 ServicioNombre = turno.Servicio != null ? turno.Servicio.Nombre : null,
                 ServicioDuracionMinutos = turno.Servicio != null ? turno.Servicio.DuracionMinutos : (int?)null,
-                ServicioPrecio = turno.Servicio != null ? turno.Servicio.Precio : (decimal?)null,
+                ServicioPrecio = precios,
                 RecursoNombre = turno.Recurso != null ? turno.Recurso.Nombre : "Sin recurso",
                 RecursoColor = turno.Recurso != null ? turno.Recurso.Color : null,
                 EstadoTurnoId = turno.EstadoTurnoId,
@@ -76,13 +83,54 @@ namespace JKTurnos.Controllers
                 EstadoColor = turno.EstadoTurno != null ? turno.EstadoTurno.Color : null,
                 FechaHoraInicio = turno.FechaHoraInicio,
                 FechaHoraFin = turno.FechaHoraFin,
-                Observaciones = turno.Observaciones
+                Observaciones = turno.Observaciones,
+                EstadoEconomico = _pagoService.CalcularEstadoEconomico(pagos, precios),
+                MontoAcumulado = pagos.Sum(p => p.Monto),
+                Pagos = pagos.Select(p => new PagoItemViewModel
+                {
+                    Monto = p.Monto,
+                    Fecha = p.Fecha,
+                    TipoPago = p.TipoPago,
+                    Observacion = p.Observacion,
+                    UsuarioNombre = nombresUsuarios.ContainsKey(p.UsuarioId) ? nombresUsuarios[p.UsuarioId] : null
+                }).ToList(),
+                PuedeEditarPagos = CurrentRole == Roles.Admin || CurrentRole == Roles.User
             };
 
             return PartialView("~/Views/Shared/Components/_TurnoDetailDrawer.cshtml", model);
         }
 
-        public ActionResult Agenda(DateTime? fecha = null, string vista = null, int? openRecursoId = null)
+        // V3: registra un pago/senia desde el Drawer (D-028). POST ajax, patrón QuickCreate (D-013).
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult RegistrarPago(PagoViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(m => m.Value.Errors.Count > 0)
+                    .ToDictionary(m => m.Key, m => m.Value.Errors.Select(e => e.ErrorMessage).FirstOrDefault());
+
+                return Json(new { success = false, errors = errors });
+            }
+
+            try
+            {
+                _pagoService.RegistrarPago(model.TurnoId, model.Monto, model.TipoPago, model.Observacion, UserId);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new Dictionary<string, string> { { "", ex.Message } }
+                });
+            }
+
+            return Json(new { success = true });
+        }
+
+        public ActionResult Agenda(DateTime? fecha = null, string vista = null, int? openRecursoId = null, int? openTurnoId = null)
         {
             var hoy = DateTime.Today;
             var fechaSeleccionada = (fecha ?? hoy).Date;
@@ -129,6 +177,7 @@ namespace JKTurnos.Controllers
 
             ViewBag.Vista = vistaNormalizada;
             ViewBag.FechaNavegacion = fechaSeleccionada;
+            ViewBag.OpenTurnoId = openTurnoId;
 
             return View(model);
         }

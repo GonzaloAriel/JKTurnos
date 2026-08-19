@@ -163,6 +163,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PagosController.cs" />
     <Compile Include="Controllers\RecursosController.cs" />
     <Compile Include="Controllers\ServiciosController.cs" />
     <Compile Include="Controllers\TurnosController.cs" />
@@ -178,27 +179,25 @@
     <Compile Include="Infrastructure\ITenantProvider.cs" />
     <Compile Include="Infrastructure\PasswordHasher.cs" />
     <Compile Include="Infrastructure\TenantProvider.cs" />
-    <Compile Include="Migrations\202607230115410_InitialCreate.cs" />
-    <Compile Include="Migrations\202607230115410_InitialCreate.Designer.cs">
-      <DependentUpon>202607230115410_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\202608182313336_Inicial.cs" />
+    <Compile Include="Migrations\202608182313336_Inicial.Designer.cs">
+      <DependentUpon>202608182313336_Inicial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202608111546208_AddRecursoServicio.cs" />
-    <Compile Include="Migrations\202608111546208_AddRecursoServicio.Designer.cs">
-      <DependentUpon>202608111546208_AddRecursoServicio.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202608120100196_IntegridadRecursoServicio.cs" />
-    <Compile Include="Migrations\202608120100196_IntegridadRecursoServicio.Designer.cs">
-      <DependentUpon>202608120100196_IntegridadRecursoServicio.cs</DependentUpon>
+    <Compile Include="Migrations\202608191306496_AddPagos.cs" />
+    <Compile Include="Migrations\202608191306496_AddPagos.Designer.cs">
+      <DependentUpon>202608191306496_AddPagos.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\EstadoTurno.cs" />
+    <Compile Include="Models\Entities\Pago.cs" />
     <Compile Include="Models\Entities\Recurso.cs" />
     <Compile Include="Models\Entities\RecursoServicio.cs" />
     <Compile Include="Models\Entities\Roles.cs" />
     <Compile Include="Models\Entities\TipoRecurso.cs" />
+    <Compile Include="Models\Entities\TipoPago.cs" />
     <Compile Include="Models\Entities\ITenantEntity.cs" />
     <Compile Include="Models\Entities\Servicio.cs" />
     <Compile Include="Models\Entities\Tenant.cs" />
@@ -206,6 +205,8 @@
     <Compile Include="Models\Entities\User.cs" />
     <Compile Include="Models\ViewModels\AgendaViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
+    <Compile Include="Models\ViewModels\PagoItemViewModel.cs" />
+    <Compile Include="Models\ViewModels\PagoViewModel.cs" />
     <Compile Include="Models\ViewModels\LoginVM.cs" />
     <Compile Include="Models\ViewModels\RecursoViewModel.cs" />
     <Compile Include="Models\ViewModels\ServicioViewModel.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\ClienteService.cs" />
     <Compile Include="Services\HomeService.cs" />
+    <Compile Include="Services\PagoService.cs" />
     <Compile Include="Services\RecursoService.cs" />
     <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
@@ -248,6 +250,7 @@
     <Content Include="Content\DesignSystem\jk-tokens.css" />
     <Content Include="Content\DesignSystem\jk-utilities.css" />
     <Content Include="Content\Pages\jk-agenda.css" />
+    <Content Include="Content\Pages\jk-pagos.css" />
     <Content Include="Content\jk-components.css" />
     <Content Include="Content\jk-dashboard.css" />
     <Content Include="Content\jk-ds.css" />
@@ -286,6 +289,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\jk-layout.js" />
     <Content Include="Scripts\jk-agenda.js" />
+    <Content Include="Scripts\jk-pagos.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -319,6 +323,7 @@
     <Content Include="Views\Shared\Components\_FloatingButton.cshtml" />
     <Content Include="Views\Shared\Components\_KpiCard.cshtml" />
     <Content Include="Views\Shared\Components\_PageHeader.cshtml" />
+    <Content Include="Views\Shared\Components\_PagoAccionesDrawer.cshtml" />
     <Content Include="Views\Shared\Components\_SearchBar.cshtml" />
     <Content Include="Views\Shared\Components\_SectionHeader.cshtml" />
     <Content Include="Views\Shared\Components\_Timeline.cshtml" />
@@ -338,6 +343,7 @@
     <Content Include="Views\Recursos\Delete.cshtml" />
     <Content Include="Views\Recursos\Edit.cshtml" />
     <Content Include="Views\Recursos\Index.cshtml" />
+    <Content Include="Views\Pagos\Index.cshtml" />
     <Content Include="Views\Tenants\Create.cshtml" />
     <Content Include="Views\Tenants\Delete.cshtml" />
     <Content Include="Views\Tenants\Edit.cshtml" />
@@ -364,6 +370,7 @@
     <Content Include="Views\Shared\Components\_RecursoQuickCreateDrawer.cshtml" />
     <Content Include="Views\Shared\Components\_SearchFilter.cshtml" />
     <Content Include="Views\Shared\Components\_ServiceQuickCreateDrawer.cshtml" />
+    <Content Include="Views\Shared\Components\_DeleteLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -396,14 +403,11 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202607230115410_InitialCreate.resx">
-      <DependentUpon>202607230115410_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202608182313336_Inicial.resx">
+      <DependentUpon>202608182313336_Inicial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202608111546208_AddRecursoServicio.resx">
-      <DependentUpon>202608111546208_AddRecursoServicio.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202608120100196_IntegridadRecursoServicio.resx">
-      <DependentUpon>202608120100196_IntegridadRecursoServicio.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202608191306496_AddPagos.resx">
+      <DependentUpon>202608191306496_AddPagos.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,67 +1,117 @@
-# Notas sobre Publicación y Base de Datos
+# Publicación y Base de Datos
 
-Este archivo documenta configuraciones críticas para el despliegue y la inicialización de la base de datos de JKTurnos.
+Guía práctica para saber **qué configurar al trabajar en local** y **qué cambiar al publicar**. Si algo no figura aquí, no hay que tocarlo.
 
-## 1. Configuración de Base de Datos (Entity Framework)
+---
 
-Para evitar errores de tipo `There is already an object named 'Clientes'` o `AutomaticDataLossException`, la configuración debe ser consistente:
+## Resumen en una tabla
 
-### 1.1. `Global.asax.cs`
-Se debe desactivar el inicializador automático en el arranque para evitar que EF intente recrear las tablas cada vez que la aplicación se inicia si estas ya existen.
+| Archivo / Configuración | LOCAL (desarrollo) | PRODUCCIÓN (publicar) | Cómo se aplica |
+|---|---|---|---|
+| `Global.asax.cs` → `Database.SetInitializer(new MigrateDatabaseToLatestVersion<JKContext, Configuration>())` | Igual | **Igual, no tocar** | Manual |
+| `Migrations/Configuration.cs` → `AutomaticMigrationsEnabled` | `false` | `false` | Ya cambiado |
+| `Migrations/Configuration.cs` → `AutomaticMigrationDataLossAllowed` | `false` | `false` | Ya cambiado |
+| `Web.config` → `compilation debug` | `true` | `false` | Automático (transform de Release) |
+| `Web.config` → `customErrors mode` | `RemoteOnly` | `On` | Manual o transform |
+| `Web.config` → cadena de conexión | SQL Express local | Servidor SQL del hosting | Manual o transform |
+| `Web.config` → `machineKey` | Igual | **Igual, no tocar** | Manual |
 
-```csharp
-// ASEGURAR QUE ESTO ESTÉ ASÍ:
-Database.SetInitializer<JKContext>(null);
+---
+
+## Qué NO se toca nunca
+
+- **`Global.asax.cs`**: `Database.SetInitializer(new MigrateDatabaseToLatestVersion<JKContext, Configuration>())` debe quedarse así en local y en producción. Es lo que hace que la app **actualice sola la base de datos** al arrancar: aplica las migraciones pendientes y ejecuta el Seed (idempotente). No volver a `SetInitializer(null)` (ahí la app no crea nada).
+- **`machineKey`** (ya existe en `Web.config`): es estática a propósito. Si la cambias, los tokens anti-forgery y las sesiones se invalidan en cada reinicio del servidor.
+
+---
+
+## 1. Para trabajar en LOCAL (desarrollo)
+
+**No hay que cambiar nada: los archivos ya están listos para local.**
+
+### Qué significa cada cosa en local
+- `AutomaticMigrationsEnabled = false` + `AutomaticMigrationDataLossAllowed = false`: el esquema se controla con migraciones explícitas. Sin pérdida de datos accidental.
+- Cadena de conexión local (solo si querés volver a desarrollo): `Server=.\SQLEXPRESS;Database=JKTurnosDB`.
+- `debug="true"`: muestra el detalle de errores mientras desarrollás.
+
+### Crear / actualizar la base de datos local
+Como el inicializador está desactivado, la BD **no se crea sola**: hay que correr `Update-Database` manualmente desde la Consola del Administrador de Paquetes:
+
+```
+Update-Database
 ```
 
-### 1.2. `Migrations/Configuration.cs`
-Para permitir que Entity Framework maneje las migraciones automáticas y los cambios en el esquema (incluso si pueden causar pérdida de datos en entornos de desarrollo/pruebas), la configuración debe ser:
+- Con migraciones explícitas, `Update-Database` aplica las migraciones pendientes al esquema. La BD local ya está al día (no hace falta volver a correrla salvo nuevos cambios).
+- Si querés un control fino, escribí una migración explícita antes:
+
+```
+Add-Migration NombreDeLaMigracion
+Update-Database
+```
+
+El `Seed` se ejecuta con cada `Update-Database` y crea:
+- Tenant demo `local`.
+- `admin@jkturnos.com` / `123456` (rol Admin) y `global@jkturnos.com` / `123456` (rol AdminGlobal).
+- `ConfiguracionTenant`, 3 estados de turno, y datos demo (clientes, servicios, recursos, turnos).
+
+---
+
+## 2. Para PUBLICAR (producción)
+
+Antes de publicar, revisá estos 3 puntos:
+
+### a) `Web.config`
+1. **`debug`**: debe quedar `false`. Ya está resuelto: `Web.Release.config` elimina el atributo `debug` automáticamente al publicar en modo **Release**. Solo asegurate de publicar en **Release** y no en Debug.
+2. **`customErrors`**: cambiá `mode="RemoteOnly"` por `mode="On"` para que los usuarios no vean el detalle de errores.
+3. **Cadena de conexión**: ya apunta al servidor SQL del hosting (`Server=sql2016;Database=w370423_jkturnos;...`). Ese valor viaja en el publish tal cual está en `Web.config`; no hace falta transform.
+
+### b) `Migrations/Configuration.cs`
+Cambiá el constructor para **desactivar las migraciones automáticas** y controlar el esquema con migraciones explícitas:
 
 ```csharp
 public Configuration()
 {
-    AutomaticMigrationsEnabled = true;
-    AutomaticMigrationDataLossAllowed = true;
+    AutomaticMigrationsEnabled = false;
+    AutomaticMigrationDataLossAllowed = false;
 }
 ```
 
-> **Nota:** `AutomaticMigrationDataLossAllowed = true` es seguro y necesario para entornos de desarrollo y pruebas para evitar bloqueos por cambios en el modelo. En un entorno de producción real, esto debe manejarse con migraciones explícitas (`Add-Migration`) para evitar la pérdida accidental de datos.
+Con esto, `Update-Database` solo aplica las migraciones explícitas que escribiste (`Add-Migration`), y nunca va a borrar columnas o datos por accidente.
 
-## 2. Configuración de Producción (`Web.config`)
+### c) `machineKey`
+No lo cambies. Ya está configurada.
 
-Para el despliegue a producción, asegúrate de que estas configuraciones estén aplicadas:
+---
 
-### 2.1. Desactivar Debug y Custom Errors
-```xml
-<system.web>
-    <!-- debug debe ser false en producción -->
-    <compilation debug="false" targetFramework="4.8" />
-    <httpRuntime targetFramework="4.8" />
-    <!-- customErrors debe ser RemoteOnly o On -->
-    <customErrors mode="RemoteOnly" />
-</system.web>
-```
+## 3. Cómo crear / actualizar la base de datos de producción
 
-### 2.2. Cadena de Conexión
-Verifica que la cadena de conexión en `Web.config` apunte al servidor SQL correcto. Actualmente apunta a una instancia local de SQL Express:
+> **La aplicación actualiza sola la base de datos.** `Global.asax.cs` usa `MigrateDatabaseToLatestVersion`: en cada arranque aplica las migraciones pendientes y corre el Seed. Para implementar un módulo nuevo alcanza con `Add-Migration` en tu PC + publicar: la BD del hosting se actualiza sola en el primer request. No se borra la BD, no se corre SQL a mano.
 
-```xml
-<connectionStrings>
-    <add name="JKTurnosConnection"
-         connectionString="Server=.\SQLEXPRESS;Database=JKTurnosDB;Trusted_Connection=True;TrustServerCertificate=True;" providerName="System.Data.SqlClient"/>
-</connectionStrings>
-```
-## 3. Seguridad de Tokens (Anti-Forgery)
+### Primera vez (la BD del hosting ya tiene tablas viejas)
 
-Si recibes un `HttpAntiForgeryException` al loguearte o enviar formularios, es porque la aplicación reinicia sus claves de encriptación cada vez que se reinicia el servidor.
+La BD actual fue creada con otra cadena de migraciones. Como la cadena se reescribió en una **migración única `Inicial`**, hay que vaciarla **una sola vez**:
 
-Para solucionarlo, debes incluir una `<machineKey>` estática en `Web.config` dentro de `<system.web>`:
+1. En el panel del hosting (phpMyAdmin / SQL Manager de `w370423_jkturnos`), ejecutá el script `Docs/host_vaciar.sql` (borra todas las tablas, incluida `__MigrationHistory`). Alternativa manual: drop + recreate de la BD si el panel lo permite.
+2. Publicá la aplicación (modo **Release**).
+3. Primer acceso a la app → crea el esquema completo (migración `Inicial`) y el Seed: tenant `JK Demo`, `admin@jkturnos.com` / `123456` (Admin), `global@jkturnos.com` / `123456` (AdminGlobal), config y 3 estados.
+4. Ingresá con `global@jkturnos.com` / `123456` para crear tenants.
 
-```xml
-<system.web>
-    ...
-    <machineKey validationKey="[TU_VALOR_HEX_LARG]" decryptionKey="[TU_VALOR_HEX_CORTO]" validation="SHA1" decryption="AES" />
-</system.web>
-```
-> **Nota:** Genera tus propias claves para asegurar que el token sea consistente entre reinicios del servidor. Nunca uses `AutoGenerate` (comportamiento por defecto) en entornos de producción.
+> Si preferís crear el esquema a mano antes de publicar: corré `Docs/host_schema.sql` (migración única `Inicial`) y después `Docs/host_bootstrap.sql` (datos base, idempotente). Con la auto-migración activa no hace falta; ambos scripts son la vía alternativa.
 
+### De ahí en adelante (cada módulo)
+
+1. En tu PC: `Add-Migration NombreDelCambio` (genera la migración con su `Designer.cs`) y verificá en local con `Update-Database`.
+2. Publicá en **Release**.
+3. Primer request en el hosting → la app aplica la migración nueva sola. Sin scripts, sin borrar nada.
+
+---
+
+## 4. Checklist final antes de publicar
+
+- [ ] Publicar en modo **Release** (garantiza `debug=false`).
+- [ ] `customErrors mode="On"` en producción (hoy `Web.Release.config` deja `RemoteOnly`; ajustar a mano en el hosting o en el transform).
+- [ ] Cadena de conexión apuntando al servidor de producción (ya está: `sql2016` / `w370423_jkturnos`).
+- [ ] `Global.asax.cs` con `MigrateDatabaseToLatestVersion` (ya está).
+- [ ] `AutomaticMigrationsEnabled = false` en `Configuration.cs` (ya está).
+- [ ] Primera vez: vaciar la BD del hosting (borrar todas las tablas) antes de publicar.
+- [ ] `machineKey` intacta.

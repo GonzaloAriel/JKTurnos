@@ -7,13 +7,13 @@ namespace JKTurnos.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddRecursoIdToTurno : IMigrationMetadata
+    public sealed partial class AddPagos : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddRecursoIdToTurno));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddPagos));
         
         string IMigrationMetadata.Id
         {
-            get { return "202608050227460_AddRecursoIdToTurno"; }
+            get { return "202608191306496_AddPagos"; }
         }
         
         string IMigrationMetadata.Source

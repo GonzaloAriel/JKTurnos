@@ -1,4 +1,4 @@
-@model JKTurnos.Models.Entities.Recurso
+﻿@model JKTurnos.Models.Entities.Recurso
 
 @{
     ViewBag.Title = "Eliminar Recurso";
@@ -8,7 +8,7 @@
 @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
 
 <div class="jk-card jk-mt-24">
-    <p>¿Estas seguro que deseas eliminar el recurso <strong>@Model.Nombre</strong> (<span>@Model.Tipo</span>)?</p>
+    <p>Estas seguro que deseas eliminar el recurso <strong>@Model.Nombre</strong> (<span>@Model.Tipo</span>)?</p>
 
     @using (Html.BeginForm("Delete", "Recursos", FormMethod.Post))
     {

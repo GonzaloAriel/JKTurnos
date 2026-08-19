@@ -1,4 +1,4 @@
-@*
+﻿@*
     JKTurnos - Agenda Grid Component
     Grilla de calendario con columna de horas sticky y fila de recursos sticky.
     Renderiza los Time Blocks de los turnos del dia seleccionado (server-side).
@@ -140,7 +140,12 @@ else
                      aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                     <div class="jk-agenda-time-block-band">
                         <span class="jk-agenda-time-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
-                        <span class="jk-agenda-time-block-menu" aria-hidden="true"><i class="bi bi-three-dots"></i></span>
+                        <span class="jk-agenda-time-block-actions">
+                            <button type="button" class="jk-agenda-time-block-pago" data-turno-id="@t.Id" title="Registrar pago" aria-label="Registrar pago de @clienteNombre">
+                                <i class="bi bi-cash-coin"></i>
+                            </button>
+                            <span class="jk-agenda-time-block-menu" aria-hidden="true"><i class="bi bi-three-dots"></i></span>
+                        </span>
                     </div>
                     <div class="jk-agenda-time-block-body">
                         <div class="jk-agenda-time-block-title">

@@ -24,7 +24,7 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-006 | El sistema administra Recursos, no Empleados. Modelo agnostico al rubro | 2026-07-29 | VIGENTE |
 | D-007 | La Agenda no se persiste: se calcula desde turnos/bloqueos | 2026-07-29 | VIGENTE |
 | D-008 | Soft delete obligatorio y filtrado por TenantId (BaseRepository) | 2026-07-29 | VIGENTE |
-| D-009 | Textos visibles sin acentos (compatibilidad de encoding) | 2026-07-19 | VIGENTE |
+| D-009 | Textos visibles sin acentos (compatibilidad de encoding) | 2026-07-19 | REEMPLAZADA por D-032 |
 | D-010 | CSS unico del DS v2 (Content/DesignSystem): sin estilos inline | 2026-07-19 | VIGENTE |
 | D-011 | Visual de Time Block: banda + fondo pastel del color del recurso; estado = punto; compacto para 30 min | 2026-08-11 | VIGENTE |
 | D-012 | Grid de Agenda con posicionamiento explicito; franjas de 30 min; rango 08:00-19:30 | 2026-08-11 | VIGENTE |
@@ -40,6 +40,14 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-022 | Acceso global de plataforma: GlobalRepository filtra solo IsActive (sin TenantId); Add NO asigna TenantId. Uso exclusivo de servicios de plataforma; AdminGlobal (TenantId=0) no ve datos de negocio via BaseRepository | 2026-08-18 | VIGENTE |
 | D-023 | Roles como constantes (Roles.cs) + [Authorize(Roles=...)]; sin tabla de permisos. AdminGlobal = TenantId 0 (sin tenant), sin FK Users.TenantId->Tenants | 2026-08-18 | VIGENTE |
 | D-024 | Un tenant nuevo nace operativo: TenantService.Create siembra Estados de Turno base (Pendiente/Confirmado/Atendido) + ConfiguracionTenant. TurnoService.Crear con guard si no hay estados | 2026-08-18 | VIGENTE |
+| D-025 | Modulo Configuracion de Negocio (solo rol Admin): datos del negocio (ConfiguracionTenant) + CRUD de Estados de Turno del tenant con selector de color. Reglas en ConfiguracionService | 2026-08-18 | VIGENTE |
+| D-026 | Logo del negocio por URL: se muestra en el sidebar (marca) y en la bienvenida del Command Center con fallback al icono/omitido si no hay URL. BaseController.OnActionExecuting expone ViewBag.ConfiguracionLogo/Nombre (un query por request) | 2026-08-18 | VIGENTE |
+| D-027 | Cadena de migraciones aplastada en una unica migracion Inicial (modelo actual completo) + auto-migracion al arranque: Global.asax.cs usa MigrateDatabaseToLatestVersion. La BD del hosting se actualiza sola en cada deploy (Add-Migration + publicar). RecursoId en Turno sin cascade (configurado en JKContext.OnModelCreating) | 2026-08-18 | VIGENTE |
+| D-028 | Modulo Estado Economico (V3): entidad Pago con el estado economico CALCULADO desde los pagos (no persistido en Turno). Sin tope de monto: el precio del servicio es solo referencia. Pago.UsuarioId autocontenido (TurnoHistorial a V2). Admin y Operador registran pagos | 2026-08-19 | VIGENTE |
+| D-029 | KPI "Ingresos" del Command Center con pagos reales: suma de Monto de los Pagos con Fecha == hoy (reemplaza la proyeccion de D-021 solo en el calculo de IngresosHoy) | 2026-08-19 | VIGENTE |
+| D-030 | Modulo Pagos: listado SOLO LECTURA + filtros (rango de fecha del pago y busqueda por cliente/recurso) + "Anular" con motivo (baja logica, D-008; el registro queda conservado con el motivo en Observacion). Sin edicion ni borrado de montos (registro financiero). Sidebar "Pagos" en grupo Gestion (Admin y Operador). Acceso rapido desde los Time Blocks/cards de la Agenda: el icono de pago abre el Drawer en modo pago (D-003). "Ver turno" desde el listado abre la Agenda y auto-abre el Drawer del turno (parametro openTurnoId). El selector de turnos del registro es un AUTOCOMPLETE ajax (busqueda por cliente/recurso, top 20) en vez de un dropdown estatico (escalable a cientos de turnos) | 2026-08-19 | VIGENTE |
+| D-031 | Edicion de pagos: se permite CORREGIR Monto, TipoPago y Observacion de un pago (modifica la clausula "sin edicion" de D-030, pedido del TEAM LEAD). Registro financiero: NO se permite borrar el pago (se anula con motivo, D-008) ni cambiar el Turno o el UsuarioId. Acceso: Admin y Operador | 2026-08-19 | VIGENTE |
+| D-032 | Encoding UTF-8 habilitado en todo el proyecto: `<globalization requestEncoding/responseEncoding/fileEncoding="utf-8">` en Web.config + archivos fuente (.cs, .cshtml, .css, .js, .config) guardados en UTF-8 con BOM. Los textos pueden usar ñ y acentos con normalidad. Reemplaza la regla D-009 de "textos sin acentos" | 2026-08-19 | VIGENTE |
 
 ## Detalle
 
@@ -376,6 +384,76 @@ Motivo: sin estados base un tenant nuevo no puede crear turnos (el form postea `
 Consecuencias: el alta de tenant via CRUD queda operable al instante. Clientes/Servicios/Recursos de un tenant nuevo nacen en blanco (se crean aparte).
 
 Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-025
+
+Fecha: 2026-08-18
+
+Decision: Modulo Configuracion de Negocio accesible solo para rol Admin (tenant). Dos secciones: (1) Datos del negocio = formulario unico sobre `ConfiguracionTenant` (NombreComercial, Telefono, Email, Direccion, LogoUrl) con caja de ayuda para subir el logo gratis (postimages.org / imgbb.com) y pegar la URL directa; (2) Estados de Turno = CRUD del tenant con nombre + color (picker nativo), baja logica (los turnos que ya usan el estado no se pierden). Reglas en `ConfiguracionService`: nombre obligatorio, color con default #6c757d, mutacion de la entidad trackeada (evita el bug de attach de EF). Entrada desde el sidebar (grupo Configuracion, item Negocio) y la accion rapida "Configurar" del Command Center.
+
+Motivo: los estados de turno no tenian CRUD propio (solo el seed los creaba) y la ConfiguracionTenant existia sin pantalla de edicion.
+
+Consecuencias: los estados nuevos aparecen automaticamente en los formularios de turno (mismo repo de tenant). El modulo se mantiene progresivo: no obliga a cargar datos.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-026
+
+Fecha: 2026-08-18
+
+Decision: El logo del negocio (URL en ConfiguracionTenant) se muestra en dos lugares: (1) la marca del sidebar (`_Sidebar.cshtml`), reemplazando el icono `bi-calendar-check` cuando hay URL, con fallback al icono si no; (2) la bienvenida del Command Center (`Views/Home/Index.cshtml`), arriba del saludo, centrada en movil. `BaseController.OnActionExecuting` carga la `ConfiguracionTenant` una vez por request y expone `ViewBag.ConfiguracionLogo` y `ViewBag.ConfiguracionNombre` (disponible para todos los roles autenticados). Estilos: sidebar 100px y bienvenida 120px, `object-fit: contain` sin recuadro (el logo se ve completo, sin recortes ni caja).
+
+Motivo: dar identidad visual al negocio; la configuracion es progresiva (no obliga a cargar logo, hay fallback).
+
+Consecuencias: un query ligero de ConfiguracionTenant por request autenticado. Se removio el nombre comercial de la bienvenida (redundante con el logo).
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-027
+
+Fecha: 2026-08-18
+
+Decision: La cadena de migraciones se reescribio en una unica migracion `Inicial` (modelo actual completo, con su Designer). Se habilito la auto-migracion al arranque: `Global.asax.cs` usa `MigrateDatabaseToLatestVersion<JKContext, Configuration>()`. El esquema de Turno->Recurso queda SIN cascade delete, configurado en `JKContext.OnModelCreating` (`WillCascadeOnDelete(false)`). Migraciones viejas sin Designer (FixCascadeDeleteTurnoRecurso, TurnoServicioOpcional) se eliminaron; sus efectos ya estan en la migracion Inicial.
+
+Motivo: el hosting no permite Update-Database remoto (error 40). Con auto-migracion, cada deploy aplica las migraciones pendientes y el Seed en el primer request, sin scripts SQL manuales ni borrar la BD por cada modulo. El fix previo de cascade era DDL-only; ahora el modelo lo refleja.
+
+Consecuencias: la BD del hosting se vacia UNA vez (primera migrada) y despues se actualiza sola. `AutomaticMigrationsEnabled=false` sigue vigente: si hay cambios de modelo sin migracion, el arranque falla a proposito (obliga a escribir Add-Migration).
+
+Reemplaza a: la configuracion anterior de `Database.SetInitializer<JKContext>(null)` (sin auto-migracion).
+
+Estado: VIGENTE
+
+### D-028
+
+Fecha: 2026-08-19
+
+Decision: Modulo Estado Economico del Turno (V3 del Drawer). Nueva entidad `Pago` (TenantId, TurnoId, Monto, Fecha, TipoPago, Observacion, UsuarioId) en el Dominio Financiero del DER. El estado economico del turno (Sin senia / Senia pagada / Pago parcial / Pago completo) se CALCULA desde los pagos (acumulado vs precio), NO se persiste en `Turno` (respetando "no duplicar info calculable"). El precio del servicio es SOLO REFERENCIA: no hay tope de monto (un servicio puede cobrarse de mas o de menos, y un turno sin servicio acepta pagos). Reglas: `Monto > 0`; la senia se registra una sola vez; no se bloquea por estado operativo (D-005, un turno Cancelado puede recibir retencion/reembolso). `Pago.UsuarioId` guarda el responsable y deja el registro autocontenido; la auditoria `TurnoHistorial` completa se difiere a V2. Registran pagos los roles `Admin` y `User` (Operador), no `AdminGlobal`.
+
+Motivo: cumplir D-005 (independencia operativo/economico) y Docs/16 V3, con decision de TEAM LEAD de no limitar el cobro al precio pactado.
+
+Consecuencias: `TurnoDetailViewModel.EstadoEconomico` (slot de V1) se puebla con el estado real. `TurnosController.RegistrarPago` (POST ajax, patrón QuickCreate de D-013). El KPI de ingresos pasa a D-029. Docs/14 regla "no se puede registrar un pago mayor al precio del servicio" queda sin efecto por decision del TEAM LEAD.
+
+Reemplaza a: la parte de las reglas economicas de Docs/14 que limitaban el monto al precio del servicio.
+
+Estado: VIGENTE
+
+### D-029
+
+Fecha: 2026-08-19
+
+Decision: El KPI "Ingresos" del Command Center se recalcula con PAGOS REALES: `IngresosHoy = sum(Monto)` de los `Pago` cuya `Fecha` cae el dia actual (dinero efectivamente cobrado hoy). Reemplaza la proyeccion de D-021 SOLO en el calculo de `IngresosHoy`; el resto de D-021 (ocupacion, exclusion de Cancelado para la lista "Mi dia") sigue vigente.
+
+Motivo: el usuario quiere saber exacto cuanto gano en el dia, no una proyeccion. Los datos de referencia para un dashboard futuro de pagos se guardaran aparte.
+
+Consecuencias: `HomeService.GetHomeData` consulta pagos del dia (via `PagoService`). `TurnosHoy` y `Ocupacion` no cambian.
+
+Reemplaza a: D-021 en lo referente al calculo de IngresosHoy.
 
 Estado: VIGENTE
 

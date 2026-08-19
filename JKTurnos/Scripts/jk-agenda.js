@@ -1,4 +1,4 @@
-/*
+﻿/*
    JKTurnos - Agenda Grid JavaScript
    Scroll sync, Time Block interaction and Turno Detail Drawer (V1 read-only).
 */
@@ -27,6 +27,8 @@
 
     if (drawer && backdrop && drawerBody) {
         var lastFocusedBlock = null;
+        var currentTurnoId = null;
+        var registrarPagoUrl = drawer.getAttribute('data-registrar-pago-url');
 
         function showToast(message, type) {
             var container = document.getElementById('jk-toast-agenda');
@@ -39,11 +41,27 @@
             setTimeout(function () { toast.remove(); }, 4000);
         }
 
-        function openTurnoDetail(block) {
+        function openPagoForm(tipo) {
+            var form = drawer.querySelector('.jk-pago-form');
+            if (!form) return;
+
+            var select = form.querySelector('select[name="TipoPago"]');
+            if (select) select.value = tipo || 'PagoParcial';
+
+            var errEl = form.querySelector('.jk-pago-error');
+            if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+
+            form.hidden = false;
+            var monto = form.querySelector('input[name="Monto"]');
+            if (monto) monto.focus();
+        }
+
+        function openTurnoDetail(block, focusPagos) {
             var id = block.getAttribute('data-turno-id');
             if (!id || !detailUrl) return;
 
             lastFocusedBlock = block;
+            currentTurnoId = id;
             drawerBody.innerHTML = '<div class="jk-drawer-loading">Cargando detalle&hellip;</div>';
             drawer.classList.add('open');
             backdrop.classList.add('open');
@@ -57,10 +75,28 @@
                 .then(function (html) {
                     drawerBody.innerHTML = html;
                     closeBtn.focus();
+                    if (focusPagos) openPagoForm('PagoParcial');
                 })
                 .catch(function () {
                     closeTurnoDetail();
                     showToast('No se pudo cargar el detalle del turno', 'error');
+                });
+        }
+
+        function refreshTurnoDetail() {
+            if (!currentTurnoId || !detailUrl) return;
+
+            fetch(detailUrl + '?id=' + encodeURIComponent(currentTurnoId))
+                .then(function (res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.text();
+                })
+                .then(function (html) {
+                    drawerBody.innerHTML = html;
+                    closeBtn.focus();
+                })
+                .catch(function () {
+                    showToast('No se pudo actualizar el detalle del turno', 'error');
                 });
         }
 
@@ -69,6 +105,7 @@
             backdrop.classList.remove('open');
             drawer.setAttribute('aria-hidden', 'true');
             drawerBody.innerHTML = '';
+            currentTurnoId = null;
             if (lastFocusedBlock) {
                 lastFocusedBlock.focus();
                 lastFocusedBlock = null;
@@ -76,6 +113,14 @@
         }
 
         agenda.addEventListener('click', function (e) {
+            var pagoBtn = e.target.closest('.jk-agenda-time-block-pago');
+            if (pagoBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                var pagoBlock = pagoBtn.closest('.jk-agenda-time-block, .jk-agenda-week-block');
+                if (pagoBlock) openTurnoDetail(pagoBlock, true);
+                return;
+            }
             var block = e.target.closest('.jk-agenda-time-block, .jk-agenda-week-block');
             if (block) {
                 openTurnoDetail(block);
@@ -90,6 +135,13 @@
         if (gridWrap) {
             gridWrap.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    var pagoBtn = e.target.closest('.jk-agenda-time-block-pago');
+                    if (pagoBtn) {
+                        e.preventDefault();
+                        var pagoBlock = pagoBtn.closest('.jk-agenda-time-block');
+                        if (pagoBlock) openTurnoDetail(pagoBlock, true);
+                        return;
+                    }
                     var block = e.target.closest('.jk-agenda-time-block');
                     if (block) {
                         e.preventDefault();
@@ -137,6 +189,13 @@
         if (weekWrap) {
             weekWrap.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    var pagoBtn = e.target.closest('.jk-agenda-time-block-pago');
+                    if (pagoBtn) {
+                        e.preventDefault();
+                        var pagoBlock = pagoBtn.closest('.jk-agenda-week-block');
+                        if (pagoBlock) openTurnoDetail(pagoBlock, true);
+                        return;
+                    }
                     var block = e.target.closest('.jk-agenda-week-block');
                     if (block) {
                         e.preventDefault();
@@ -148,6 +207,78 @@
 
         closeBtn.addEventListener('click', closeTurnoDetail);
         backdrop.addEventListener('click', closeTurnoDetail);
+
+        /*
+         * Auto-open del drawer al llegar con openTurnoId (link "Ver turno"
+         * desde el listado de Pagos). El bloque debe estar visible en la vista.
+         */
+        var openTurnoId = agenda.getAttribute('data-open-turno-id');
+        if (openTurnoId) {
+            var target = agenda.querySelector('[data-turno-id="' + openTurnoId + '"]');
+            if (target) {
+                openTurnoDetail(target);
+            } else {
+                showToast('El turno no se encuentra en esta vista', 'info');
+            }
+        }
+
+        /*
+         * V3 payments: "Registrar senia"/"Registrar pago" open the inline form,
+         * submit via fetch (anti-forgery) and refresh the drawer (D-028/D-016).
+         */
+        drawer.addEventListener('click', function (e) {
+            var accionBtn = e.target.closest('[data-pago-accion]');
+            if (accionBtn) {
+                e.preventDefault();
+                var tipo = accionBtn.getAttribute('data-pago-accion') === 'Senia' ? 'Senia' : 'PagoParcial';
+                openPagoForm(tipo);
+                return;
+            }
+
+            var cancelarBtn = e.target.closest('[data-pago-cancelar]');
+            if (cancelarBtn) {
+                e.preventDefault();
+                var cancelForm = cancelarBtn.closest('.jk-pago-form');
+                if (cancelForm) cancelForm.hidden = true;
+            }
+        });
+
+        drawer.addEventListener('submit', function (e) {
+            var form = e.target.closest('.jk-pago-form');
+            if (!form) return;
+
+            e.preventDefault();
+
+            var errEl = form.querySelector('.jk-pago-error');
+            if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+
+            var montoEl = form.querySelector('input[name="Monto"]');
+            var monto = parseFloat(montoEl ? montoEl.value : 0);
+            if (!monto || monto <= 0) {
+                if (errEl) { errEl.textContent = 'El monto debe ser mayor a 0'; errEl.hidden = false; }
+                return;
+            }
+
+            fetch(registrarPagoUrl, {
+                method: 'POST',
+                body: new FormData(form)
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    showToast('Pago registrado', 'success');
+                    refreshTurnoDetail();
+                } else {
+                    var msg = (data.errors && data.errors[''])
+                        ? data.errors['']
+                        : 'No se pudo registrar el pago';
+                    if (errEl) { errEl.textContent = msg; errEl.hidden = false; }
+                }
+            })
+            .catch(function () {
+                if (errEl) { errEl.textContent = 'No se pudo registrar el pago'; errEl.hidden = false; }
+            });
+        });
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && drawer.classList.contains('open')) {

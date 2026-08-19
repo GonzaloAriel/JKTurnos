@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JKTurnos.Models.Entities;
 
 namespace JKTurnos.Models.ViewModels

@@ -1,4 +1,4 @@
-namespace JKTurnos.Models.Entities
+﻿namespace JKTurnos.Models.Entities
 {
     /// <summary>
     /// D-023: Roles como constantes + atributos, sin tabla de permisos.

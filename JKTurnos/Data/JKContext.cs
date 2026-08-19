@@ -1,4 +1,4 @@
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using JKTurnos.Models.Entities;
 
 namespace JKTurnos.Data
@@ -21,5 +21,21 @@ namespace JKTurnos.Data
         public DbSet<EstadoTurno> EstadosTurno { get; set; }
         public DbSet<Recurso> Recursos { get; set; }
         public DbSet<RecursoServicio> RecursoServicios { get; set; }
+        public DbSet<Pago> Pagos { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Turno>()
+                .HasRequired(t => t.Recurso)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Pago>()
+                .HasRequired(p => p.Turno)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+        }
     }
 }

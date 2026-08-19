@@ -1,4 +1,4 @@
-/* 
+﻿/* 
    JKTurnos - Layout System
    AppShell, Sidebar, Topbar, Content Grid and responsive zones.
    Dependencies: jk-tokens.css, jk-base.css
@@ -271,6 +271,10 @@
 .is-collapsed .jk-nav-collapse {
     justify-content: center;
     padding: var(--jk-space-8);
+}
+
+.is-collapsed .jk-nav-collapse span {
+    display: none;
 }
 
 .jk-nav-item-logout {

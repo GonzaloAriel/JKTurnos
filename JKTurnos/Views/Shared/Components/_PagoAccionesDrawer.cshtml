@@ -1,0 +1,135 @@
+﻿@*
+    JKTurnos - Pagos: drawers de Editar y Anular pago.
+    Los botones disparadores usan data-jk-open-drawer + data-pago-*; el script
+    de este partial puebla el formulario antes de abrir. Envio por POST nativo
+    (redirect + TempData toast). Patron de drawer del DS (quick-create).
+*@
+
+@{
+    string editarUrl = Url.Action("EditarPago");
+    string anularUrl = Url.Action("Anular");
+}
+
+@* Drawer Editar *@
+<div class="jk-drawer-backdrop" id="drawer-pago-editar-backdrop"></div>
+<aside class="jk-drawer" id="drawer-pago-editar" role="dialog" aria-modal="true" aria-labelledby="drawer-pago-editar-title" aria-hidden="true">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-pago-editar-title">Editar pago</h3>
+        <button type="button" class="jk-drawer-close" data-jk-close-drawer="drawer-pago-editar" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body">
+        <form method="post" action="@editarUrl">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="pago-editar-id" />
+            <div class="jk-form-group">
+                <label class="jk-label" for="pago-editar-monto">Monto</label>
+                <input type="number" name="Monto" id="pago-editar-monto" class="jk-input" min="0.01" step="0.01" required />
+            </div>
+            <div class="jk-form-group">
+                <label class="jk-label" for="pago-editar-tipo">Tipo</label>
+                <select name="TipoPago" id="pago-editar-tipo" class="jk-select">
+                    <option value="PagoParcial">Pago parcial</option>
+                    <option value="Senia">Seña</option>
+                    <option value="PagoTotal">Pago total</option>
+                </select>
+            </div>
+            <div class="jk-form-group">
+                <label class="jk-label" for="pago-editar-observacion">Observacion</label>
+                <input type="text" name="Observacion" id="pago-editar-observacion" class="jk-input" maxlength="200" />
+            </div>
+            <div class="jk-flex jk-gap-12 jk-mt-16">
+                <button type="button" class="jk-btn jk-btn-ghost" data-jk-close-drawer="drawer-pago-editar">Cancelar</button>
+                <button type="submit" class="jk-btn jk-btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</aside>
+
+@* Drawer Anular *@
+<div class="jk-drawer-backdrop" id="drawer-pago-anular-backdrop"></div>
+<aside class="jk-drawer" id="drawer-pago-anular" role="dialog" aria-modal="true" aria-labelledby="drawer-pago-anular-title" aria-hidden="true">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-pago-anular-title">Anular pago</h3>
+        <button type="button" class="jk-drawer-close" data-jk-close-drawer="drawer-pago-anular" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body">
+        <form method="post" action="@anularUrl">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="pago-anular-id" />
+            <p class="jk-small">Indica el motivo. El registro queda conservado (baja logica).</p>
+            <div class="jk-form-group">
+                <label class="jk-label" for="pago-anular-motivo">Motivo</label>
+                <input type="text" name="motivo" id="pago-anular-motivo" class="jk-input" maxlength="200" required />
+            </div>
+            <div class="jk-flex jk-gap-12 jk-mt-16">
+                <button type="button" class="jk-btn jk-btn-ghost" data-jk-close-drawer="drawer-pago-anular">Cancelar</button>
+                <button type="submit" class="jk-btn jk-btn-danger">Confirmar anulacion</button>
+            </div>
+        </form>
+    </div>
+</aside>
+
+<script>
+    (function () {
+        'use strict';
+
+        function setupDrawer(drawerId, populate) {
+            var drawer = document.getElementById(drawerId);
+            var backdrop = document.getElementById(drawerId + '-backdrop');
+            if (!drawer || !backdrop) return;
+
+            function open() {
+                drawer.classList.add('open');
+                backdrop.classList.add('open');
+                drawer.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('jk-drawer-open');
+                var first = drawer.querySelector('input, select, textarea');
+                if (first) setTimeout(function () { first.focus(); }, 150);
+            }
+
+            function close() {
+                drawer.classList.remove('open');
+                backdrop.classList.remove('open');
+                drawer.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('jk-drawer-open');
+            }
+
+            document.querySelectorAll('[data-jk-open-drawer="' + drawerId + '"]').forEach(function (trigger) {
+                trigger.addEventListener('click', function () {
+                    if (populate) populate(trigger);
+                    open();
+                });
+            });
+
+            backdrop.addEventListener('click', close);
+
+            drawer.querySelectorAll('[data-jk-close-drawer]').forEach(function (btn) {
+                btn.addEventListener('click', close);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if ((e.key === 'Escape' || e.keyCode === 27) && drawer.classList.contains('open')) {
+                    close();
+                }
+            });
+        }
+
+        setupDrawer('drawer-pago-editar', function (trigger) {
+            document.getElementById('pago-editar-id').value = trigger.getAttribute('data-pago-id');
+            document.getElementById('pago-editar-monto').value = trigger.getAttribute('data-pago-monto');
+            var tipoSel = document.getElementById('pago-editar-tipo');
+            var tipo = trigger.getAttribute('data-pago-tipo');
+            if (tipoSel && tipo) tipoSel.value = tipo;
+            document.getElementById('pago-editar-observacion').value = trigger.getAttribute('data-pago-observacion') || '';
+        });
+
+        setupDrawer('drawer-pago-anular', function (trigger) {
+            document.getElementById('pago-anular-id').value = trigger.getAttribute('data-pago-id');
+            document.getElementById('pago-anular-motivo').value = '';
+        });
+    })();
+</script>
