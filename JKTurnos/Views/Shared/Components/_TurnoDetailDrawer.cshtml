@@ -15,6 +15,8 @@
 
 @model JKTurnos.Models.ViewModels.TurnoDetailViewModel
 
+@Html.AntiForgeryToken()
+
 <div class="jk-drawer-section">
     <div class="jk-flex jk-flex-between">
         <h4 class="jk-drawer-subtitle">@Model.ClienteNombre</h4>
@@ -84,6 +86,17 @@
            title="Abre WhatsApp con el recordatorio del turno prellenado">
             <i class="bi bi-whatsapp"></i> Recordar por WhatsApp
         </a>
+    }
+
+    @if (Model.PuedeEnviarEmail)
+    {
+        <button type="button"
+                class="jk-btn jk-btn-sm jk-btn-secondary jk-mt-12"
+                data-enviar-email="@Model.Id"
+                data-enviar-email-url="@Url.Action("EnviarRecordatorioEmail", "Turnos")"
+                title="Envia el recordatorio del turno al email del cliente">
+            <i class="bi bi-envelope"></i> Enviar recordatorio por email
+        </button>
     }
 </div>
 

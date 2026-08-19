@@ -39,18 +39,6 @@
         Si la imagen no aparece, verifica que sea una URL directa y no un enlace a una pagina web.
     </div>
 
-    <br />
-
-    <div class="jk-form-group">
-        <label class="jk-label" for="WhatsAppTemplate">Recordatorio por WhatsApp (plantilla)</label>
-        @Html.TextAreaFor(m => m.WhatsAppTemplate, 4, 1, new { @class = "jk-input", id = "WhatsAppTemplate", placeholder = "Hola {nombre}! Te recordamos tu turno de {servicio} el {fecha} a las {hora}." })
-        <small class="jk-small text-secondary">
-            Se usa en el boton "Recordar por WhatsApp" del detalle del turno.
-            Utiliza estos datos entre {} en el cuerpo del mensaje: <code>{nombre}</code>, <code>{servicio}</code>, <code>{fecha}</code> y <code>{hora}</code>.
-            Ejemplo: Holo {nombre}!!! Tu cita de {servicio} comienza el dia {fecha} a las {hora} Saludos!!!
-        </small>
-    </div>
-
 }
 
 @{

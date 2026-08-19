@@ -223,3 +223,72 @@
     }
 
 })();
+
+/*
+ * D-033 Fase 2: recordatorio por email desde el drawer del turno.
+ * Handler global (jk-layout.js se carga en todas las paginas) con delegacion
+ * en document, asi funciona en Agenda, Pagos y Dashboard sin duplicar logica.
+ * El boton ([data-enviar-email]) vive dentro de _TurnoDetailDrawer.
+ */
+(function () {
+    'use strict';
+
+    function showToast(message, type) {
+        var container = document.querySelector('.jk-toast-container');
+        if (!container) return;
+        var toast = document.createElement('div');
+        toast.className = 'jk-toast jk-toast-' + type;
+        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
+            + '"></i> ' + message;
+        container.appendChild(toast);
+        setTimeout(function () { toast.remove(); }, 4000);
+    }
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-enviar-email]');
+        if (!btn || btn.disabled) return;
+
+        e.preventDefault();
+
+        var turnoId = btn.getAttribute('data-enviar-email');
+        var url = btn.getAttribute('data-enviar-email-url');
+        if (!turnoId || !url) return;
+
+        var drawer = btn.closest('.jk-drawer');
+        var tokenEl = drawer
+            ? drawer.querySelector('input[name="__RequestVerificationToken"]')
+            : null;
+        var token = tokenEl ? tokenEl.value : '';
+
+        btn.disabled = true;
+        var originalLabel = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-envelope"></i> Enviando&hellip;';
+
+        var data = new FormData();
+        data.append('__RequestVerificationToken', token);
+        data.append('turnoId', turnoId);
+
+        function resetBtn() {
+            btn.disabled = false;
+            btn.innerHTML = originalLabel;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            body: data
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+            if (json && json.success) {
+                showToast(json.message || 'Recordatorio enviado por email', 'success');
+            } else {
+                showToast(json && json.message ? json.message : 'No se pudo enviar el correo', 'error');
+            }
+            resetBtn();
+        })
+        .catch(function () {
+            showToast('No se pudo enviar el correo', 'error');
+            resetBtn();
+        });
+    });
+})();

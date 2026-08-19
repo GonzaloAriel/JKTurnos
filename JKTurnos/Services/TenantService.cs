@@ -129,6 +129,9 @@ namespace JKTurnos.Services
                 Telefono = string.Empty,
                 Direccion = string.Empty,
                 WhatsAppTemplate = NotificacionService.DefaultTemplate,
+                EmailAsunto = NotificacionService.DefaultEmailAsunto,
+                EmailTemplate = NotificacionService.DefaultEmailTemplate,
+                SmtpHabilitado = false,
                 IsActive = true,
                 CreatedAt = DateTime.Now
             });

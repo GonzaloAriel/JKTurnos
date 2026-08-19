@@ -33,6 +33,9 @@ namespace JKTurnos.Models.ViewModels
         // D-033: link wa.me con el recordatorio prellenado (null si el cliente no tiene telefono).
         public string WhatsAppLink { get; set; }
 
+        // D-033 Fase 2: el cliente tiene email cargado (habilita el boton de envio por email).
+        public bool PuedeEnviarEmail { get; set; }
+
         // V3: estado economico (senia/pago) calculado desde los Pagos.
         public string EstadoEconomico { get; set; }
 

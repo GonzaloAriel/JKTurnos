@@ -188,6 +188,10 @@
     <Compile Include="Migrations\202608191306496_AddPagos.Designer.cs">
       <DependentUpon>202608191306496_AddPagos.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608192242533_AddNotificacionesEmail.cs" />
+    <Compile Include="Migrations\202608192242533_AddNotificacionesEmail.Designer.cs">
+      <DependentUpon>202608192242533_AddNotificacionesEmail.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202608191913508_AddNotificacionesWhatsApp.cs" />
     <Compile Include="Migrations\202608191913508_AddNotificacionesWhatsApp.Designer.cs">
       <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>
@@ -349,6 +353,9 @@
     <Content Include="Views\Configuracion\EstadoEditar.cshtml" />
     <Content Include="Views\Configuracion\EstadoEliminar.cshtml" />
     <Content Include="Views\Configuracion\Index.cshtml" />
+    <Content Include="Views\Configuracion\Notificaciones.cshtml" />
+    <Content Include="Views\Configuracion\NotificacionesWhatsApp.cshtml" />
+    <Content Include="Views\Configuracion\NotificacionesEmail.cshtml" />
     <Content Include="Views\Recursos\Create.cshtml" />
     <Content Include="Views\Recursos\Delete.cshtml" />
     <Content Include="Views\Recursos\Edit.cshtml" />
@@ -419,6 +426,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608191306496_AddPagos.resx">
       <DependentUpon>202608191306496_AddPagos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608192242533_AddNotificacionesEmail.resx">
+      <DependentUpon>202608192242533_AddNotificacionesEmail.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608191913508_AddNotificacionesWhatsApp.resx">
       <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>

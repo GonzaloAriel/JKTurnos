@@ -81,6 +81,9 @@ namespace JKTurnos.Migrations
                     Email = adminEmail,
                     Direccion = "",
                     WhatsAppTemplate = NotificacionService.DefaultTemplate,
+                    EmailAsunto = NotificacionService.DefaultEmailAsunto,
+                    EmailTemplate = NotificacionService.DefaultEmailTemplate,
+                    SmtpHabilitado = false,
                     IsActive = true,
                     CreatedAt = DateTime.Now
                 });

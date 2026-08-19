@@ -86,6 +86,7 @@ namespace JKTurnos.Controllers
                 FechaHoraFin = turno.FechaHoraFin,
                 Observaciones = turno.Observaciones,
                 WhatsAppLink = notificacionService.GenerarLinkWhatsApp(turno),
+                PuedeEnviarEmail = turno.Cliente != null && !string.IsNullOrWhiteSpace(turno.Cliente.Email),
                 EstadoEconomico = _pagoService.CalcularEstadoEconomico(pagos, precios),
                 MontoAcumulado = pagos.Sum(p => p.Monto),
                 Pagos = pagos.Select(p => new PagoItemViewModel
@@ -130,6 +131,33 @@ namespace JKTurnos.Controllers
             }
 
             return Json(new { success = true });
+        }
+
+        // D-033 Fase 2: envia el recordatorio por email al cliente desde el drawer.
+        // POST ajax, patron QuickCreate (D-013). El boton aparece en el drawer solo
+        // si el cliente tiene email (PuedeEnviarEmail).
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EnviarRecordatorioEmail(int turnoId)
+        {
+            try
+            {
+                new NotificacionService().EnviarEmail(turnoId);
+            }
+            catch (ArgumentException ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "No se pudo enviar el correo: " + ex.Message });
+            }
+
+            return Json(new { success = true, message = "Recordatorio enviado por email" });
         }
 
         public ActionResult Agenda(DateTime? fecha = null, string vista = null, int? openRecursoId = null, int? openTurnoId = null)

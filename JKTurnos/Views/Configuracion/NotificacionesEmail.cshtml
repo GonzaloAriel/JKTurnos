@@ -1,0 +1,76 @@
+@model JKTurnos.Models.Entities.ConfiguracionTenant
+
+@helper FormContent()
+{
+    <div class="jk-form-group">
+        <label class="jk-label jk-flex jk-gap-8">
+            @Html.CheckBoxFor(m => m.SmtpHabilitado, new { @class = "jk-checkbox", id = "SmtpHabilitado" })
+            <span>Habilitar envio por email</span>
+        </label>
+        <small class="jk-small text-secondary">
+            Al activarlo aparece el boton "Enviar recordatorio por email" en el detalle del turno.
+            El envio usa el servidor SMTP configurado abajo.
+        </small>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="EmailDesde">Remitente (email desde)</label>
+        @Html.TextBoxFor(m => m.EmailDesde, new { @class = "jk-input", placeholder = "turnos@tu-negocio.com", id = "EmailDesde" })
+        <small class="jk-small text-secondary">Direccion que recibe el cliente. Si se deja vacia se usa el usuario SMTP.</small>
+    </div>
+
+    <div class="jk-grid">
+        <div class="jk-col-8">
+            <div class="jk-form-group">
+                <label class="jk-label" for="SmtpServidor">Servidor SMTP</label>
+                @Html.TextBoxFor(m => m.SmtpServidor, new { @class = "jk-input", placeholder = "smtp.tu-proveedor.com", id = "SmtpServidor" })
+            </div>
+        </div>
+        <div class="jk-col-4">
+            <div class="jk-form-group">
+                <label class="jk-label" for="SmtpPuerto">Puerto</label>
+                @Html.TextBoxFor(m => m.SmtpPuerto, new { @class = "jk-input", placeholder = "587", id = "SmtpPuerto", type = "number", min = "1", max = "65535" })
+                <small class="jk-small text-secondary">Por defecto 587 (TLS).</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="jk-grid">
+        <div class="jk-col-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="SmtpUsuario">Usuario SMTP</label>
+                @Html.TextBoxFor(m => m.SmtpUsuario, new { @class = "jk-input", placeholder = "turnos@tu-negocio.com", id = "SmtpUsuario" })
+            </div>
+        </div>
+        <div class="jk-col-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="SmtpPassword">Contrasena SMTP</label>
+                @Html.PasswordFor(m => m.SmtpPassword, new { @class = "jk-input", id = "SmtpPassword", placeholder = "Dejar en blanco para conservar la actual", autocomplete = "new-password" })
+            </div>
+        </div>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="EmailAsunto">Asunto del email (plantilla)</label>
+        @Html.TextBoxFor(m => m.EmailAsunto, new { @class = "jk-input", id = "EmailAsunto", placeholder = "Recordatorio de tu turno: {servicio}" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="EmailTemplate">Cuerpo del email (plantilla)</label>
+        @Html.TextAreaFor(m => m.EmailTemplate, 4, 1, new { @class = "jk-input", id = "EmailTemplate", placeholder = "Hola {nombre}! Te recordamos tu turno de {servicio} el {fecha} a las {hora}." })
+        <small class="jk-small text-secondary">
+            Asunto y cuerpo usan los mismos datos: <code>{nombre}</code>, <code>{servicio}</code>, <code>{fecha}</code> y <code>{hora}</code>.
+        </small>
+    </div>
+}
+
+@{
+    ViewBag.Title = "Editar email";
+    ViewBag.Subtitle = "Recordatorio por email (SMTP)";
+    ViewBag.SubmitText = "Guardar";
+    ViewBag.CancelUrl = Url.Action("Notificaciones");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

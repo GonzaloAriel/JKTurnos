@@ -1,0 +1,86 @@
+@{
+    ViewBag.Title = "Notificaciones";
+    ViewBag.Subtitle = "Recordatorios a tus clientes por WhatsApp y email";
+
+    var config = ViewBag.Configuracion as JKTurnos.Models.Entities.ConfiguracionTenant;
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<!-- ===== RECORDATORIO POR WHATSAPP ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Recordatorio por WhatsApp</h3>
+        <a href="@Url.Action("NotificacionesWhatsApp")" class="jk-btn jk-btn-sm jk-btn-ghost">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+    </div>
+
+    @if (config != null)
+    {
+        <div class="jk-grid">
+            <div class="jk-col-6">
+                <p class="jk-small text-secondary jk-mb-0">Plantilla del mensaje</p>
+                <p class="jk-mt-4 jk-small" style="white-space: pre-line;">
+                    @(string.IsNullOrWhiteSpace(config.WhatsAppTemplate)
+                        ? "No configurada. Se usara la plantilla por defecto."
+                        : config.WhatsAppTemplate)
+                </p>
+                <p class="jk-small text-secondary jk-mt-8 jk-mb-0">
+                    Disponibles: <code>{nombre}</code>, <code>{servicio}</code>, <code>{fecha}</code>, <code>{hora}</code>.
+                    El boton "Recordar por WhatsApp" del detalle del turno abre WhatsApp con este mensaje prellenado
+                    (se muestra solo si el cliente tiene telefono cargado).
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">Carga los datos del negocio para configurar los recordatorios.</p>
+    }
+</div>
+
+<!-- ===== RECORDATORIO POR EMAIL (SMTP) ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Recordatorio por email (SMTP)</h3>
+        <a href="@Url.Action("NotificacionesEmail")" class="jk-btn jk-btn-sm jk-btn-ghost">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+    </div>
+
+    @if (config != null)
+    {
+        <div class="jk-grid">
+            <div class="jk-col-6">
+                <p class="jk-small text-secondary jk-mb-0">Estado del envio</p>
+                @if (config.SmtpHabilitado)
+                {
+                    <p class="jk-mt-4 jk-small">
+                        Habilitado
+                        @if (!string.IsNullOrWhiteSpace(config.SmtpServidor))
+                        {<text>· servidor @config.SmtpServidor</text>}
+                        @if (!string.IsNullOrWhiteSpace(config.EmailDesde))
+                        {<text>· desde @config.EmailDesde</text>}
+                    </p>
+                }
+                else
+                {
+                    <p class="jk-mt-4 jk-small">No habilitado. El boton "Enviar recordatorio por email" aparece al activarlo.</p>
+                }
+
+                <p class="jk-small text-secondary jk-mt-8 jk-mb-0">
+                    Asunto: @(string.IsNullOrWhiteSpace(config.EmailAsunto) ? "por defecto" : config.EmailAsunto)
+                </p>
+                <p class="jk-small text-secondary jk-mt-4 jk-mb-0">
+                    El boton del detalle del turno envia el recordatorio al email del cliente
+                    (se muestra solo si el cliente tiene email cargado).
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">Carga los datos del negocio para configurar los recordatorios.</p>
+    }
+</div>

@@ -27,6 +27,31 @@ namespace JKTurnos.Models.Entities
         [StringLength(500)]
         public string WhatsAppTemplate { get; set; }
 
+        // D-033 Fase 2: recordatorio por EMAIL SMTP. El asunto y el cuerpo admiten
+        // los mismos placeholders que WhatsApp. SmtpHabilitado enciende el envio
+        // (el boton del drawer); sin datos SMTP el envio falla con mensaje claro.
+        [StringLength(200)]
+        public string EmailAsunto { get; set; }
+
+        [StringLength(1000)]
+        public string EmailTemplate { get; set; }
+
+        [StringLength(150)]
+        public string EmailDesde { get; set; }
+
+        [StringLength(200)]
+        public string SmtpServidor { get; set; }
+
+        public int? SmtpPuerto { get; set; }
+
+        [StringLength(150)]
+        public string SmtpUsuario { get; set; }
+
+        [StringLength(150)]
+        public string SmtpPassword { get; set; }
+
+        public bool SmtpHabilitado { get; set; }
+
         [ForeignKey("TenantId")]
         public virtual Tenant Tenant { get; set; }
     }

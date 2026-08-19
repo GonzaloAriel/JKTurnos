@@ -27,7 +27,9 @@ namespace JKTurnos.Services
             return _configRepo.GetAll().FirstOrDefault();
         }
 
-        public void UpdateConfiguracion(ConfiguracionTenant model)
+        // Datos del negocio (forma DatosNegocio). No toca las notificaciones:
+        // se editan en su propia seccion (NotificacionesEditar).
+        public void UpdateDatosNegocio(ConfiguracionTenant model)
         {
             model.NombreComercial = (model.NombreComercial ?? "").Trim();
 
@@ -44,7 +46,47 @@ namespace JKTurnos.Services
             actual.Email = model.Email;
             actual.Direccion = model.Direccion;
             actual.LogoUrl = model.LogoUrl;
+            _configRepo.Update(actual);
+        }
+
+        // Plantilla del recordatorio por WhatsApp (forma NotificacionesWhatsApp).
+        public void UpdateNotificacionWhatsApp(ConfiguracionTenant model)
+        {
+            var actual = _configRepo.GetAll().FirstOrDefault();
+
+            if (actual == null)
+            {
+                _configRepo.Add(model);
+                return;
+            }
+
             actual.WhatsAppTemplate = model.WhatsAppTemplate;
+            _configRepo.Update(actual);
+        }
+
+        // Email SMTP (forma NotificacionesEmail). La password en blanco conserva
+        // la existente (el form no re-renderiza el valor almacenado por seguridad).
+        public void UpdateNotificacionEmail(ConfiguracionTenant model)
+        {
+            var actual = _configRepo.GetAll().FirstOrDefault();
+
+            if (actual == null)
+            {
+                _configRepo.Add(model);
+                return;
+            }
+
+            actual.EmailAsunto = model.EmailAsunto;
+            actual.EmailTemplate = model.EmailTemplate;
+            actual.EmailDesde = model.EmailDesde;
+            actual.SmtpServidor = model.SmtpServidor;
+            actual.SmtpPuerto = model.SmtpPuerto;
+            actual.SmtpUsuario = model.SmtpUsuario;
+            actual.SmtpHabilitado = model.SmtpHabilitado;
+
+            if (!string.IsNullOrWhiteSpace(model.SmtpPassword))
+                actual.SmtpPassword = model.SmtpPassword.Trim();
+
             _configRepo.Update(actual);
         }
 
