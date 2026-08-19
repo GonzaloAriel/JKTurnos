@@ -49,7 +49,7 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-031 | Edicion de pagos: se permite CORREGIR Monto, TipoPago y Observacion de un pago (modifica la clausula "sin edicion" de D-030, pedido del TEAM LEAD). Registro financiero: NO se permite borrar el pago (se anula con motivo, D-008) ni cambiar el Turno o el UsuarioId. Acceso: Admin y Operador | 2026-08-19 | VIGENTE |
 | D-032 | Encoding UTF-8 habilitado en todo el proyecto: `<globalization requestEncoding/responseEncoding/fileEncoding="utf-8">` en Web.config + archivos fuente (.cs, .cshtml, .css, .js, .config) guardados en UTF-8 con BOM. Los textos pueden usar ñ y acentos con normalidad. Reemplaza la regla D-009 de "textos sin acentos" | 2026-08-19 | VIGENTE |
 | D-033 | Modulo Notificaciones al Cliente (Docs/14 seccion 8), canales por fases sin infraestructura externa al inicio. Fase 1 WhatsApp via link `wa.me` con mensaje prellenado (boton "Recordar por WhatsApp" desde el Drawer del turno + plantillas de mensaje configurables por tenant en Configuracion); Fase 2 email SMTP; Fase 3 centro de notificaciones in-app y recordatorios programados. Los disparadores nacen de los eventos del turno (auditoria TurnoHistorial de V2) | 2026-08-19 | VIGENTE (Fase 1) |
-| D-034 | Modulo Dashboard en SECCION APARTE (decidido por TEAM LEAD 2026-08-19: nada en el Command Center). Fase 1 (implementada, pendiente de confirmacion): KPIs del mes, ocupacion semanal (grafica CSS sin librerias), ingresos del mes por dia, proximos turnos (click abre el drawer de la Agenda via openTurnoId), turnos sin confirmar, ranking de servicios, cobrado por recurso y saldo pendiente. Fase 2: dashboard de pagos (ingresos mensuales, por recurso, saldo pendiente). Fase 3: exportacion CSV/PDF | 2026-08-19 | VIGENTE (Fase 1) |
+| D-034 | Modulo Dashboard en SECCION APARTE (decidido por TEAM LEAD 2026-08-19: nada en el Command Center). Fase 1 CONSOLIDADA (2026-08-19): KPIs del mes, ocupacion semanal (grafica CSS sin librerias), ingresos del mes por dia, proximos turnos y sin confirmar (click abre el drawer en la MISMA seccion via `jk-dashboard.js`), ranking de servicios, cobrado por recurso y saldo pendiente. Fase 2 CONSOLIDADA (2026-08-19): KPI de ingresos con variacion vs mes anterior, evolucion de ingresos 12 meses, ingresos por recurso (barras con %), pagos por tipo (Senia/Parcial/Total) y saldo pendiente. Fase 3: exportacion CSV/PDF | 2026-08-19 | VIGENTE (Fases 1 y 2 CONSOLIDADAS) |
 
 ## Detalle
 
@@ -477,7 +477,7 @@ Estado: VIGENTE (Fase 1 en curso)
 
 Fecha: 2026-08-19
 
-Decision: El Dashboard vive en una SECCION APARTE (modulo propio `Dashboard`, sidebar grupo Principal, `DashboardController` + `Views/Dashboard/Index.cshtml`). El TEAM LEAD decidio que NO se toca el Command Center: nada de graficas ni reportes en el Home. Fase 1 (implementada 2026-08-19, pendiente de confirmacion): KPIs del mes (turnos, ingresos por pagos, ocupacion de hoy, clientes), grafica de ocupacion semanal y de ingresos del mes por dia (CSS puro, sin librerias), proximos turnos y turnos sin confirmar (cada item abre el drawer de la Agenda via `openTurnoId`), ranking de servicios mas reservados, cobrado por recurso y saldo pendiente (precio - acumulado de pagos de turnos activos del mes). Fase 2: dashboard de pagos (ingresos mensuales, por recurso, saldo pendiente). Fase 3: exportacion CSV/PDF.
+Decision: El Dashboard vive en una SECCION APARTE (modulo propio `Dashboard`, sidebar grupo Principal, `DashboardController` + `Views/Dashboard/Index.cshtml`). El TEAM LEAD decidio que NO se toca el Command Center: nada de graficas ni reportes en el Home. Fase 1 (CONSOLIDADA 2026-08-19): KPIs del mes (turnos, ingresos por pagos, ocupacion de hoy, clientes), grafica de ocupacion semanal y de ingresos del mes por dia (CSS puro, sin librerias), proximos turnos y turnos sin confirmar (cada item abre el drawer en la MISMA seccion via `jk-dashboard.js`), ranking de servicios mas reservados, cobrado por recurso y saldo pendiente (precio - acumulado de pagos de turnos activos del mes). Fase 2 (CONSOLIDADA 2026-08-19): dashboard de pagos — KPI de ingresos con variacion vs mes anterior, evolucion de ingresos por mes (12 meses), ingresos por recurso del mes (barras con %), desglose de pagos por tipo (Senia/PagoParcial/Total) y saldo pendiente. Fase 3: exportacion CSV/PDF.
 
 Motivo: el usuario quiere ver el estado del negocio en una seccion dedicada sin mezclarla con el Home.
 
@@ -485,7 +485,7 @@ Consecuencias: nuevas consultas en `DashboardService` (usa `PagoService.GetPagos
 
 Reemplaza a: la redaccion previa de D-034 que evolucionaba el Home (nunca implementada).
 
-Estado: VIGENTE (Fase 1 implementada)
+Estado: VIGENTE (Fase 1 y Fase 2 CONSOLIDADAS)
 
 Al tomar una decision nueva, agregar una ficha con el ID siguiente y actualizar el indice.
 

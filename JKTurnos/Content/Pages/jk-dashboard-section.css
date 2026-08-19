@@ -4,6 +4,21 @@
    aparte Dashboard. Reutiliza las clases KPI de jk-dashboard.css.
    ================================================================ */
 
+/* ===== VARIACION MENSUAL EN EL KPI DE INGRESOS ===== */
+.kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: var(--jk-text-xs);
+    font-weight: var(--jk-weight-medium);
+    font-variant-numeric: tabular-nums;
+}
+
+.jk-delta-up { color: var(--jk-success); }
+.jk-delta-down { color: var(--jk-danger); }
+.jk-delta-neutral { color: var(--jk-text-tertiary); }
+
 /* ===== GRAFICA DE BARRAS VERTICALES (ocupacion semanal) ===== */
 .jk-chart-bars {
     display: flex;
@@ -96,6 +111,19 @@
     font-weight: var(--jk-weight-semibold);
     color: var(--jk-text-primary);
     font-variant-numeric: tabular-nums;
+}
+
+/* Etiqueta ancha para nombres de recurso (grafica de ingresos por recurso). */
+.jk-chart-row-label-wide {
+    width: 110px;
+    flex-shrink: 0;
+    font-size: var(--jk-text-xs);
+    font-weight: var(--jk-weight-medium);
+    color: var(--jk-text-secondary);
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ===== LISTAS DEL DASHBOARD ===== */
@@ -208,6 +236,42 @@
     line-height: 1.4;
 }
 
+/* ===== PAGOS DEL MES POR TIPO ===== */
+.jk-pagos-tipo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--jk-space-12);
+}
+
+.jk-pagos-tipo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--jk-space-12);
+    border: 1px solid var(--jk-border-light);
+    border-radius: var(--jk-radius);
+    background: var(--jk-bg);
+}
+
+.jk-pagos-tipo-name {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-medium);
+    color: var(--jk-text-secondary);
+}
+
+.jk-pagos-tipo-total {
+    font-size: 1.3rem;
+    font-weight: var(--jk-weight-bold);
+    color: var(--jk-text-primary);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.jk-pagos-tipo-count {
+    font-size: var(--jk-text-xs);
+    color: var(--jk-text-tertiary);
+}
+
 @media (max-width: 767px) {
     .jk-chart-bars {
         height: 140px;
@@ -215,5 +279,14 @@
 
     .jk-dash-item {
         padding: var(--jk-space-8);
+    }
+
+    .jk-chart-row-label-wide {
+        width: 76px;
+    }
+
+    .jk-pagos-tipo {
+        grid-template-columns: 1fr;
+        gap: var(--jk-space-8);
     }
 }

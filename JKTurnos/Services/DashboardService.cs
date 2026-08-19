@@ -1,16 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JKTurnos.Models.Entities;
 using JKTurnos.Models.ViewModels;
 
 namespace JKTurnos.Services
 {
     // D-034: Seccion Dashboard (seccion aparte). Agrega y agrupa datos que ya
     // existen (Turnos, Pagos, Clientes, Servicios, Recursos) sin nuevo schema.
+    // Fase 2: evolucion de ingresos (12 meses), ingresos por recurso,
+    // desglose por tipo de pago y variacion mensual.
     public class DashboardService
     {
         // Jornada laboral estandar de la Agenda (D-012): 08:00 - 19:30
         private const int MinutosJornada = 690;
+
+        private static readonly string[] MesesCortos =
+            { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
 
         private readonly TurnoService _turnoService;
         private readonly PagoService _pagoService;
@@ -36,10 +42,15 @@ namespace JKTurnos.Services
 
             var pagosMes = _pagoService.GetPagosEnRango(inicioMes, finMes);
 
+            var ingresoMesAnterior = _pagoService.GetPagosEnRango(inicioMes.AddMonths(-1), inicioMes)
+                .Sum(p => p.Monto);
+
             return new DashboardViewModel
             {
                 TurnosMes = activosMes.Count,
                 IngresosMes = pagosMes.Sum(p => p.Monto),
+                IngresosMesAnterior = ingresoMesAnterior,
+                VariacionMensual = CalcularVariacion(pagosMes.Sum(p => p.Monto), ingresoMesAnterior),
                 Clientes = _clienteService.GetAll().Count,
                 OcupacionHoy = CalcularOcupacionHoy(hoyDate),
                 OcupacionSemana = CalcularOcupacionSemana(hoyDate),
@@ -48,13 +59,80 @@ namespace JKTurnos.Services
                     .OrderBy(g => g.Key)
                     .Select(g => new BarraGrafico { Etiqueta = g.Key.Day.ToString(), Valor = g.Sum(p => p.Monto) })
                     .ToList(),
+                IngresosUltimosMeses = EvolucionIngresos(inicioMes, finMes),
                 ProximosTurnos = ProximosTurnos(),
                 TurnosPendientes = TurnosPendientes(),
                 RankingServicios = RankingServicios(activosMes),
-                CobradoPorRecurso = CobradoPorRecurso(pagosMes),
+                IngresosPorRecurso = IngresosPorRecurso(pagosMes),
+                PagosPorTipo = PagosPorTipo(pagosMes),
                 SaldoPendiente = CalcularSaldoPendiente(activosMes, pagosMes, out int turnosConSaldo),
                 TurnosConSaldoPendiente = turnosConSaldo
             };
+        }
+
+        private static decimal CalcularVariacion(decimal actual, decimal anterior)
+        {
+            if (anterior <= 0)
+                return 0;
+
+            return Math.Round(((actual - anterior) / anterior) * 100, 1);
+        }
+
+        private static List<BarraGrafico> EvolucionIngresos(DateTime inicioMes, DateTime finMes)
+        {
+            var pagos12 = new PagoService().GetPagosEnRango(inicioMes.AddMonths(-11), finMes);
+
+            var resultado = new List<BarraGrafico>();
+
+            for (var i = 11; i >= 0; i--)
+            {
+                var mes = inicioMes.AddMonths(-i);
+                var siguiente = mes.AddMonths(1);
+
+                var total = pagos12
+                    .Where(p => p.Fecha >= mes && p.Fecha < siguiente)
+                    .Sum(p => p.Monto);
+
+                resultado.Add(new BarraGrafico
+                {
+                    Etiqueta = MesesCortos[mes.Month - 1],
+                    Valor = total
+                });
+            }
+
+            return resultado;
+        }
+
+        private static List<RankingItem> IngresosPorRecurso(List<Pago> pagosMes)
+        {
+            return pagosMes
+                .Where(p => p.Turno != null && p.Turno.Recurso != null)
+                .GroupBy(p => p.Turno.Recurso.Nombre)
+                .OrderByDescending(g => g.Sum(p => p.Monto))
+                .Take(6)
+                .Select(g => new RankingItem { Nombre = g.Key, Total = g.Sum(p => p.Monto) })
+                .ToList();
+        }
+
+        private static List<PagosPorTipoItem> PagosPorTipo(List<Pago> pagosMes)
+        {
+            var porTipo = pagosMes.GroupBy(p => p.TipoPago);
+
+            return Enum.GetValues(typeof(TipoPago))
+                .Cast<TipoPago>()
+                .Select(tipo =>
+                {
+                    var grupo = porTipo.FirstOrDefault(g => g.Key == tipo);
+                    var items = grupo != null ? grupo.ToList() : new List<Pago>();
+
+                    return new PagosPorTipoItem
+                    {
+                        Tipo = tipo == TipoPago.Senia ? "Senia" : (tipo == TipoPago.PagoParcial ? "Pago parcial" : "Pago total"),
+                        Cantidad = items.Count,
+                        Total = items.Sum(p => p.Monto)
+                    };
+                })
+                .ToList();
         }
 
         private int CalcularOcupacionHoy(DateTime hoyDate)
@@ -125,17 +203,6 @@ namespace JKTurnos.Services
                 .OrderByDescending(g => g.Count())
                 .Take(5)
                 .Select(g => new RankingItem { Nombre = g.Key, Cantidad = g.Count() })
-                .ToList();
-        }
-
-        private List<RankingItem> CobradoPorRecurso(List<Models.Entities.Pago> pagosMes)
-        {
-            return pagosMes
-                .Where(p => p.Turno != null && p.Turno.Recurso != null)
-                .GroupBy(p => p.Turno.Recurso.Nombre)
-                .OrderByDescending(g => g.Sum(p => p.Monto))
-                .Take(5)
-                .Select(g => new RankingItem { Nombre = g.Key, Total = g.Sum(p => p.Monto) })
                 .ToList();
         }
 

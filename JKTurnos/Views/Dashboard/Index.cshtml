@@ -6,6 +6,7 @@
 
     var maxSemana = Model.OcupacionSemana.Count > 0 ? Model.OcupacionSemana.Max(b => b.Valor) : 0;
     var maxIngresos = Model.IngresosMesPorDia.Count > 0 ? Model.IngresosMesPorDia.Max(b => b.Valor) : 0;
+    var maxMeses = Model.IngresosUltimosMeses.Count > 0 ? Model.IngresosUltimosMeses.Max(b => b.Valor) : 0;
 }
 
 @section PageStyles {
@@ -26,6 +27,18 @@
             <div class="kpi-item">
                 <div class="kpi-label">Ingresos del mes</div>
                 <div class="kpi-value">$ @Model.IngresosMes.ToString("N2")</div>
+                @if (Model.IngresosMesAnterior > 0)
+                {
+                    var deltaClass = Model.VariacionMensual >= 0 ? "jk-delta-up" : "jk-delta-down";
+                    var deltaIcon = Model.VariacionMensual >= 0 ? "bi-arrow-up-right" : "bi-arrow-down-right";
+                    <span class="kpi-delta @deltaClass">
+                        <i class="bi @deltaIcon"></i> @Math.Abs(Model.VariacionMensual).ToString("0.#")% vs mes anterior
+                    </span>
+                }
+                else
+                {
+                    <span class="kpi-delta jk-delta-neutral">Sin datos del mes anterior</span>
+                }
             </div>
             <div class="kpi-item">
                 <div class="kpi-label">Ocupacion hoy</div>
@@ -93,6 +106,31 @@
                 }
             </div>
         </div>
+    </div>
+
+    <!-- ===== 2.5 EVOLUCION DE INGRESOS (12 MESES) ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="jk-card-header">
+            <h3 class="jk-card-title">Evolucion de ingresos (12 meses)</h3>
+        </div>
+        @if (Model.IngresosUltimosMeses.Any(b => b.Valor > 0))
+        {
+            <div class="jk-chart-bars">
+                @foreach (var b in Model.IngresosUltimosMeses)
+                {
+                    var altura = b.Valor <= 0 ? 4 : (int)Math.Max(8, (b.Valor / (maxMeses == 0 ? 1 : maxMeses)) * 100);
+                    <div class="jk-chart-col" title="@b.Etiqueta: $ @b.Valor.ToString("N0")">
+                        <span class="jk-chart-value">@b.Valor.ToString("N0")</span>
+                        <div class="jk-chart-bar" style="height: @altura%;"></div>
+                        <span class="jk-chart-label">@b.Etiqueta</span>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="jk-small text-secondary jk-mb-0">Sin ingresos en los ultimos 12 meses.</p>
+        }
     </div>
 
     <!-- ===== 3. PROXIMOS TURNOS + SIN CONFIRMAR ===== -->
@@ -192,16 +230,21 @@
         <div class="jk-col-4">
             <div class="jk-card">
                 <div class="jk-card-header">
-                    <h3 class="jk-card-title">Cobrado por recurso</h3>
+                    <h3 class="jk-card-title">Ingresos por recurso (mes)</h3>
                 </div>
-                @if (Model.CobradoPorRecurso.Count > 0)
+                @if (Model.IngresosPorRecurso.Count > 0)
                 {
-                    <div class="jk-dash-list">
-                        @foreach (var r in Model.CobradoPorRecurso)
+                    var maxRecurso = Model.IngresosPorRecurso.Max(r => r.Total);
+                    <div class="jk-chart-rows">
+                        @foreach (var r in Model.IngresosPorRecurso)
                         {
-                            <div class="jk-dash-row">
-                                <span class="jk-dash-row-name">@r.Nombre</span>
-                                <span class="jk-dash-row-value">$ @r.Total.ToString("N0")</span>
+                            var ancho = r.Total <= 0 ? 0 : (int)Math.Max(4, (r.Total / (maxRecurso == 0 ? 1 : maxRecurso)) * 100);
+                            <div class="jk-chart-row" title="@r.Nombre: $ @r.Total.ToString("N0")">
+                                <span class="jk-chart-row-label-wide">@r.Nombre</span>
+                                <div class="jk-chart-row-track">
+                                    <div class="jk-chart-row-bar" style="width: @ancho%;"></div>
+                                </div>
+                                <span class="jk-chart-row-value">$ @r.Total.ToString("N0")</span>
                             </div>
                         }
                     </div>
@@ -226,6 +269,30 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- ===== 5. PAGOS DEL MES POR TIPO ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="jk-card-header">
+            <h3 class="jk-card-title">Pagos del mes por tipo</h3>
+        </div>
+        @if (Model.PagosPorTipo.Any(p => p.Cantidad > 0))
+        {
+            <div class="jk-pagos-tipo">
+                @foreach (var p in Model.PagosPorTipo)
+                {
+                    <div class="jk-pagos-tipo-item">
+                        <span class="jk-pagos-tipo-name">@p.Tipo</span>
+                        <span class="jk-pagos-tipo-total">$ @p.Total.ToString("N0")</span>
+                        <span class="jk-pagos-tipo-count">@p.Cantidad pago(s)</span>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="jk-small text-secondary jk-mb-0">Sin pagos en el mes.</p>
+        }
     </div>
 
 </div>
