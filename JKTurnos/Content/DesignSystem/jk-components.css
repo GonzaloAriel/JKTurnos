@@ -97,6 +97,19 @@
     box-shadow: var(--jk-shadow);
 }
 
+.jk-btn-whatsapp {
+    background: #25d366;
+    color: var(--jk-white);
+    border-color: #25d366;
+}
+
+.jk-btn-whatsapp:hover {
+    background: #1eb857;
+    border-color: #1eb857;
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
 /* Sizes */
 .jk-btn-sm {
     padding: var(--jk-space-4) var(--jk-space-12);

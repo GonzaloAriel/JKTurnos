@@ -1,0 +1,250 @@
+@model JKTurnos.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+    ViewBag.Subtitle = "El estado de tu negocio en un vistazo";
+
+    var maxSemana = Model.OcupacionSemana.Count > 0 ? Model.OcupacionSemana.Max(b => b.Valor) : 0;
+    var maxIngresos = Model.IngresosMesPorDia.Count > 0 ? Model.IngresosMesPorDia.Max(b => b.Valor) : 0;
+}
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-dashboard-section.css" rel="stylesheet" />
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="fade-in">
+
+    <!-- ===== 1. KPIs ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="kpi-row">
+            <div class="kpi-item">
+                <div class="kpi-label">Turnos del mes</div>
+                <div class="kpi-value">@Model.TurnosMes</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Ingresos del mes</div>
+                <div class="kpi-value">$ @Model.IngresosMes.ToString("N2")</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Ocupacion hoy</div>
+                <div class="kpi-value">@Model.OcupacionHoy%</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Clientes</div>
+                <div class="kpi-value">@Model.Clientes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. GRAFICAS ===== -->
+    <div class="jk-grid jk-mt-24">
+        <div class="jk-col-6">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Turnos por dia (semana)</h3>
+                </div>
+                @if (Model.OcupacionSemana.Any(b => b.Valor > 0))
+                {
+                    <div class="jk-chart-bars">
+                        @foreach (var b in Model.OcupacionSemana)
+                        {
+                            var altura = b.Valor <= 0 ? 4 : (int)Math.Max(8, (b.Valor / (maxSemana == 0 ? 1 : maxSemana)) * 100);
+                            <div class="jk-chart-col" title="@b.Etiqueta: @b.Valor turno(s)">
+                                <span class="jk-chart-value">@b.Valor</span>
+                                <div class="jk-chart-bar" style="height: @altura%;"></div>
+                                <span class="jk-chart-label">@b.Etiqueta</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">Sin turnos en la semana.</p>
+                }
+            </div>
+        </div>
+
+        <div class="jk-col-6">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Ingresos por dia (mes)</h3>
+                </div>
+                @if (Model.IngresosMesPorDia.Count > 0)
+                {
+                    <div class="jk-chart-rows">
+                        @foreach (var b in Model.IngresosMesPorDia)
+                        {
+                            var ancho = b.Valor <= 0 ? 0 : (int)Math.Max(4, (b.Valor / (maxIngresos == 0 ? 1 : maxIngresos)) * 100);
+                            <div class="jk-chart-row">
+                                <span class="jk-chart-row-label">@b.Etiqueta</span>
+                                <div class="jk-chart-row-track">
+                                    <div class="jk-chart-row-bar" style="width: @ancho%;"></div>
+                                </div>
+                                <span class="jk-chart-row-value">$ @b.Valor.ToString("N0")</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">Sin ingresos en el mes.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 3. PROXIMOS TURNOS + SIN CONFIRMAR ===== -->
+    <div class="jk-grid jk-mt-24">
+        <div class="jk-col-6">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Proximos turnos</h3>
+                    <a href="@Url.Action("Agenda", "Turnos")" class="jk-btn jk-btn-sm jk-btn-ghost">Ver agenda</a>
+                </div>
+                @if (Model.ProximosTurnos.Count > 0)
+                {
+                    <div class="jk-dash-list">
+                        @foreach (var t in Model.ProximosTurnos)
+                        {
+                            <button type="button" class="jk-dash-item" data-ver-turno="@t.Id"
+                                    aria-label="Ver detalle del turno de @t.ClienteNombre">
+                                <div class="jk-dash-item-main">
+                                    <span class="jk-dash-item-time">@t.FechaHoraInicio.ToString("dd/MM HH:mm")</span>
+                                    <span class="jk-dash-item-client">@t.ClienteNombre</span>
+                                    <span class="jk-dash-item-sub">
+                                        @(t.ServicioNombre) &middot; @t.RecursoNombre
+                                    </span>
+                                </div>
+                                <span class="jk-badge" style="--jk-status-color: @(t.EstadoColor ?? "#aeaeb2");">
+                                    <i class="bi bi-circle-fill" style="color: @(t.EstadoColor ?? "#aeaeb2");"></i> @t.EstadoNombre
+                                </span>
+                            </button>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">No hay turnos proximos en los proximos 14 dias.</p>
+                }
+            </div>
+        </div>
+
+        <div class="jk-col-6">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Sin confirmar</h3>
+                </div>
+                @if (Model.TurnosPendientes.Count > 0)
+                {
+                    <div class="jk-dash-list">
+                        @foreach (var t in Model.TurnosPendientes)
+                        {
+                            <button type="button" class="jk-dash-item" data-ver-turno="@t.Id"
+                                    aria-label="Ver detalle del turno de @t.ClienteNombre">
+                                <div class="jk-dash-item-main">
+                                    <span class="jk-dash-item-time">@t.FechaHoraInicio.ToString("dd/MM HH:mm")</span>
+                                    <span class="jk-dash-item-client">@t.ClienteNombre</span>
+                                    <span class="jk-dash-item-sub">
+                                        @(t.ServicioNombre) &middot; @t.RecursoNombre
+                                    </span>
+                                </div>
+                                <i class="bi bi-clock" title="Pendiente de confirmar"></i>
+                            </button>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">No hay turnos sin confirmar.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 4. RANKINGS + SALDO ===== -->
+    <div class="jk-grid jk-mt-24">
+        <div class="jk-col-4">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Servicios mas reservados</h3>
+                </div>
+                @if (Model.RankingServicios.Count > 0)
+                {
+                    <div class="jk-dash-list">
+                        @foreach (var r in Model.RankingServicios)
+                        {
+                            <div class="jk-dash-row">
+                                <span class="jk-dash-row-name">@r.Nombre</span>
+                                <span class="jk-badge">@r.Cantidad</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">Sin reservas en el mes.</p>
+                }
+            </div>
+        </div>
+
+        <div class="jk-col-4">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Cobrado por recurso</h3>
+                </div>
+                @if (Model.CobradoPorRecurso.Count > 0)
+                {
+                    <div class="jk-dash-list">
+                        @foreach (var r in Model.CobradoPorRecurso)
+                        {
+                            <div class="jk-dash-row">
+                                <span class="jk-dash-row-name">@r.Nombre</span>
+                                <span class="jk-dash-row-value">$ @r.Total.ToString("N0")</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">Sin cobros en el mes.</p>
+                }
+            </div>
+        </div>
+
+        <div class="jk-col-4">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Saldo pendiente</h3>
+                </div>
+                <div class="jk-dash-saldo">
+                    <span class="jk-dash-saldo-value">$ @Model.SaldoPendiente.ToString("N2")</span>
+                    <span class="jk-dash-saldo-sub">
+                        en @Model.TurnosConSaldoPendiente turno(s) del mes sin cobrar del todo
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="jk-drawer-backdrop" id="drawer-dashboard-turno-backdrop"></div>
+<div class="jk-drawer" id="drawer-dashboard-turno" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-dashboard-turno-title"
+     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
+     data-registrar-pago-url="@Url.Action("RegistrarPago", "Turnos")">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-dashboard-turno-title">Detalle del turno</h3>
+        <button type="button" class="jk-drawer-close" id="drawer-dashboard-turno-close" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body" id="drawer-dashboard-turno-body"></div>
+</div>
+
+@Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-dashboard" } })
+
+@section scripts {
+    <script src="~/Scripts/jk-dashboard.js"></script>
+}

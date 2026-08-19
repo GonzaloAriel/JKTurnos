@@ -44,6 +44,7 @@ namespace JKTurnos.Services
             actual.Email = model.Email;
             actual.Direccion = model.Direccion;
             actual.LogoUrl = model.LogoUrl;
+            actual.WhatsAppTemplate = model.WhatsAppTemplate;
             _configRepo.Update(actual);
         }
 

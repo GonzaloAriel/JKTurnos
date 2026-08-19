@@ -49,6 +49,37 @@
     }
 </div>
 
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Notificaciones al cliente</h3>
+        <a href="@Url.Action("DatosNegocio")" class="jk-btn jk-btn-sm jk-btn-ghost">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+    </div>
+
+    @if (config != null)
+    {
+        <div class="jk-grid">
+            <div class="jk-col-8">
+                <p class="jk-small text-secondary jk-mb-0">Recordatorio por WhatsApp (plantilla)</p>
+                <p class="jk-mt-4 jk-small" style="white-space: pre-line;">
+                    @(string.IsNullOrWhiteSpace(config.WhatsAppTemplate)
+                        ? "No configurada. Se usara la plantilla por defecto."
+                        : config.WhatsAppTemplate)
+                </p>
+                <p class="jk-small text-secondary jk-mt-8 jk-mb-0">
+                    Disponibles: <code>{nombre}</code>, <code>{servicio}</code>, <code>{fecha}</code>, <code>{hora}</code>.
+                    El boton "Recordar por WhatsApp" del detalle del turno abre WhatsApp con este mensaje.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">Carga los datos del negocio para configurar el recordatorio por WhatsApp.</p>
+    }
+</div>
+
 <!-- ===== ESTADOS DE TURNO ===== -->
 <div class="jk-card jk-mt-24">
     <div class="jk-card-header">

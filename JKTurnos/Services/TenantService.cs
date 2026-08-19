@@ -128,6 +128,7 @@ namespace JKTurnos.Services
                 Email = adminEmail ?? string.Empty,
                 Telefono = string.Empty,
                 Direccion = string.Empty,
+                WhatsAppTemplate = NotificacionService.DefaultTemplate,
                 IsActive = true,
                 CreatedAt = DateTime.Now
             });

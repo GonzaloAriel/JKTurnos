@@ -170,6 +170,7 @@
     <Compile Include="Controllers\UsuariosController.cs" />
     <Compile Include="Controllers\TenantsController.cs" />
     <Compile Include="Controllers\ConfiguracionController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\GlobalRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
@@ -186,6 +187,10 @@
     <Compile Include="Migrations\202608191306496_AddPagos.cs" />
     <Compile Include="Migrations\202608191306496_AddPagos.Designer.cs">
       <DependentUpon>202608191306496_AddPagos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608191913508_AddNotificacionesWhatsApp.cs" />
+    <Compile Include="Migrations\202608191913508_AddNotificacionesWhatsApp.Designer.cs">
+      <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
@@ -212,6 +217,7 @@
     <Compile Include="Models\ViewModels\ServicioViewModel.cs" />
     <Compile Include="Models\ViewModels\TurnoViewModel.cs" />
     <Compile Include="Models\ViewModels\TurnoDetailViewModel.cs" />
+    <Compile Include="Models\ViewModels\DashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\UsuarioViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
@@ -222,7 +228,9 @@
     <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
     <Compile Include="Services\TenantService.cs" />
+    <Compile Include="Services\NotificacionService.cs" />
     <Compile Include="Services\ConfiguracionService.cs" />
+    <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\TurnoService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
@@ -251,6 +259,7 @@
     <Content Include="Content\DesignSystem\jk-utilities.css" />
     <Content Include="Content\Pages\jk-agenda.css" />
     <Content Include="Content\Pages\jk-pagos.css" />
+    <Content Include="Content\Pages\jk-dashboard-section.css" />
     <Content Include="Content\jk-components.css" />
     <Content Include="Content\jk-dashboard.css" />
     <Content Include="Content\jk-ds.css" />
@@ -290,6 +299,7 @@
     <Content Include="Scripts\jk-layout.js" />
     <Content Include="Scripts\jk-agenda.js" />
     <Content Include="Scripts\jk-pagos.js" />
+    <Content Include="Scripts\jk-dashboard.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -344,6 +354,7 @@
     <Content Include="Views\Recursos\Edit.cshtml" />
     <Content Include="Views\Recursos\Index.cshtml" />
     <Content Include="Views\Pagos\Index.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
     <Content Include="Views\Tenants\Create.cshtml" />
     <Content Include="Views\Tenants\Delete.cshtml" />
     <Content Include="Views\Tenants\Edit.cshtml" />
@@ -408,6 +419,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608191306496_AddPagos.resx">
       <DependentUpon>202608191306496_AddPagos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608191913508_AddNotificacionesWhatsApp.resx">
+      <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -58,7 +58,7 @@ else
             @for (int i = 0; i < recursos.Count; i++)
             {
                 var rec = recursos[i];
-                <div class="jk-agenda-resource-header" style="grid-row: 1; grid-column: @(i + 2);" role="columnheader" aria-label="@rec.Nombre">
+                <div class="jk-agenda-resource-header" data-recurso-id="@rec.Id" style="grid-row: 1; grid-column: @(i + 2);" role="columnheader" aria-label="@rec.Nombre">
                     <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb")"></span>
                     <span class="jk-agenda-resource-name">@rec.Nombre</span>
                 </div>
@@ -82,11 +82,11 @@ else
                     var rec = recursos[i];
                     if (hour.EndsWith(":00"))
                     {
-                        @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
+                        @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
                     }
                     else
                     {
-                        @:<div class="jk-agenda-cell" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
+                        @:<div class="jk-agenda-cell" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
                     }
                 }
             }
@@ -136,6 +136,7 @@ else
                      role="button"
                      tabindex="0"
                      data-turno-id="@t.Id"
+                     data-recurso-id="@t.RecursoId"
                      style="grid-column: @gridColumn; grid-row: @gridRowStart / @gridRowEnd; --jk-block-color: @recursoColor;"
                      aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                     <div class="jk-agenda-time-block-band">

@@ -4,6 +4,7 @@ using System.Linq;
 using JKTurnos.Data;
 using JKTurnos.Infrastructure;
 using JKTurnos.Models.Entities;
+using JKTurnos.Services;
 
 namespace JKTurnos.Migrations
 {
@@ -79,6 +80,7 @@ namespace JKTurnos.Migrations
                     Telefono = "",
                     Email = adminEmail,
                     Direccion = "",
+                    WhatsAppTemplate = NotificacionService.DefaultTemplate,
                     IsActive = true,
                     CreatedAt = DateTime.Now
                 });

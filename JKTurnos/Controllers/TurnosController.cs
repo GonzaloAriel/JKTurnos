@@ -66,6 +66,7 @@ namespace JKTurnos.Controllers
             var pagos = _pagoService.GetPagos(id);
             var precios = turno.Servicio != null ? turno.Servicio.Precio : (decimal?)null;
             var nombresUsuarios = _pagoService.GetNombresUsuarios(pagos.Select(p => p.UsuarioId));
+            var notificacionService = new NotificacionService();
 
             var model = new TurnoDetailViewModel
             {
@@ -84,6 +85,7 @@ namespace JKTurnos.Controllers
                 FechaHoraInicio = turno.FechaHoraInicio,
                 FechaHoraFin = turno.FechaHoraFin,
                 Observaciones = turno.Observaciones,
+                WhatsAppLink = notificacionService.GenerarLinkWhatsApp(turno),
                 EstadoEconomico = _pagoService.CalcularEstadoEconomico(pagos, precios),
                 MontoAcumulado = pagos.Sum(p => p.Monto),
                 Pagos = pagos.Select(p => new PagoItemViewModel

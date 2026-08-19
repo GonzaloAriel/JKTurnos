@@ -79,11 +79,17 @@
 /* ===== FILTERS ===== */
 
 .jk-agenda-filters {
-    display: none;
+    display: flex;
     align-items: center;
     gap: var(--jk-space-12);
     margin-bottom: var(--jk-space-16);
     flex-wrap: wrap;
+}
+
+/* Filtro de recursos en grilla: oculta la columna/time blocks del recurso desmarcado */
+.jk-agenda-grid .is-filtered,
+.jk-agenda-week .is-filtered {
+    display: none;
 }
 
 .jk-agenda-filter-label {

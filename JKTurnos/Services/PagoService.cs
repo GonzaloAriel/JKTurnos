@@ -151,6 +151,21 @@ namespace JKTurnos.Services
                 .Sum(p => (decimal?)p.Monto) ?? 0m;
         }
 
+        // D-034: pagos en un rango de fechas (para el Dashboard). Incluye el turno
+        // con recurso y servicio para agrupar por recurso.
+        public List<Pago> GetPagosEnRango(DateTime desde, DateTime hasta)
+        {
+            var inicio = desde.Date;
+            var fin = hasta.Date.AddDays(1);
+
+            return _repo.GetAll()
+                .Include(p => p.Turno.Recurso)
+                .Include(p => p.Turno.Servicio)
+                .Where(p => p.Fecha >= inicio && p.Fecha < fin)
+                .OrderBy(p => p.Fecha)
+                .ToList();
+        }
+
         // Estado economico CALCULADO desde los pagos (nunca persistido, D-028).
         public string CalcularEstadoEconomico(List<Pago> pagos, decimal? precio)
         {

@@ -289,8 +289,9 @@
 
     /*
      * Recursos filter dropdown -> oculta/muestra las tarjetas del acordeon
-     * (_AgendaMobile) segun el checkbox. Solo visible en mobile (< 768px).
-     * El filtro de la grilla desktop queda pendiente (Docs/16).
+     * (_AgendaMobile) segun el checkbox y filtra la grilla desktop (_AgendaGrid,
+     * _AgendaGridSemanal): las columnas del recurso desmarcado se colapsan y sus
+     * Time Blocks desaparecen.
      */
     var filterList = document.querySelector('.jk-agenda-filter-list');
     if (filterList) {
@@ -303,6 +304,68 @@
             cards.forEach(function (card) {
                 card.hidden = !input.checked;
             });
+
+            applyDesktopResourceFilter();
+        });
+    }
+
+    function applyDesktopResourceFilter() {
+        var inputs = Array.prototype.slice.call(document.querySelectorAll('.jk-agenda-filter-list input[data-recurso-id]'));
+        var checked = inputs
+            .filter(function (i) { return i.checked; })
+            .map(function (i) { return i.getAttribute('data-recurso-id'); });
+
+        var count = document.querySelector('.jk-agenda-filter-count');
+        if (count) { count.textContent = checked.length; }
+
+        var weekBlocks = document.querySelectorAll('.jk-agenda-week-block');
+        weekBlocks.forEach(function (b) {
+            b.classList.toggle('is-filtered', checked.indexOf(b.getAttribute('data-recurso-id')) === -1);
+        });
+
+        var grid = document.querySelector('.jk-agenda-grid');
+        if (!grid) { return; }
+
+        var headers = Array.prototype.slice.call(grid.querySelectorAll('.jk-agenda-resource-header'));
+        var visible = headers
+            .map(function (h) { return h.getAttribute('data-recurso-id'); })
+            .filter(function (rid) { return checked.indexOf(rid) !== -1; });
+
+        grid.style.setProperty('--jk-resource-count', visible.length);
+
+        headers.forEach(function (h) {
+            var rid = h.getAttribute('data-recurso-id');
+            var idx = visible.indexOf(rid);
+            if (idx === -1) {
+                h.classList.add('is-filtered');
+            } else {
+                h.classList.remove('is-filtered');
+                h.style.gridColumn = idx + 2;
+            }
+        });
+
+        var cells = grid.querySelectorAll('.jk-agenda-cell');
+        cells.forEach(function (c) {
+            var rid = c.getAttribute('data-recurso-id');
+            var idx = visible.indexOf(rid);
+            if (idx === -1) {
+                c.classList.add('is-filtered');
+            } else {
+                c.classList.remove('is-filtered');
+                c.style.gridColumn = idx + 2;
+            }
+        });
+
+        var blocks = grid.querySelectorAll('.jk-agenda-time-block');
+        blocks.forEach(function (b) {
+            var rid = b.getAttribute('data-recurso-id');
+            var idx = visible.indexOf(rid);
+            if (idx === -1) {
+                b.classList.add('is-filtered');
+            } else {
+                b.classList.remove('is-filtered');
+                b.style.gridColumn = idx + 2;
+            }
         });
     }
 

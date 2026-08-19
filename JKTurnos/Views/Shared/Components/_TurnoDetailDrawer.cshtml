@@ -74,6 +74,17 @@
         <span class="jk-drawer-label">Horario</span>
         <span>@Model.FechaHoraInicio.ToString("HH:mm") - @Model.FechaHoraFin.ToString("HH:mm")</span>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.WhatsAppLink))
+    {
+        <a href="@Model.WhatsAppLink"
+           class="jk-btn jk-btn-sm jk-btn-whatsapp jk-mt-12"
+           target="_blank"
+           rel="noopener noreferrer"
+           title="Abre WhatsApp con el recordatorio del turno prellenado">
+            <i class="bi bi-whatsapp"></i> Recordar por WhatsApp
+        </a>
+    }
 </div>
 
 @if (!string.IsNullOrWhiteSpace(Model.Observaciones))

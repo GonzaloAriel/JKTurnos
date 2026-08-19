@@ -30,6 +30,9 @@ namespace JKTurnos.Models.ViewModels
 
         public string Observaciones { get; set; }
 
+        // D-033: link wa.me con el recordatorio prellenado (null si el cliente no tiene telefono).
+        public string WhatsAppLink { get; set; }
+
         // V3: estado economico (senia/pago) calculado desde los Pagos.
         public string EstadoEconomico { get; set; }
 
