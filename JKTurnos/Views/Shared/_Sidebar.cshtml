@@ -31,13 +31,16 @@
                 <i class="bi bi-house-door"></i>
                 <span>Command Center</span>
             </a>
-            <a href="@Url.Action("Index", "Dashboard")"
-               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "active" : "")"
-               data-sidebar-item
-               @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "aria-current=\"page\"" : "")>
-                <i class="bi bi-graph-up-arrow"></i>
-                <span>Dashboard</span>
-            </a>
+            @if (User.IsInRole(RolesConst.Admin))
+            {
+                <a href="@Url.Action("Index", "Dashboard")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Dashboard</span>
+                </a>
+            }
             <a href="@Url.Action("Agenda", "Turnos")"
                class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Agenda" ? "active" : "")"
                data-sidebar-item

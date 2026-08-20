@@ -18,6 +18,8 @@ namespace JKTurnos.Services
     {
         public const string DefaultTemplate = "Hola {nombre}! Te recordamos tu turno de {servicio} el {fecha} a las {hora}. Te esperamos!";
 
+        public const string DefaultTemplateDia = "Hola {nombre}! Te esperamos hoy {fecha} a las {hora} por tu turno de {servicio}. Te esperamos!";
+
         public const string DefaultEmailAsunto = "Recordatorio de tu turno: {servicio}";
         public const string DefaultEmailTemplate = "Hola {nombre}! Te recordamos tu turno de {servicio} el {fecha} a las {hora}. Te esperamos!";
 
@@ -50,6 +52,15 @@ namespace JKTurnos.Services
         public string GenerarMensaje(Turno turno)
         {
             var config = _configService.GetConfiguracion();
+
+            // Si el turno es del mismo dia, se usa la plantilla de confirmacion
+            // del dia (WhatsAppTemplateDia); si esta vacia, cae en la general.
+            var esMismoDia = turno != null && turno.FechaHoraInicio.Date == DateTime.Today;
+            var plantillaDia = config != null ? config.WhatsAppTemplateDia : null;
+
+            if (esMismoDia && !string.IsNullOrWhiteSpace(plantillaDia))
+                return RellenarPlantilla(turno, plantillaDia);
+
             var plantilla = config != null && !string.IsNullOrWhiteSpace(config.WhatsAppTemplate)
                 ? config.WhatsAppTemplate
                 : DefaultTemplate;
@@ -105,22 +116,32 @@ namespace JKTurnos.Services
                 ? config.EmailDesde
                 : config.SmtpUsuario;
 
-            using (var mensaje = new MailMessage())
+            try
             {
-                mensaje.From = new MailAddress(desde, config.NombreComercial);
-                mensaje.To.Add(turno.Cliente.Email);
-                mensaje.Subject = GenerarAsuntoEmail(turno);
-                mensaje.Body = GenerarCuerpoEmail(turno);
-                mensaje.IsBodyHtml = false;
-
-                using (var cliente = new SmtpClient())
+                using (var mensaje = new MailMessage())
                 {
-                    cliente.Host = config.SmtpServidor.Trim();
-                    cliente.Port = config.SmtpPuerto.GetValueOrDefault(587);
-                    cliente.EnableSsl = true;
-                    cliente.Credentials = new NetworkCredential(config.SmtpUsuario, config.SmtpPassword ?? "");
-                    cliente.Send(mensaje);
+                    mensaje.From = new MailAddress(desde, config.NombreComercial);
+                    mensaje.To.Add(turno.Cliente.Email);
+                    mensaje.Subject = GenerarAsuntoEmail(turno);
+                    mensaje.Body = GenerarCuerpoEmail(turno);
+                    mensaje.IsBodyHtml = false;
+
+                    using (var cliente = new SmtpClient())
+                    {
+                        cliente.Host = config.SmtpServidor.Trim();
+                        cliente.Port = config.SmtpPuerto.GetValueOrDefault(587);
+                        cliente.EnableSsl = true;
+                        cliente.Credentials = new NetworkCredential(config.SmtpUsuario, config.SmtpPassword ?? "");
+                        cliente.Send(mensaje);
+                    }
                 }
+
+                new NotificacionSistemaService().RegistrarEmail(turnoId, true);
+            }
+            catch (Exception ex)
+            {
+                new NotificacionSistemaService().RegistrarEmail(turnoId, false, ex.Message);
+                throw;
             }
         }
 

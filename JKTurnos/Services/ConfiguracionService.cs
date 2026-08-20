@@ -61,6 +61,7 @@ namespace JKTurnos.Services
             }
 
             actual.WhatsAppTemplate = model.WhatsAppTemplate;
+            actual.WhatsAppTemplateDia = model.WhatsAppTemplateDia;
             _configRepo.Update(actual);
         }
 

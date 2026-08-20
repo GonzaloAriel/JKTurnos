@@ -27,6 +27,13 @@ namespace JKTurnos.Models.Entities
         [StringLength(500)]
         public string WhatsAppTemplate { get; set; }
 
+        // D-033: plantilla de CONFIRMACION DEL DIA (turnos del mismo dia). Se usa
+        // en el boton "Recordar por WhatsApp" cuando el turno es hoy; si esta
+        // vacia se usa WhatsAppTemplate. Asi el usuario no modifica la plantilla
+        // general segun el caso. Mismos placeholders que WhatsAppTemplate.
+        [StringLength(500)]
+        public string WhatsAppTemplateDia { get; set; }
+
         // D-033 Fase 2: recordatorio por EMAIL SMTP. El asunto y el cuerpo admiten
         // los mismos placeholders que WhatsApp. SmtpHabilitado enciende el envio
         // (el boton del drawer); sin datos SMTP el envio falla con mensaje claro.

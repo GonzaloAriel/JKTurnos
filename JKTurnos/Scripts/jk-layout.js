@@ -292,3 +292,101 @@
         });
     });
 })();
+
+/*
+ * Notificaciones del sistema (feed in-app):
+ * - Toggle del dropdown de la campanita.
+ * - "Marcar todas leidas" (POST ajax + antiforgery).
+ * - Cierre con click afuera o Escape.
+ */
+(function () {
+    'use strict';
+
+    var container = document.getElementById('topbar-notif');
+    if (!container) return;
+
+    var toggle = document.getElementById('topbar-notif-toggle');
+    var panel = document.getElementById('topbar-notif-panel');
+    var markReadBtn = document.getElementById('topbar-notif-markread');
+
+    function showToast(message, type) {
+        var toastContainer = document.querySelector('.jk-toast-container');
+        if (!toastContainer) return;
+        var toast = document.createElement('div');
+        toast.className = 'jk-toast jk-toast-' + type;
+        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
+            + '"></i> ' + message;
+        toastContainer.appendChild(toast);
+        setTimeout(function () { toast.remove(); }, 4000);
+    }
+
+    function setOpen(open) {
+        panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function isOpen() {
+        return panel.getAttribute('aria-hidden') === 'false';
+    }
+
+    toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(!isOpen());
+    });
+
+    document.addEventListener('click', function (e) {
+        if (isOpen() && !container.contains(e.target)) {
+            setOpen(false);
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            if (isOpen()) setOpen(false);
+        }
+    });
+
+    if (markReadBtn) {
+        markReadBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var url = markReadBtn.getAttribute('data-marcar-notif-url');
+            if (!url) return;
+
+            var tokenEl = container.querySelector('input[name="__RequestVerificationToken"]');
+            var token = tokenEl ? tokenEl.value : '';
+
+            var data = new FormData();
+            data.append('__RequestVerificationToken', token);
+
+            fetch(url, {
+                method: 'POST',
+                body: data
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+                if (json && json.success) {
+                    // El badge cuenta recordatorios (se calculan en vivo),
+                    // asi que no se elimina al marcar la actividad como leida.
+                    markReadBtn.remove();
+                    var items = panel.querySelectorAll('.jk-notif-item.is-unread');
+                    for (var i = 0; i < items.length; i++) {
+                        items[i].classList.remove('is-unread');
+                    }
+                    var unreadDots = panel.querySelectorAll('.jk-notif-unread-dot');
+                    for (var j = 0; j < unreadDots.length; j++) {
+                        unreadDots[j].remove();
+                    }
+                    showToast('Todas las notificaciones marcadas como leidas', 'success');
+                } else {
+                    showToast('No se pudo actualizar el estado', 'error');
+                }
+            })
+            .catch(function () {
+                showToast('No se pudo actualizar el estado', 'error');
+            });
+        });
+    }
+})();

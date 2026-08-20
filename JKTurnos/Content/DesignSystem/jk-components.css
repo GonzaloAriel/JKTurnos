@@ -1205,3 +1205,258 @@
         flex: 1 1 100%;
     }
 }
+
+/* ================================================================
+   Notificaciones del sistema (campanita + feed de actividad)
+   ================================================================ */
+
+.jk-topbar-notif {
+    position: relative;
+}
+
+.jk-topbar-notif-toggle {
+    position: relative;
+}
+
+.jk-notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-danger);
+    color: var(--jk-white);
+    font-size: 0.6875rem;
+    font-weight: var(--jk-weight-semibold);
+    line-height: 18px;
+    text-align: center;
+}
+
+.jk-notif-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 360px;
+    max-width: calc(100vw - var(--jk-space-32));
+    background: var(--jk-surface);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    box-shadow: var(--jk-shadow-lg);
+    z-index: var(--jk-z-topbar);
+    overflow: hidden;
+    display: none;
+}
+
+.jk-notif-panel[aria-hidden="false"] {
+    display: block;
+}
+
+.jk-notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-12) var(--jk-space-16);
+    border-bottom: 1px solid var(--jk-border);
+}
+
+.jk-notif-header-title {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+}
+
+.jk-notif-markread {
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--jk-accent);
+    font-size: var(--jk-text-xs);
+    font-weight: var(--jk-weight-medium);
+    cursor: pointer;
+}
+
+.jk-notif-markread:hover {
+    color: var(--jk-accent-hover);
+    text-decoration: underline;
+}
+
+.jk-notif-list {
+    max-height: 360px;
+    overflow-y: auto;
+    padding: var(--jk-space-8);
+}
+
+.jk-notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-12);
+    border-radius: var(--jk-radius);
+    text-decoration: none;
+    color: var(--jk-text-primary);
+}
+
+a.jk-notif-item:hover {
+    background: var(--jk-bg);
+    color: var(--jk-text-primary);
+    text-decoration: none;
+}
+
+.jk-notif-item.is-unread {
+    background: var(--jk-accent-light);
+}
+
+.jk-notif-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-text-tertiary);
+}
+
+.jk-notif-dot-accent {
+    background: var(--jk-accent);
+}
+
+.jk-notif-dot-success {
+    background: var(--jk-success);
+}
+
+.jk-notif-dot-warning {
+    background: var(--jk-warning);
+}
+
+.jk-notif-dot-muted {
+    background: var(--jk-text-tertiary);
+}
+
+.jk-notif-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.jk-notif-title {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+    line-height: var(--jk-leading-normal);
+}
+
+.jk-notif-msg {
+    font-size: var(--jk-text-xs);
+    color: var(--jk-text-secondary);
+    line-height: var(--jk-leading-normal);
+    margin-top: 2px;
+}
+
+.jk-notif-time {
+    font-size: 0.6875rem;
+    color: var(--jk-text-tertiary);
+    margin-top: 4px;
+}
+
+.jk-notif-unread-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-accent);
+}
+
+.jk-notif-empty {
+    padding: var(--jk-space-24);
+}
+
+/* Actividad reciente (Command Center) */
+.activity-timeline .jk-notif-item {
+    padding: var(--jk-space-12) 0;
+}
+
+.jk-notif-scroll {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: var(--jk-space-4);
+}
+
+/* Recordatorios de la campanita (seccion superior del panel) */
+.jk-notif-section-title {
+    padding: var(--jk-space-8) var(--jk-space-16);
+    font-size: 0.6875rem;
+    font-weight: var(--jk-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--jk-text-tertiary);
+}
+
+.jk-notif-section-divider {
+    height: 1px;
+    margin: var(--jk-space-4) var(--jk-space-8);
+    background: var(--jk-border);
+}
+
+.jk-recordatorio {
+    background: var(--jk-bg);
+}
+
+.jk-notif-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--jk-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+}
+
+.jk-notif-icon i {
+    line-height: 1;
+}
+
+.jk-notif-icon-accent {
+    background: var(--jk-accent-light);
+    color: var(--jk-accent);
+}
+
+.jk-notif-icon-warning {
+    background: var(--jk-warning-light);
+    color: var(--jk-warning);
+}
+
+.jk-notif-icon-success {
+    background: var(--jk-success-light);
+    color: var(--jk-success);
+}
+
+.jk-notif-icon-danger {
+    background: var(--jk-danger-light);
+    color: var(--jk-danger);
+}
+
+.jk-notif-icon-muted {
+    background: var(--jk-bg);
+    color: var(--jk-text-secondary);
+}
+
+.jk-notif-arrow {
+    flex-shrink: 0;
+    align-self: center;
+    color: var(--jk-text-tertiary);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 767.98px) {
+    .jk-notif-panel {
+        position: fixed;
+        top: var(--jk-topbar-height);
+        right: var(--jk-space-16);
+        left: var(--jk-space-16);
+        width: auto;
+        max-width: none;
+    }
+}

@@ -12,9 +12,54 @@
     </div>
 
     <div class="jk-topbar-right">
-        <button class="jk-btn-icon" aria-label="Notificaciones">
-            <i class="bi bi-bell"></i>
-        </button>
+        @if (User.Identity.IsAuthenticated)
+        {
+            var recordatorios = ViewBag.TopbarRecordatorios != null
+                ? (List<JKTurnos.Models.ViewModels.RecordatorioSistema>)ViewBag.TopbarRecordatorios
+                : new List<JKTurnos.Models.ViewModels.RecordatorioSistema>();
+            var noLeidas = ViewBag.TopbarNoLeidas != null ? (int)ViewBag.TopbarNoLeidas : 0;
+
+            <div class="jk-topbar-notif" id="topbar-notif">
+                @Html.AntiForgeryToken()
+                <button class="jk-btn-icon jk-topbar-notif-toggle"
+                        id="topbar-notif-toggle"
+                        type="button"
+                        aria-label="Notificaciones"
+                        aria-expanded="false"
+                        aria-controls="topbar-notif-panel">
+                    <i class="bi bi-bell"></i>
+                    @if (recordatorios.Count > 0)
+                    {
+                        <span class="jk-notif-badge" id="topbar-notif-badge">@recordatorios.Count</span>
+                    }
+                </button>
+                <div class="jk-notif-panel" id="topbar-notif-panel" aria-hidden="true">
+                    <div class="jk-notif-header">
+                        <span class="jk-notif-header-title">Notificaciones</span>
+                        @if (noLeidas > 0)
+                        {
+                            <button type="button"
+                                    class="jk-notif-markread"
+                                    id="topbar-notif-markread"
+                                    data-marcar-notif
+                                    data-marcar-notif-url="@Url.Action("MarcarTodasLeidas", "Notificaciones")">
+                                Marcar todas leidas
+                            </button>
+                        }
+                    </div>
+                    <div class="jk-notif-list">
+                        @if (recordatorios.Count > 0)
+                        {
+                            <div class="jk-notif-section-title">Recordatorios</div>
+                            @Html.Partial("~/Views/Shared/Components/_RecordatoriosFeed.cshtml")
+                            <div class="jk-notif-section-divider"></div>
+                        }
+                        <div class="jk-notif-section-title">Actividad reciente</div>
+                        @Html.Partial("~/Views/Shared/Components/_NotificacionesFeed.cshtml")
+                    </div>
+                </div>
+            </div>
+        }
         <div class="jk-topbar-user">
             <div class="jk-avatar">
                 @{

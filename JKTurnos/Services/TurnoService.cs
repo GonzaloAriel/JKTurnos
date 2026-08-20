@@ -151,6 +151,8 @@ namespace JKTurnos.Services
                     "No hay estados de turno configurados. Contacte al administrador.");
 
             _repo.Add(turno);
+
+            new NotificacionSistemaService().RegistrarTurnoCreado(turno.Id);
         }
 
         public void Update(Turno turno)
@@ -172,6 +174,9 @@ namespace JKTurnos.Services
 
             turno.EstadoTurnoId = estadoTurnoId;
             _repo.Update(turno);
+
+            var estadoNombre = _estadoRepo.GetById(estadoTurnoId)?.Nombre;
+            new NotificacionSistemaService().RegistrarCambioEstado(turnoId, estadoNombre);
         }
 
         public void Cancelar(int turnoId)
@@ -189,6 +194,8 @@ namespace JKTurnos.Services
 
             turno.EstadoTurnoId = cancelado.Id;
             _repo.Update(turno);
+
+            new NotificacionSistemaService().RegistrarCambioEstado(turnoId, "Cancelado");
         }
 
         public void Delete(int id)

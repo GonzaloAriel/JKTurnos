@@ -222,19 +222,8 @@
             <h2 class="section-title">Actividad reciente</h2>
         </div>
 
-        <div class="activity-timeline">
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">Hace 2 horas</div>
-                <p class="timeline-text">Bienvenido a JKTurnos</p>
-                <p class="timeline-desc">Tu cuenta fue creada y configurada exitosamente.</p>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot timeline-dot-success"></div>
-                <div class="timeline-time">Hace 2 horas</div>
-                <p class="timeline-text">Primer inicio de sesion</p>
-                <p class="timeline-desc">Accediste a tu panel de administracion.</p>
-            </div>
+        <div class="activity-timeline jk-notif-scroll">
+            @Html.Partial("~/Views/Shared/Components/_NotificacionesFeed.cshtml")
         </div>
     </div>
 

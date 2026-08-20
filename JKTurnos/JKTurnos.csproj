@@ -171,6 +171,7 @@
     <Compile Include="Controllers\TenantsController.cs" />
     <Compile Include="Controllers\ConfiguracionController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\NotificacionesController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\GlobalRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
@@ -196,6 +197,14 @@
     <Compile Include="Migrations\202608191913508_AddNotificacionesWhatsApp.Designer.cs">
       <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608201002025_AddNotificacionesSistema.cs" />
+    <Compile Include="Migrations\202608201002025_AddNotificacionesSistema.Designer.cs">
+      <DependentUpon>202608201002025_AddNotificacionesSistema.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608201142265_AddWhatsAppTemplateDia.cs" />
+    <Compile Include="Migrations\202608201142265_AddWhatsAppTemplateDia.Designer.cs">
+      <DependentUpon>202608201142265_AddWhatsAppTemplateDia.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
@@ -208,6 +217,7 @@
     <Compile Include="Models\Entities\TipoRecurso.cs" />
     <Compile Include="Models\Entities\TipoPago.cs" />
     <Compile Include="Models\Entities\ITenantEntity.cs" />
+    <Compile Include="Models\Entities\NotificacionSistema.cs" />
     <Compile Include="Models\Entities\Servicio.cs" />
     <Compile Include="Models\Entities\Tenant.cs" />
     <Compile Include="Models\Entities\Turno.cs" />
@@ -222,6 +232,7 @@
     <Compile Include="Models\ViewModels\TurnoViewModel.cs" />
     <Compile Include="Models\ViewModels\TurnoDetailViewModel.cs" />
     <Compile Include="Models\ViewModels\DashboardViewModel.cs" />
+    <Compile Include="Models\ViewModels\RecordatorioSistema.cs" />
     <Compile Include="Models\ViewModels\UsuarioViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
@@ -233,8 +244,10 @@
     <Compile Include="Services\ServicioService.cs" />
     <Compile Include="Services\TenantService.cs" />
     <Compile Include="Services\NotificacionService.cs" />
+    <Compile Include="Services\NotificacionSistemaService.cs" />
     <Compile Include="Services\ConfiguracionService.cs" />
     <Compile Include="Services\DashboardService.cs" />
+    <Compile Include="Services\RecordatorioService.cs" />
     <Compile Include="Services\TurnoService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
@@ -341,6 +354,8 @@
     <Content Include="Views\Shared\Components\_SearchBar.cshtml" />
     <Content Include="Views\Shared\Components\_SectionHeader.cshtml" />
     <Content Include="Views\Shared\Components\_Timeline.cshtml" />
+    <Content Include="Views\Shared\Components\_NotificacionesFeed.cshtml" />
+    <Content Include="Views\Shared\Components\_RecordatoriosFeed.cshtml" />
     <Content Include="Views\Shared\Components\_Toast.cshtml" />
     <Content Include="Views\Shared\Components\_TurnoDetailDrawer.cshtml" />
     <Content Include="Views\Shared\Components\_CrudPage.cshtml" />
@@ -429,6 +444,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608192242533_AddNotificacionesEmail.resx">
       <DependentUpon>202608192242533_AddNotificacionesEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608201002025_AddNotificacionesSistema.resx">
+      <DependentUpon>202608201002025_AddNotificacionesSistema.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608201142265_AddWhatsAppTemplateDia.resx">
+      <DependentUpon>202608201142265_AddWhatsAppTemplateDia.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608191913508_AddNotificacionesWhatsApp.resx">
       <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>

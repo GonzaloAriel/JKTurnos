@@ -1,0 +1,100 @@
+@using JKTurnos.Models.Entities
+@using JKTurnos.Services
+@{
+    var items = (ViewBag.TopbarNotificaciones as List<NotificacionSistema>)
+        ?? new List<NotificacionSistema>();
+}
+
+@functions {
+    string TiempoRelativo(DateTime fecha)
+    {
+        var dif = DateTime.Now - fecha;
+
+        if (dif.TotalMinutes < 1)
+            return "Ahora";
+
+        if (dif.TotalMinutes < 60)
+            return "Hace " + (int)dif.TotalMinutes + " min";
+
+        if (dif.TotalHours < 24)
+            return "Hace " + (int)dif.TotalHours + " h";
+
+        if (dif.TotalDays < 7)
+            return "Hace " + (int)dif.TotalDays + " d";
+
+        return fecha.ToString("dd/MM");
+    }
+}
+
+@if (items.Count == 0)
+{
+    <p class="jk-text-center jk-muted jk-notif-empty">Sin actividad reciente</p>
+}
+else
+{
+    foreach (var n in items)
+    {
+        string dotClass;
+        switch (n.Tipo)
+        {
+            case NotificacionSistemaService.TipoTurnoCreado:
+                dotClass = "jk-notif-dot-accent";
+                break;
+            case NotificacionSistemaService.TipoTurnoEstado:
+                dotClass = "jk-notif-dot-success";
+                break;
+            case NotificacionSistemaService.TipoPagoRegistrado:
+                dotClass = "jk-notif-dot-success";
+                break;
+            case NotificacionSistemaService.TipoPagoAnulado:
+                dotClass = "jk-notif-dot-warning";
+                break;
+            default:
+                dotClass = "jk-notif-dot-muted";
+                break;
+        }
+
+        string href = null;
+        if (n.EntidadTipo == NotificacionSistemaService.EntidadTurno && n.EntidadId.HasValue)
+        {
+            href = Url.Action("Agenda", "Turnos", new { openTurnoId = n.EntidadId.Value });
+        }
+        else if (n.EntidadTipo == NotificacionSistemaService.EntidadPago)
+        {
+            href = Url.Action("Index", "Pagos");
+        }
+
+        string unread = n.Leida ? "" : "is-unread";
+
+        if (href == null)
+        {
+            <div class="jk-notif-item @unread">
+                <span class="jk-notif-dot @dotClass"></span>
+                <div class="jk-notif-body">
+                    <div class="jk-notif-title">@n.Titulo</div>
+                    <div class="jk-notif-msg">@n.Mensaje</div>
+                    <div class="jk-notif-time">@TiempoRelativo(n.Fecha)</div>
+                </div>
+                @if (!n.Leida)
+                {
+                    <span class="jk-notif-unread-dot"></span>
+                }
+            </div>
+        }
+        else
+        {
+            <a class="jk-notif-item @unread" href="@href">
+                <span class="jk-notif-dot @dotClass"></span>
+                <div class="jk-notif-body">
+                    <div class="jk-notif-title">@n.Titulo</div>
+                    <div class="jk-notif-msg">@n.Mensaje</div>
+                    <div class="jk-notif-time">@TiempoRelativo(n.Fecha)</div>
+                </div>
+                @if (!n.Leida)
+                {
+                    <span class="jk-notif-unread-dot"></span>
+                }
+            </a>
+        }
+    }
+}

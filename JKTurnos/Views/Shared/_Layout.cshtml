@@ -44,6 +44,8 @@
         </div>
     </div>
 
+    @Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-global" } })
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     <script src="~/Scripts/jk-layout.js"></script>

@@ -2,6 +2,7 @@
 using JKTurnos.Infrastructure;
 using JKTurnos.Models.Entities;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
@@ -50,6 +51,19 @@ public class BaseRepository<TEntity>
     {
         entity.UpdatedAt = DateTime.Now;
         _context.Entry(entity).State = EntityState.Modified;
+        _context.SaveChanges();
+    }
+
+    public void UpdateRange(IEnumerable<TEntity> entities)
+    {
+        var list = entities as IList<TEntity> ?? entities.ToList();
+
+        foreach (var entity in list)
+        {
+            entity.UpdatedAt = DateTime.Now;
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+
         _context.SaveChanges();
     }
 

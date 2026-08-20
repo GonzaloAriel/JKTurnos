@@ -22,6 +22,7 @@ namespace JKTurnos.Data
         public DbSet<Recurso> Recursos { get; set; }
         public DbSet<RecursoServicio> RecursoServicios { get; set; }
         public DbSet<Pago> Pagos { get; set; }
+        public DbSet<NotificacionSistema> NotificacionesSistema { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

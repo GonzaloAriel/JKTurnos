@@ -1,0 +1,19 @@
+@using JKTurnos.Models.ViewModels
+@{
+    var items = (ViewBag.TopbarRecordatorios as List<RecordatorioSistema>)
+        ?? new List<RecordatorioSistema>();
+}
+
+@foreach (var r in items)
+{
+    string href = Url.Action(r.Accion, r.Controlador, r.RouteValues);
+
+    <a class="jk-notif-item jk-recordatorio" href="@href">
+        <span class="jk-notif-icon @r.IconoClase"><i class="bi @r.Icono"></i></span>
+        <div class="jk-notif-body">
+            <div class="jk-notif-title">@r.Titulo</div>
+            <div class="jk-notif-msg">@r.Mensaje</div>
+        </div>
+        <span class="jk-notif-arrow"><i class="bi bi-chevron-right"></i></span>
+    </a>
+}

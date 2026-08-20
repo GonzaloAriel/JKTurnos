@@ -2,6 +2,8 @@
 
 @helper FormContent()
 {
+    @Html.HiddenFor(m => m.NombreComercial)
+
     <div class="jk-form-group">
         <label class="jk-label jk-flex jk-gap-8">
             @Html.CheckBoxFor(m => m.SmtpHabilitado, new { @class = "jk-checkbox", id = "SmtpHabilitado" })

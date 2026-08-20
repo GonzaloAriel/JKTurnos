@@ -44,6 +44,8 @@ namespace JKTurnos.Services
                 Observacion = (observacion ?? "").Trim(),
                 UsuarioId = usuarioId
             });
+
+            new NotificacionSistemaService().RegistrarPagoRegistrado(turnoId, monto, NombreTipoPago(tipo));
         }
 
         public List<Pago> GetPagos(int turnoId)
@@ -98,7 +100,12 @@ namespace JKTurnos.Services
             if (!string.IsNullOrWhiteSpace(motivo))
                 pago.Observacion = ((pago.Observacion ?? "") + " | Anulado: " + motivo.Trim()).Trim();
 
+            var montoAnulado = pago.Monto;
+            var turnoIdAnulado = pago.TurnoId;
+
             _repo.Delete(pagoId);
+
+            new NotificacionSistemaService().RegistrarPagoAnulado(turnoIdAnulado, montoAnulado);
         }
 
         // Edicion del monto/tipo/observacion (D-031): corrige un error de carga.
@@ -188,6 +195,22 @@ namespace JKTurnos.Services
                 return "Senia pagada";
 
             return "Pago parcial";
+        }
+
+        // Nombre legible del tipo de pago para el feed de actividad.
+        private static string NombreTipoPago(TipoPago tipo)
+        {
+            switch (tipo)
+            {
+                case TipoPago.Senia:
+                    return "Seña";
+                case TipoPago.PagoParcial:
+                    return "Pago parcial";
+                case TipoPago.PagoTotal:
+                    return "Pago total";
+                default:
+                    return tipo.ToString();
+            }
         }
 
         // Resolucion de nombres del responsable (lectura de plataforma, D-022).

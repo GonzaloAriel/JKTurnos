@@ -82,6 +82,17 @@ namespace JKTurnos.Controllers
                     ? config.NombreComercial
                     : null;
 
+            // Feed de actividad (campanita + Actividad reciente).
+            var notifService = new Services.NotificacionSistemaService();
+            ViewBag.TopbarNoLeidas = notifService.GetNoLeidasCount();
+            ViewBag.TopbarNotificaciones = notifService.GetUltimas(8);
+
+            // Recordatorios operativos de la campanita (calculados en vivo).
+            var recordatorioService = new Services.RecordatorioService();
+            var recordatorios = recordatorioService.GetRecordatorios(incluirConfiguracion: IsAdmin);
+            ViewBag.TopbarRecordatorios = recordatorios;
+            ViewBag.TopbarReminderCount = recordatorios.Count;
+
             base.OnActionExecuting(filterContext);
         }
     }
