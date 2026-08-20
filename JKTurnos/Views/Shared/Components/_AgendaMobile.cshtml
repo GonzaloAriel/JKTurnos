@@ -117,7 +117,14 @@ else
                         <div class="jk-agenda-mobile-free-list" role="list" aria-label="Horarios libres">
                             @foreach (var libre in libres)
                             {
-                                <span class="jk-agenda-mobile-free-slot" role="listitem">Libre @libre.Item1.ToString("HH:mm") - @libre.Item2.ToString("HH:mm")</span>
+                                <button type="button"
+                                        class="jk-agenda-mobile-free-slot"
+                                        role="listitem"
+                                        data-hora="@libre.Item1.ToString("HH:mm")"
+                                        data-recurso-id="@rec.Id"
+                                        title="Reservar turno @libre.Item1.ToString("HH:mm")">
+                                    Libre @libre.Item1.ToString("HH:mm") - @libre.Item2.ToString("HH:mm")
+                                </button>
                             }
                         </div>
                     }

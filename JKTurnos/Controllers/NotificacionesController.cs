@@ -21,6 +21,20 @@ namespace JKTurnos.Controllers
         public JsonResult MarcarTodasLeidas()
         {
             _service.MarcarTodasLeidas();
+
+            // "Marcar todas leidas" tambien oculta los recordatorios actuales
+            // de la campanita (persistido por claves hasta que cambie su
+            // condicion), para que el badge de la campanita se limpie.
+            new RecordatorioService().OcultarActuales(incluirConfiguracion: IsAdmin);
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult Descartar(string clave)
+        {
+            new RecordatorioService().OcultarUna(clave);
             return Json(new { success = true });
         }
     }

@@ -1,0 +1,69 @@
+/* ================================================================
+   JKTurnos - Seccion Ayuda (FAQ)
+   Centro de ayuda estatico: cuadricula de guias rapidas + acordeon
+   de preguntas frecuentes (details/summary nativo, sin JS).
+   Usa unicamente tokens del Design System (--jk-*).
+   ================================================================ */
+
+/* ===== CUADRICULA DE CATEGORIAS ===== */
+.jk-ayuda-categorias {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--jk-space-16);
+    padding-top: var(--jk-space-16);
+}
+
+/* ===== ACORDEON DE PREGUNTAS FRECUENTES ===== */
+.jk-faq-list {
+    padding-top: var(--jk-space-16);
+}
+
+.jk-faq-item {
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius);
+    background: var(--jk-surface);
+    overflow: hidden;
+}
+
+.jk-faq-item + .jk-faq-item {
+    margin-top: var(--jk-space-8);
+}
+
+.jk-faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-12) var(--jk-space-16);
+    cursor: pointer;
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+    list-style: none;
+}
+
+.jk-faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.jk-faq-item summary:hover {
+    background: var(--jk-bg);
+}
+
+.jk-faq-chevron {
+    flex-shrink: 0;
+    color: var(--jk-text-tertiary);
+    font-size: var(--jk-text-xs);
+    transition: transform 0.2s ease;
+}
+
+.jk-faq-item[open] .jk-faq-chevron {
+    transform: rotate(180deg);
+}
+
+.jk-faq-body {
+    padding: 0 var(--jk-space-16) var(--jk-space-16);
+    font-size: var(--jk-text-sm);
+    line-height: var(--jk-leading-normal);
+    color: var(--jk-text-secondary);
+}

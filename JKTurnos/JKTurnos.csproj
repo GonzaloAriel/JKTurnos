@@ -172,6 +172,7 @@
     <Compile Include="Controllers\ConfiguracionController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\NotificacionesController.cs" />
+    <Compile Include="Controllers\AyudaController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\GlobalRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
@@ -204,6 +205,10 @@
     <Compile Include="Migrations\202608201142265_AddWhatsAppTemplateDia.cs" />
     <Compile Include="Migrations\202608201142265_AddWhatsAppTemplateDia.Designer.cs">
       <DependentUpon>202608201142265_AddWhatsAppTemplateDia.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608201407558_AddRecordatoriosOcultos.cs" />
+    <Compile Include="Migrations\202608201407558_AddRecordatoriosOcultos.Designer.cs">
+      <DependentUpon>202608201407558_AddRecordatoriosOcultos.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
@@ -277,6 +282,7 @@
     <Content Include="Content\Pages\jk-agenda.css" />
     <Content Include="Content\Pages\jk-pagos.css" />
     <Content Include="Content\Pages\jk-dashboard-section.css" />
+    <Content Include="Content\Pages\jk-ayuda.css" />
     <Content Include="Content\jk-components.css" />
     <Content Include="Content\jk-dashboard.css" />
     <Content Include="Content\jk-ds.css" />
@@ -377,6 +383,7 @@
     <Content Include="Views\Recursos\Index.cshtml" />
     <Content Include="Views\Pagos\Index.cshtml" />
     <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Ayuda\Index.cshtml" />
     <Content Include="Views\Tenants\Create.cshtml" />
     <Content Include="Views\Tenants\Delete.cshtml" />
     <Content Include="Views\Tenants\Edit.cshtml" />
@@ -450,6 +457,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608201142265_AddWhatsAppTemplateDia.resx">
       <DependentUpon>202608201142265_AddWhatsAppTemplateDia.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608201407558_AddRecordatoriosOcultos.resx">
+      <DependentUpon>202608201407558_AddRecordatoriosOcultos.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608191913508_AddNotificacionesWhatsApp.resx">
       <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>

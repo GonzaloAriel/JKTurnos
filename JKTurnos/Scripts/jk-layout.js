@@ -347,6 +347,81 @@
         }
     });
 
+    function getToken() {
+        var tokenEl = container.querySelector('input[name="__RequestVerificationToken"]');
+        return tokenEl ? tokenEl.value : '';
+    }
+
+    function clearReminderUI() {
+        var badge = document.getElementById('topbar-notif-badge');
+        if (badge) badge.remove();
+
+        var recSec = document.getElementById('topbar-recordatorios-section');
+        if (recSec) recSec.remove();
+
+        if (markReadBtn) markReadBtn.disabled = true;
+
+        var list = panel.querySelector('.jk-notif-list');
+        if (list && !list.querySelector('.jk-notif-empty')) {
+            var empty = document.createElement('div');
+            empty.className = 'jk-notif-empty';
+            empty.textContent = 'No hay recordatorios pendientes';
+            list.appendChild(empty);
+        }
+    }
+
+    function decrementBadge() {
+        var badge = document.getElementById('topbar-notif-badge');
+        if (!badge) return;
+        var n = parseInt(badge.textContent, 10) - 1;
+        if (n > 0) {
+            badge.textContent = n;
+        } else {
+            badge.remove();
+        }
+    }
+
+    // Descartar un recordatorio (boton "x"): se quita de a uno y baja el
+    // contador de la campanita. Al quedar vacio, se muestra el estado vacio
+    // y se deshabilita "Marcar todas leidas".
+    panel.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('[data-descartar-recordatorio]') : null;
+        if (!btn) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var url = btn.getAttribute('data-descartar-url');
+        var clave = btn.getAttribute('data-clave');
+        if (!url || !clave) return;
+
+        var data = new FormData();
+        data.append('__RequestVerificationToken', getToken());
+        data.append('clave', clave);
+
+        fetch(url, {
+            method: 'POST',
+            body: data
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+            if (json && json.success) {
+                var item = btn.closest('.jk-recordatorio');
+                if (item) item.remove();
+                decrementBadge();
+                if (!panel.querySelector('.jk-recordatorio')) {
+                    clearReminderUI();
+                }
+                showToast('Recordatorio descartado', 'success');
+            } else {
+                showToast('No se pudo descartar el recordatorio', 'error');
+            }
+        })
+        .catch(function () {
+            showToast('No se pudo descartar el recordatorio', 'error');
+        });
+    });
+
     if (markReadBtn) {
         markReadBtn.addEventListener('click', function (e) {
             e.preventDefault();
@@ -355,11 +430,8 @@
             var url = markReadBtn.getAttribute('data-marcar-notif-url');
             if (!url) return;
 
-            var tokenEl = container.querySelector('input[name="__RequestVerificationToken"]');
-            var token = tokenEl ? tokenEl.value : '';
-
             var data = new FormData();
-            data.append('__RequestVerificationToken', token);
+            data.append('__RequestVerificationToken', getToken());
 
             fetch(url, {
                 method: 'POST',
@@ -368,17 +440,7 @@
             .then(function (res) { return res.json(); })
             .then(function (json) {
                 if (json && json.success) {
-                    // El badge cuenta recordatorios (se calculan en vivo),
-                    // asi que no se elimina al marcar la actividad como leida.
-                    markReadBtn.remove();
-                    var items = panel.querySelectorAll('.jk-notif-item.is-unread');
-                    for (var i = 0; i < items.length; i++) {
-                        items[i].classList.remove('is-unread');
-                    }
-                    var unreadDots = panel.querySelectorAll('.jk-notif-unread-dot');
-                    for (var j = 0; j < unreadDots.length; j++) {
-                        unreadDots[j].remove();
-                    }
+                    clearReminderUI();
                     showToast('Todas las notificaciones marcadas como leidas', 'success');
                 } else {
                     showToast('No se pudo actualizar el estado', 'error');

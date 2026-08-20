@@ -130,6 +130,10 @@ namespace JKTurnos.Services
 
         public void Crear(Turno turno)
         {
+            if (turno.FechaHoraInicio < DateTime.Now)
+                throw new InvalidOperationException(
+                    "La fecha y hora del turno no puede ser anterior a la fecha y hora actual.");
+
             if (turno.FechaHoraFin == default)
                 turno.FechaHoraFin = CalcularFin(turno.FechaHoraInicio, turno.ServicioId);
 

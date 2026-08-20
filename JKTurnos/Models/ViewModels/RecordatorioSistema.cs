@@ -9,6 +9,11 @@ namespace JKTurnos.Models.ViewModels
 
         public string Mensaje { get; set; }
 
+        // Clave estable por recordatorio (ej. "diaWhatsapp:5", "saldo:202608").
+        // Se usa para ocultarlo con "Marcar todas leidas" hasta que cambie
+        // la condicion que lo origina.
+        public string Clave { get; set; }
+
         // Icono de Bootstrap Icons (bi-alarm, bi-hourglass-split, etc.).
         public string Icono { get; set; }
 

@@ -1,0 +1,171 @@
+@using RolesConst = JKTurnos.Models.Entities.Roles
+@{
+    ViewBag.Title = "Ayuda";
+    ViewBag.Subtitle = "Preguntas frecuentes y guias rapidas";
+}
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-ayuda.css" rel="stylesheet" />
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="fade-in">
+
+    <!-- ===== 1. CATEGORIAS / GUIAS RAPIDAS ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="jk-card-header">
+            <h3 class="jk-card-title">Guias rapidas</h3>
+        </div>
+        <div class="jk-ayuda-categorias">
+            @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+                new ViewDataDictionary {
+                    { "Title", "Primeros pasos" },
+                    { "Description", "Conoce tu Command Center y crea tu primer turno." },
+                    { "Icon", "rocket-takeoff" },
+                    { "Url", Url.Action("Index", "Home") }
+                })
+            @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+                new ViewDataDictionary {
+                    { "Title", "Agenda y turnos" },
+                    { "Description", "Crea, edita y consulta los turnos del dia." },
+                    { "Icon", "calendar3" },
+                    { "Url", Url.Action("Agenda", "Turnos") }
+                })
+            @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+                new ViewDataDictionary {
+                    { "Title", "Clientes" },
+                    { "Description", "Administra tus clientes y sus datos de contacto." },
+                    { "Icon", "people" },
+                    { "Url", Url.Action("Index", "Clientes") }
+                })
+            @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+                new ViewDataDictionary {
+                    { "Title", "Servicios y recursos" },
+                    { "Description", "Define que ofreces, con que y en cuanto tiempo." },
+                    { "Icon", "briefcase" },
+                    { "Url", Url.Action("Index", "Servicios") }
+                })
+            @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+                new ViewDataDictionary {
+                    { "Title", "Pagos y saldos" },
+                    { "Description", "Registra senias y pagos, y controla lo por cobrar." },
+                    { "Icon", "cash-coin" },
+                    { "Url", Url.Action("Index", "Pagos") }
+                })
+            @if (User.IsInRole(RolesConst.Admin))
+            {
+                @Html.Partial("~/Views/Shared/Components/_ActionCard.cshtml",
+                    new ViewDataDictionary {
+                        { "Title", "Recordatorios" },
+                        { "Description", "Configura los avisos por WhatsApp y email a tus clientes." },
+                        { "Icon", "bell" },
+                        { "Url", Url.Action("Notificaciones", "Configuracion") }
+                    })
+            }
+        </div>
+    </div>
+
+    <!-- ===== 2. PREGUNTAS FRECUENTES ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="jk-card-header">
+            <h3 class="jk-card-title">Preguntas frecuentes</h3>
+        </div>
+        <div class="jk-faq-list">
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Como creo un turno?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    Entra a "Mi Agenda" y usa el boton "Nuevo Turno". Elegi el cliente, el servicio, el recurso y la fecha y hora.
+                    El sistema valida que el recurso este disponible en ese horario. Si no hay estados configurados, se asigna
+                    "Pendiente" por defecto.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Como registro una senia o un pago?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    Abri el detalle del turno desde la Agenda (seccion Pagos). Podes registrar una senia una sola vez, un pago
+                    parcial o el pago total. El estado economico se calcula automaticamente desde los pagos registrados.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Como envio el recordatorio por WhatsApp?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    En el detalle del turno, el boton "Recordar por WhatsApp" abre WhatsApp con el mensaje prellenado. Solo
+                    aparece si el cliente tiene telefono cargado. Para turnos del dia se usa la plantilla de confirmacion del
+                    dia; para turnos futuros, la plantilla general.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Como envio el recordatorio por email?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    Primero activa el envio en Configuracion, Recordatorio por email (SMTP) y carga servidor, puerto y usuario.
+                    Luego el boton "Enviar recordatorio por email" aparece en el detalle del turno cuando el cliente tiene email.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Que diferencia hay entre la plantilla general y la del dia?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    La plantilla general se usa para recordar turnos futuros. La de confirmacion del dia se usa cuando el turno
+                    es hoy. Asi configuras cada mensaje una sola vez sin modificarlos segun el caso. Si la del dia esta vacia,
+                    se usa la general.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Que son los recordatorios de la campanita?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    La campanita muestra lo que requiere tu atencion: el proximo turno, turnos sin confirmar, saldo por cobrar,
+                    clientes sin contacto y la configuracion pendiente. Se calculan al momento y desaparecen cuando se resuelven.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Como agrego un servicio o un recurso?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    Desde las secciones Servicios y Recursos. Un servicio define nombre, precio y duracion. Un recurso es quien
+                    atiende o el espacio/equipo que se usa. El servicio debe estar vinculado a al menos un recurso para poder
+                    agendar.
+                </div>
+            </details>
+
+            <details class="jk-faq-item">
+                <summary>
+                    <span>Como cambio mi contrasena?</span>
+                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                </summary>
+                <div class="jk-faq-body">
+                    Desde el pie del menu, usa "Cambiar contrasena" (disponible para Administrador y Administrador Global).
+                    Ingresa tu contrasena actual y la nueva.
+                </div>
+            </details>
+
+        </div>
+    </div>
+
+</div>

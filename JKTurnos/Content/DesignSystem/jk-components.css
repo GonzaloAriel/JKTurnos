@@ -1283,6 +1283,16 @@
     text-decoration: underline;
 }
 
+.jk-notif-markread:disabled {
+    color: var(--jk-text-tertiary);
+    cursor: default;
+}
+
+.jk-notif-markread:disabled:hover {
+    color: var(--jk-text-tertiary);
+    text-decoration: none;
+}
+
 .jk-notif-list {
     max-height: 360px;
     overflow-y: auto;
@@ -1370,6 +1380,9 @@ a.jk-notif-item:hover {
 
 .jk-notif-empty {
     padding: var(--jk-space-24);
+    text-align: center;
+    font-size: var(--jk-text-xs);
+    color: var(--jk-text-tertiary);
 }
 
 /* Actividad reciente (Command Center) */
@@ -1401,6 +1414,47 @@ a.jk-notif-item:hover {
 
 .jk-recordatorio {
     background: var(--jk-bg);
+    padding: 0;
+}
+
+.jk-recordatorio-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-12);
+    border-radius: var(--jk-radius);
+    text-decoration: none;
+    color: var(--jk-text-primary);
+}
+
+.jk-recordatorio-main:hover {
+    background: var(--jk-bg);
+    color: var(--jk-text-primary);
+    text-decoration: none;
+}
+
+.jk-recordatorio-dismiss {
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin: var(--jk-space-4) var(--jk-space-4) 0 0;
+    border: none;
+    background: none;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--jk-radius-full);
+    color: var(--jk-text-tertiary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.jk-recordatorio-dismiss:hover {
+    background: var(--jk-border);
+    color: var(--jk-text-primary);
 }
 
 .jk-notif-icon {

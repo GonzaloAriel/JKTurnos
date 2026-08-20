@@ -8,12 +8,23 @@
 {
     string href = Url.Action(r.Accion, r.Controlador, r.RouteValues);
 
-    <a class="jk-notif-item jk-recordatorio" href="@href">
-        <span class="jk-notif-icon @r.IconoClase"><i class="bi @r.Icono"></i></span>
-        <div class="jk-notif-body">
-            <div class="jk-notif-title">@r.Titulo</div>
-            <div class="jk-notif-msg">@r.Mensaje</div>
-        </div>
-        <span class="jk-notif-arrow"><i class="bi bi-chevron-right"></i></span>
-    </a>
+    <div class="jk-notif-item jk-recordatorio">
+        <a class="jk-recordatorio-main" href="@href">
+            <span class="jk-notif-icon @r.IconoClase"><i class="bi @r.Icono"></i></span>
+            <div class="jk-notif-body">
+                <div class="jk-notif-title">@r.Titulo</div>
+                <div class="jk-notif-msg">@r.Mensaje</div>
+            </div>
+            <span class="jk-notif-arrow"><i class="bi bi-chevron-right"></i></span>
+        </a>
+        <button type="button"
+                class="jk-recordatorio-dismiss"
+                data-descartar-recordatorio
+                data-descartar-url="@Url.Action("Descartar", "Notificaciones")"
+                data-clave="@r.Clave"
+                aria-label="Descartar recordatorio"
+                title="Descartar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
 }

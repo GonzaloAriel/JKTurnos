@@ -59,6 +59,13 @@ namespace JKTurnos.Models.Entities
 
         public bool SmtpHabilitado { get; set; }
 
+        // Recordatorios de la campanita que el usuario oculto con
+        // "Marcar todas leidas". Lista de claves separadas por | : el
+        // recordatorio no vuelve a aparecer hasta que cambia su condicion
+        // (otro turno, otro dia, otro mes o configuracion resuelta).
+        [Column(TypeName = "nvarchar(max)")]
+        public string RecordatoriosOcultos { get; set; }
+
         [ForeignKey("TenantId")]
         public virtual Tenant Tenant { get; set; }
     }

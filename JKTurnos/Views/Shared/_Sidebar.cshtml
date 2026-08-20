@@ -151,6 +151,13 @@
                 <span>Cambiar contrasena</span>
             </a>
         }
+        <a href="@Url.Action("Index", "Ayuda")"
+           class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Ayuda" ? "active" : "")"
+           data-sidebar-item
+           @(ViewContext.RouteData.Values["controller"].ToString() == "Ayuda" ? "aria-current=\"page\"" : "")>
+            <i class="bi bi-question-circle"></i>
+            <span>Ayuda</span>
+        </a>
         <a href="@Url.Action("Logout", "Account")" class="jk-nav-item jk-nav-item-logout" data-sidebar-item>
             <i class="bi bi-box-arrow-left"></i>
             <span>Cerrar Sesion</span>

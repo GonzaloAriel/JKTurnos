@@ -126,10 +126,6 @@
                 openTurnoDetail(block);
                 return;
             }
-            var cell = e.target.closest('.jk-agenda-cell');
-            if (cell) {
-                cell.focus();
-            }
         });
 
         if (gridWrap) {
@@ -306,6 +302,196 @@
             });
 
             applyDesktopResourceFilter();
+        });
+    }
+
+    /*
+     * Quick Create Turno Drawer (D-017)
+     * Click en una celda libre de la grilla, en un slot libre mobile o en el
+     * cuerpo de un dia semanal, abre un drawer con Cliente/Servicio/Recurso y
+     * la fecha+hora (+recurso) de la celda prellenados. El envio es ajax
+     * (patron QuickCreate D-013); al crear, recarga la agenda de la misma
+     * fecha/vista y abre el detalle del turno nuevo.
+     */
+    var qcDrawer = document.getElementById('drawer-turno-quick');
+    var qcBackdrop = document.getElementById('drawer-turno-quick-backdrop');
+    var qcClose = document.getElementById('drawer-turno-quick-close');
+    var qcForm = document.getElementById('form-turno-quick');
+    var agendaFecha = agenda.getAttribute('data-agenda-fecha');
+    var agendaVista = agenda.getAttribute('data-agenda-vista');
+    var agendaBaseUrl = agenda.getAttribute('data-agenda-base-url');
+    var quickCreateUrl = agenda.getAttribute('data-quick-create-url');
+    var recursosUrl = agenda.getAttribute('data-recursos-url');
+    var recursosTodosUrl = agenda.getAttribute('data-recursos-todos-url');
+
+    function qcToast(message, type) {
+        var container = document.getElementById('jk-toast-agenda');
+        if (!container) return;
+        var toast = document.createElement('div');
+        toast.className = 'jk-toast jk-toast-' + type;
+        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
+            + '"></i> ' + message;
+        container.appendChild(toast);
+        setTimeout(function () { toast.remove(); }, 4000);
+    }
+
+    if (qcDrawer && qcBackdrop && qcForm) {
+        function setQcValue(id, value) {
+            var el = document.getElementById(id);
+            if (el) el.value = value || '';
+        }
+
+        function openQuickCreate(hora, recursoId, fecha) {
+            setQcValue('qk-FechaHoraInicio', (fecha || agendaFecha) + 'T' + (hora || '09:00'));
+            setQcValue('qk-RecursoId', recursoId);
+            clearQcErrors();
+            qcDrawer.classList.add('open');
+            qcBackdrop.classList.add('open');
+            qcDrawer.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('jk-drawer-open');
+            var first = qcForm.querySelector('select, input');
+            if (first) setTimeout(function () { first.focus(); }, 150);
+        }
+
+        function closeQuickCreate() {
+            qcDrawer.classList.remove('open');
+            qcBackdrop.classList.remove('open');
+            qcDrawer.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('jk-drawer-open');
+        }
+
+        function clearQcErrors() {
+            qcForm.querySelectorAll('.jk-field-error').forEach(function (el) {
+                el.hidden = true;
+                el.textContent = '';
+            });
+            qcForm.querySelectorAll('.jk-input.error').forEach(function (el) {
+                el.classList.remove('error');
+            });
+        }
+
+        function showQcFieldError(field, message) {
+            var input = qcForm.querySelector('[name="' + field + '"]');
+            var error = qcForm.querySelector('[data-error-for="' + field + '"]');
+            if (input) input.classList.add('error');
+            if (error) {
+                error.textContent = message;
+                error.hidden = false;
+            }
+        }
+
+        agenda.addEventListener('click', function (e) {
+            var weekBlock = e.target.closest('.jk-agenda-week-block');
+            if (weekBlock) return;
+
+            var cell = e.target.closest('.jk-agenda-cell');
+            if (cell) {
+                openQuickCreate(cell.getAttribute('data-hour'), cell.getAttribute('data-recurso-id'));
+                return;
+            }
+
+            var freeSlot = e.target.closest('.jk-agenda-mobile-free-slot');
+            if (freeSlot) {
+                openQuickCreate(freeSlot.getAttribute('data-hora'), freeSlot.getAttribute('data-recurso-id'));
+                return;
+            }
+
+            var weekBody = e.target.closest('.jk-agenda-week-day-body');
+            if (weekBody) {
+                openQuickCreate('09:00', '', weekBody.getAttribute('data-agenda-fecha'));
+            }
+        });
+
+        if (gridWrap) {
+            gridWrap.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    var cell = e.target.closest('.jk-agenda-cell');
+                    if (cell) {
+                        e.preventDefault();
+                        openQuickCreate(cell.getAttribute('data-hour'), cell.getAttribute('data-recurso-id'));
+                    }
+                }
+            });
+        }
+
+        qcClose.addEventListener('click', closeQuickCreate);
+        qcBackdrop.addEventListener('click', closeQuickCreate);
+        qcForm.querySelectorAll('[data-quick-cancel]').forEach(function (btn) {
+            btn.addEventListener('click', closeQuickCreate);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.key === 'Escape' || e.keyCode === 27) && qcDrawer.classList.contains('open')) {
+                closeQuickCreate();
+            }
+        });
+
+        // Cambio de servicio -> recarga los recursos habilitados (misma logica
+        // que el alta completa, replicada para el formulario del drawer).
+        var qcServicio = document.getElementById('qk-ServicioId');
+        if (qcServicio && recursosUrl) {
+            qcServicio.addEventListener('change', function () {
+                var recursoDdl = document.getElementById('qk-RecursoId');
+                if (!recursoDdl) return;
+
+                recursoDdl.innerHTML = '<option value="">Cargando...</option>';
+
+                var url = this.value
+                    ? recursosUrl + '?servicioId=' + encodeURIComponent(this.value)
+                    : recursosTodosUrl;
+
+                fetch(url)
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        recursoDdl.innerHTML = '<option value="">Seleccione un recurso</option>';
+                        data.forEach(function (r) {
+                            var option = document.createElement('option');
+                            option.value = r.Id;
+                            option.textContent = r.Nombre;
+                            recursoDdl.appendChild(option);
+                        });
+                    });
+            });
+        }
+
+        qcForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearQcErrors();
+
+            var submitBtn = qcForm.querySelector('[type="submit"]');
+            submitBtn.disabled = true;
+
+            fetch(quickCreateUrl, { method: 'POST', body: new FormData(qcForm) })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data && data.success) {
+                        closeQuickCreate();
+                        qcToast('Turno creado correctamente', 'success');
+                        var url = agendaBaseUrl
+                            + '?fecha=' + encodeURIComponent(agendaFecha)
+                            + '&vista=' + encodeURIComponent(agendaVista || 'dia')
+                            + '&openTurnoId=' + data.id;
+                        window.location.href = url;
+                    } else {
+                        var errors = data && data.errors;
+                        var shown = false;
+                        if (errors) {
+                            Object.keys(errors).forEach(function (key) {
+                                if (key) {
+                                    showQcFieldError(key, errors[key]);
+                                    shown = true;
+                                }
+                            });
+                        }
+                        if (!shown) {
+                            qcToast((errors && errors['']) ? errors[''] : 'No se pudo crear el turno', 'error');
+                        }
+                    }
+                })
+                .catch(function () {
+                    qcToast('Error de conexion al crear el turno', 'error');
+                })
+                .then(function () { submitBtn.disabled = false; });
         });
     }
 

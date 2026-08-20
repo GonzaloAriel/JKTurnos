@@ -32,6 +32,9 @@ namespace JKTurnos.Services
 
             var turnos = _turnoService.GetTurnosEnRango(hoy, hoy.AddDays(2));
 
+            var config = _configService.GetConfiguracion();
+            var ocultos = ObtenerOcultos(config);
+
             var recordatorios = new List<RecordatorioSistema>();
 
             AgregarProximoTurno(recordatorios, turnos, ahora);
@@ -41,9 +44,75 @@ namespace JKTurnos.Services
             AgregarClientesSinContacto(recordatorios, turnos, hoy);
 
             if (incluirConfiguracion)
-                AgregarConfiguracion(recordatorios);
+                AgregarConfiguracion(recordatorios, config);
 
-            return recordatorios;
+            return recordatorios
+                .Where(r => !string.IsNullOrEmpty(r.Clave) && !ocultos.Contains(r.Clave))
+                .ToList();
+        }
+
+        // Oculta los recordatorios actuales con "Marcar todas leidas": guarda
+        // sus claves para que no vuelvan a mostrarse hasta que cambie la
+        // condicion que los origina (nuevo turno, otro dia/mes, config resuelta).
+        public void OcultarActuales(bool incluirConfiguracion)
+        {
+            var claves = GetRecordatorios(incluirConfiguracion)
+                .Select(r => r.Clave)
+                .ToList();
+
+            if (claves.Count == 0)
+                return;
+
+            var config = _configService.GetConfiguracion();
+            if (config == null)
+                return;
+
+            var ocultos = ObtenerOcultos(config);
+            foreach (var c in claves)
+                ocultos.Add(c);
+
+            // Cap: se descartan las claves mas viejas para que la columna no
+            // crezca sin limite (los turnos y dias viejos dejan de coincidir).
+            var lista = ocultos.ToList();
+            if (lista.Count > 100)
+                lista = lista.Skip(lista.Count - 100).ToList();
+
+            _configService.GuardarRecordatoriosOcultos(string.Join("|", lista));
+        }
+
+        // Oculta UN recordatorio (click en la "x" del item). Se persiste su
+        // clave para que no vuelva a mostrarse hasta que cambie la condicion.
+        public void OcultarUna(string clave)
+        {
+            if (string.IsNullOrWhiteSpace(clave))
+                return;
+
+            var config = _configService.GetConfiguracion();
+            if (config == null)
+                return;
+
+            var ocultos = ObtenerOcultos(config);
+            if (!ocultos.Add(clave.Trim()))
+                return;
+
+            var lista = ocultos.ToList();
+            if (lista.Count > 100)
+                lista = lista.Skip(lista.Count - 100).ToList();
+
+            _configService.GuardarRecordatoriosOcultos(string.Join("|", lista));
+        }
+
+        private static HashSet<string> ObtenerOcultos(ConfiguracionTenant config)
+        {
+            var ocultos = new HashSet<string>();
+
+            if (config == null || string.IsNullOrWhiteSpace(config.RecordatoriosOcultos))
+                return ocultos;
+
+            foreach (var k in config.RecordatoriosOcultos.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
+                ocultos.Add(k.Trim());
+
+            return ocultos;
         }
 
         private static void AgregarProximoTurno(
@@ -76,6 +145,7 @@ namespace JKTurnos.Services
                 Mensaje = cliente + " a las " + proximo.FechaHoraInicio.ToString("HH:mm") + " (" + cuando + ").",
                 Icono = "bi-alarm",
                 IconoClase = "jk-notif-icon-accent",
+                Clave = "proximoTurno:" + proximo.Id,
                 Controlador = "Turnos",
                 Accion = "Agenda",
                 RouteValues = new { openTurnoId = proximo.Id }
@@ -111,6 +181,7 @@ namespace JKTurnos.Services
                     Mensaje = "Hoy " + t.Cliente.Nombre + " tiene " + servicio + " a las " + t.FechaHoraInicio.ToString("HH:mm") + ". Enviale un recordatorio por whatsapp.",
                     Icono = "bi-whatsapp",
                     IconoClase = "jk-notif-icon-success",
+                    Clave = "diaWhatsapp:" + t.Id,
                     Controlador = "Turnos",
                     Accion = "Agenda",
                     RouteValues = new { openTurnoId = t.Id }
@@ -140,6 +211,7 @@ namespace JKTurnos.Services
                 Mensaje = "Tenes " + sinConfirmar + " " + turnosTxt + " para hoy o manana.",
                 Icono = "bi-hourglass-split",
                 IconoClase = "jk-notif-icon-warning",
+                Clave = "sinConfirmar:" + hoy.AddDays(1).ToString("yyyyMMdd"),
                 Controlador = "Turnos",
                 Accion = "Agenda",
                 RouteValues = new { }
@@ -187,6 +259,7 @@ namespace JKTurnos.Services
                 Mensaje = "Hay $" + saldo.ToString("0.##") + " por cobrar (" + turnosConSaldo + " " + turnosTxt + ").",
                 Icono = "bi-cash-stack",
                 IconoClase = "jk-notif-icon-warning",
+                Clave = "saldo:" + inicioMes.ToString("yyyyMM"),
                 Controlador = "Pagos",
                 Accion = "Index",
                 RouteValues = new { }
@@ -216,16 +289,15 @@ namespace JKTurnos.Services
                 Mensaje = sinContacto + " " + turnosTxt + " cliente sin telefono ni email. No podras enviarles recordatorios.",
                 Icono = "bi-person-x",
                 IconoClase = "jk-notif-icon-danger",
+                Clave = "sinContacto:" + hoy.ToString("yyyyMMdd"),
                 Controlador = "Turnos",
                 Accion = "Agenda",
                 RouteValues = new { }
             });
         }
 
-        private void AgregarConfiguracion(List<RecordatorioSistema> recordatorios)
+        private void AgregarConfiguracion(List<RecordatorioSistema> recordatorios, ConfiguracionTenant config)
         {
-            var config = _configService.GetConfiguracion();
-
             if (config == null || string.IsNullOrWhiteSpace(config.NombreComercial))
             {
                 recordatorios.Add(new RecordatorioSistema
@@ -234,6 +306,7 @@ namespace JKTurnos.Services
                     Mensaje = "Completa nombre, telefono y direccion de tu negocio.",
                     Icono = "bi-shop",
                     IconoClase = "jk-notif-icon-muted",
+                    Clave = "configNegocio",
                     Controlador = "Configuracion",
                     Accion = "DatosNegocio",
                     RouteValues = new { }
@@ -248,6 +321,7 @@ namespace JKTurnos.Services
                     Mensaje = "Activa el envio de recordatorios por email desde Configuracion.",
                     Icono = "bi-envelope",
                     IconoClase = "jk-notif-icon-muted",
+                    Clave = "configEmail",
                     Controlador = "Configuracion",
                     Accion = "NotificacionesEmail",
                     RouteValues = new { }
@@ -262,6 +336,7 @@ namespace JKTurnos.Services
                     Mensaje = "Defini la plantilla de recordatorio por WhatsApp.",
                     Icono = "bi-chat-dots",
                     IconoClase = "jk-notif-icon-muted",
+                    Clave = "configWhatsApp",
                     Controlador = "Configuracion",
                     Accion = "NotificacionesWhatsApp",
                     RouteValues = new { }

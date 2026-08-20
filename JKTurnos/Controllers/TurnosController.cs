@@ -209,6 +209,11 @@ namespace JKTurnos.Controllers
             ViewBag.FechaNavegacion = fechaSeleccionada;
             ViewBag.OpenTurnoId = openTurnoId;
 
+            // Modelo de dropdowns para el drawer de Quick Create (D-017).
+            var quickModel = new TurnoViewModel();
+            PopulateDropdowns(quickModel);
+            ViewBag.TurnoQuickModel = quickModel;
+
             return View(model);
         }
 
@@ -266,6 +271,48 @@ namespace JKTurnos.Controllers
             }
 
             return RedirectToAction("Agenda", new { openRecursoId = model.RecursoId });
+        }
+
+        // D-017 QuickCreate: alta rapida de turno desde el drawer de la agenda
+        // (click en celda libre). POST ajax, patron QuickCreate (D-013). La
+        // fecha/hora y el recurso llegan prellenados por la celda; el fin se
+        // calcula con la duracion del servicio.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult QuickCreate(TurnoViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(m => m.Value.Errors.Count > 0)
+                    .ToDictionary(m => m.Key, m => m.Value.Errors.Select(e => e.ErrorMessage).FirstOrDefault());
+
+                return Json(new { success = false, errors = errors });
+            }
+
+            var turno = new Turno
+            {
+                ClienteId = model.ClienteId,
+                ServicioId = model.ServicioId,
+                RecursoId = model.RecursoId,
+                FechaHoraInicio = model.FechaHoraInicio,
+                Observaciones = model.Observaciones
+            };
+
+            try
+            {
+                _turnoService.Crear(turno);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new Dictionary<string, string> { { "", ex.Message } }
+                });
+            }
+
+            return Json(new { success = true, id = turno.Id });
         }
 
         // GET: Turnos/Edit/5

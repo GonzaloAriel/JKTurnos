@@ -37,7 +37,7 @@
 
     <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.FechaHoraInicio)">@Html.DisplayNameFor(m => m.FechaHoraInicio)</label>
-        @Html.TextBoxFor(m => m.FechaHoraInicio, new { @class = "jk-input", type = "datetime-local" })
+        @Html.TextBoxFor(m => m.FechaHoraInicio, new { @class = "jk-input", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
         @Html.ValidationMessageFor(m => m.FechaHoraInicio, "", new { @class = "jk-field-error" })
     </div>
 

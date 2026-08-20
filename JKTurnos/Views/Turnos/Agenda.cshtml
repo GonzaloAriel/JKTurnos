@@ -10,7 +10,13 @@
 
 <div class="jk-agenda" role="application" aria-label="Agenda de turnos"
      data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
-     data-open-turno-id="@(ViewBag.OpenTurnoId ?? "")">
+     data-open-turno-id="@(ViewBag.OpenTurnoId ?? "")"
+     data-agenda-fecha="@Model.Fecha.ToString("yyyy-MM-dd")"
+     data-agenda-vista="@ViewBag.Vista"
+     data-agenda-base-url="@Url.Action("Agenda", "Turnos")"
+     data-quick-create-url="@Url.Action("QuickCreate", "Turnos")"
+     data-recursos-url="@Url.Action("GetRecursosPorServicio", "Turnos")"
+     data-recursos-todos-url="@Url.Action("GetRecursos", "Turnos")">
 
     @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
 
@@ -45,6 +51,99 @@
     </div>
     <div class="jk-drawer-body" id="drawer-turno-detalle-body"></div>
 </div>
+
+@*
+    Drawer de Quick Create de turno (D-017): se abre al hacer click en una
+    celda libre de la grilla (o slot libre mobile / dia semanal) con la
+    fecha+hora y el recurso de la celda prellenados. Renderizado server-side
+    para que los drawers anidados de Quick Create (cliente/servicio/recurso)
+    ejecuten sus scripts sin problemas. La logica vive en jk-agenda.js.
+*@
+@{
+    var quickModel = (JKTurnos.Models.ViewModels.TurnoViewModel)ViewBag.TurnoQuickModel;
+}
+<div class="jk-drawer-backdrop" id="drawer-turno-quick-backdrop"></div>
+<div class="jk-drawer" id="drawer-turno-quick" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-quick-title">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-turno-quick-title">Nuevo turno</h3>
+        <button type="button" class="jk-drawer-close" id="drawer-turno-quick-close" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body">
+        <form id="form-turno-quick" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="qk-ClienteId">Cliente</label>
+                <div class="jk-flex jk-gap-8">
+                    @Html.DropDownList("ClienteId", quickModel.Clientes, "Seleccione un cliente", new { @class = "jk-input jk-flex-1", id = "qk-ClienteId" })
+                    <button type="button" class="jk-btn jk-btn-icon" data-jk-open-drawer="drawer-quick-cliente" title="Crear cliente" aria-label="Crear cliente">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+                <div class="jk-field-error" data-error-for="ClienteId" hidden></div>
+            </div>
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="qk-ServicioId">Servicio</label>
+                <div class="jk-flex jk-gap-8">
+                    @Html.DropDownList("ServicioId", quickModel.Servicios, "Seleccione un servicio (opcional)", new { @class = "jk-input jk-flex-1", id = "qk-ServicioId" })
+                    <button type="button" class="jk-btn jk-btn-icon" data-jk-open-drawer="drawer-quick-servicio" title="Crear servicio" aria-label="Crear servicio">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+                <div class="jk-field-error" data-error-for="ServicioId" hidden></div>
+            </div>
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="qk-RecursoId">Recurso</label>
+                <div class="jk-flex jk-gap-8">
+                    @Html.DropDownList("RecursoId", quickModel.Recursos, "Seleccione un recurso", new { @class = "jk-input jk-flex-1", id = "qk-RecursoId" })
+                    <button type="button" class="jk-btn jk-btn-icon" data-jk-open-drawer="drawer-quick-recurso" title="Crear recurso" aria-label="Crear recurso">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+                <div class="jk-field-error" data-error-for="RecursoId" hidden></div>
+            </div>
+
+            <div class="jk-form-group">
+                <label class="jk-label" for="qk-FechaHoraInicio">Inicio</label>
+                <input type="datetime-local" name="FechaHoraInicio" id="qk-FechaHoraInicio" class="jk-input" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                <div class="jk-field-error" data-error-for="FechaHoraInicio" hidden></div>
+            </div>
+
+            <div class="jk-flex jk-gap-12 jk-mt-16">
+                <button type="button" class="jk-btn jk-btn-ghost" data-quick-cancel>Cancelar</button>
+                <button type="submit" class="jk-btn jk-btn-primary">Guardar turno</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@Html.Partial("~/Views/Shared/Components/_ClienteQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-cliente" },
+        { "SelectId", "qk-ClienteId" },
+        { "ToastId", "jk-toast-qk-cliente" },
+        { "ToastMessage", "Cliente creado correctamente" }
+    })
+
+@Html.Partial("~/Views/Shared/Components/_ServiceQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-servicio" },
+        { "SelectId", "qk-ServicioId" },
+        { "ToastId", "jk-toast-qk-servicio" },
+        { "ToastMessage", "Servicio creado correctamente" }
+    })
+
+@Html.Partial("~/Views/Shared/Components/_RecursoQuickCreateDrawer.cshtml",
+    new ViewDataDictionary {
+        { "DrawerId", "drawer-quick-recurso" },
+        { "SelectId", "qk-RecursoId" },
+        { "ToastId", "jk-toast-qk-recurso" },
+        { "ToastMessage", "Recurso creado correctamente" }
+    })
 
 @Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-agenda" } })
 

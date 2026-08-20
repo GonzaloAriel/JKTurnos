@@ -622,6 +622,14 @@
         border-radius: var(--jk-radius-sm);
         padding: 4px var(--jk-space-10);
         line-height: 1.2;
+        background: transparent;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background var(--jk-transition-fast);
+    }
+
+    .jk-agenda-mobile-free-slot:hover {
+        background: var(--jk-success-light);
     }
 
 }

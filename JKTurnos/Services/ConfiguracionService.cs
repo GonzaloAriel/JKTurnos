@@ -91,6 +91,22 @@ namespace JKTurnos.Services
             _configRepo.Update(actual);
         }
 
+        // Claves de recordatorios ocultos con "Marcar todas leidas".
+        public string GetRecordatoriosOcultos()
+        {
+            return _configRepo.GetAll().FirstOrDefault()?.RecordatoriosOcultos;
+        }
+
+        public void GuardarRecordatoriosOcultos(string claves)
+        {
+            var actual = _configRepo.GetAll().FirstOrDefault();
+            if (actual == null)
+                return;
+
+            actual.RecordatoriosOcultos = claves;
+            _configRepo.Update(actual);
+        }
+
         public List<EstadoTurno> GetEstados()
         {
             return _estadoRepo.GetAll().OrderBy(x => x.Nombre).ToList();
