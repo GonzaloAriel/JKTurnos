@@ -12,12 +12,14 @@ namespace JKTurnos.Services
         private readonly BaseRepository<Turno> _repo;
         private readonly BaseRepository<Servicio> _servicioRepo;
         private readonly BaseRepository<EstadoTurno> _estadoRepo;
+        private readonly BaseRepository<Cliente> _clienteRepo;
 
         public TurnoService()
         {
             _repo = new BaseRepository<Turno>();
             _servicioRepo = new BaseRepository<Servicio>();
             _estadoRepo = new BaseRepository<EstadoTurno>();
+            _clienteRepo = new BaseRepository<Cliente>();
         }
 
         public List<Turno> GetAll()
@@ -157,17 +159,40 @@ namespace JKTurnos.Services
             _repo.Add(turno);
 
             new NotificacionSistemaService().RegistrarTurnoCreado(turno.Id);
+
+            new AuditService().Registrar(
+                AuditService.A_Crear,
+                AuditService.E_Turno,
+                "Creo el turno de " + NombreCliente(turno.ClienteId) +
+                " (" + NombreServicio(turno.ServicioId) + ") " +
+                turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
+                turno.Id);
         }
 
         public void Update(Turno turno)
         {
+            var existente = _repo.GetById(turno.Id);
+
+            if (existente == null)
+                throw new ArgumentException("Turno no encontrado.");
+
             turno.FechaHoraFin = CalcularFin(turno.FechaHoraInicio, turno.ServicioId);
 
             if (!ValidarDisponibilidad(turno.RecursoId, turno.FechaHoraInicio, turno.FechaHoraFin, turno.Id))
                 throw new InvalidOperationException(
                     "El recurso no esta disponible en el horario seleccionado.");
 
+            var cambios = CompararTurnos(existente, turno);
+
             _repo.Update(turno);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Turno,
+                "Edito el turno de " + NombreCliente(turno.ClienteId) + " " +
+                turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
+                turno.Id,
+                cambios);
         }
 
         public void CambiarEstado(int turnoId, int estadoTurnoId)
@@ -176,11 +201,22 @@ namespace JKTurnos.Services
             if (turno == null)
                 throw new ArgumentException("Turno no encontrado.");
 
+            var estadoAnterior = _estadoRepo.GetById(turno.EstadoTurnoId)?.Nombre ?? turno.EstadoTurnoId.ToString();
+            var estadoNuevo = _estadoRepo.GetById(estadoTurnoId)?.Nombre ?? estadoTurnoId.ToString();
+
             turno.EstadoTurnoId = estadoTurnoId;
             _repo.Update(turno);
 
-            var estadoNombre = _estadoRepo.GetById(estadoTurnoId)?.Nombre;
-            new NotificacionSistemaService().RegistrarCambioEstado(turnoId, estadoNombre);
+            new NotificacionSistemaService().RegistrarCambioEstado(turnoId, estadoNuevo);
+
+            new AuditService().Registrar(
+                AuditService.A_CambiarEstado,
+                AuditService.E_Turno,
+                "Cambio el estado del turno de " + NombreCliente(turno.ClienteId) + " " +
+                turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm") + " a " + estadoNuevo,
+                turnoId,
+                AuditService.FormatearCambios(
+                    AuditService.Campo("Estado", estadoAnterior, estadoNuevo)));
         }
 
         public void Cancelar(int turnoId)
@@ -188,6 +224,8 @@ namespace JKTurnos.Services
             var turno = _repo.GetById(turnoId);
             if (turno == null)
                 throw new ArgumentException("Turno no encontrado.");
+
+            var estadoAnterior = _estadoRepo.GetById(turno.EstadoTurnoId)?.Nombre ?? turno.EstadoTurnoId.ToString();
 
             var cancelado = _estadoRepo.GetAll()
                 .FirstOrDefault(x => x.Nombre == "Cancelado");
@@ -200,11 +238,60 @@ namespace JKTurnos.Services
             _repo.Update(turno);
 
             new NotificacionSistemaService().RegistrarCambioEstado(turnoId, "Cancelado");
+
+            new AuditService().Registrar(
+                AuditService.A_CambiarEstado,
+                AuditService.E_Turno,
+                "Cancelo el turno de " + NombreCliente(turno.ClienteId) + " " +
+                turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
+                turnoId,
+                AuditService.FormatearCambios(
+                    AuditService.Campo("Estado", estadoAnterior, "Cancelado")));
         }
 
         public void Delete(int id)
         {
+            var turno = _repo.GetById(id);
+
+            var detalle = turno != null
+                ? "Elimino el turno de " + NombreCliente(turno.ClienteId) +
+                  " (" + NombreServicio(turno.ServicioId) + ") " +
+                  turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")
+                : "Elimino el turno #" + id;
+
             _repo.Delete(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Eliminar,
+                AuditService.E_Turno,
+                detalle,
+                id);
+        }
+
+        private string NombreCliente(int clienteId)
+        {
+            var cliente = _clienteRepo.GetById(clienteId);
+            return cliente != null ? cliente.Nombre : "#" + clienteId;
+        }
+
+        private string NombreServicio(int? servicioId)
+        {
+            if (!servicioId.HasValue)
+                return "sin servicio";
+
+            var servicio = _servicioRepo.GetById(servicioId.Value);
+            return servicio != null ? servicio.Nombre : "#" + servicioId;
+        }
+
+        private static string CompararTurnos(Turno a, Turno b)
+        {
+            return AuditService.FormatearCambios(
+                AuditService.Campo("Cliente", a.ClienteId.ToString(), b.ClienteId.ToString()),
+                AuditService.Campo("Servicio", a.ServicioId?.ToString(), b.ServicioId?.ToString()),
+                AuditService.Campo("Recurso", a.RecursoId.ToString(), b.RecursoId.ToString()),
+                AuditService.Campo("Estado", a.EstadoTurnoId.ToString(), b.EstadoTurnoId.ToString()),
+                AuditService.Campo("Inicio", a.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"), b.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")),
+                AuditService.Campo("Observaciones", a.Observaciones, b.Observaciones));
         }
     }
 }

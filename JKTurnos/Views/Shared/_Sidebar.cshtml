@@ -131,6 +131,13 @@
                     <i class="bi bi-gear"></i>
                     <span>Negocio</span>
                 </a>
+                <a href="@Url.Action("Index", "Auditoria")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Auditoria" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Auditoria" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-journal-text"></i>
+                    <span>Auditoria</span>
+                </a>
             </div>
         }
     </div>

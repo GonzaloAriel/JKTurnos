@@ -43,6 +43,11 @@ namespace JKTurnos.Controllers
 
         public ActionResult Logout()
         {
+            new Services.AuditService().Registrar(
+                Services.AuditService.A_Logout,
+                Services.AuditService.E_Autenticacion,
+                "Cierre de sesion");
+
             HttpContext
                 .GetOwinContext()
                 .Authentication

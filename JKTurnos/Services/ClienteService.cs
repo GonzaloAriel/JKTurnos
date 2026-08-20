@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JKTurnos.Data;
 using JKTurnos.Models.Entities;
@@ -47,16 +48,54 @@ namespace JKTurnos.Services
         public void Create(Cliente cliente)
         {
             _repo.Add(cliente);
+
+            new AuditService().Registrar(
+                AuditService.A_Crear,
+                AuditService.E_Cliente,
+                "Creo el cliente " + cliente.Nombre,
+                cliente.Id);
         }
 
         public void Update(Cliente cliente)
         {
+            var existente = _repo.GetById(cliente.Id);
+
+            if (existente == null)
+                throw new ArgumentException("Cliente no encontrado.");
+
+            var cambios = CompararClientes(existente, cliente);
+
             _repo.Update(cliente);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Cliente,
+                "Edito el cliente " + cliente.Nombre,
+                cliente.Id,
+                cambios);
         }
 
         public void Delete(int id)
         {
+            var cliente = _repo.GetById(id);
+
             _repo.Delete(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Eliminar,
+                AuditService.E_Cliente,
+                cliente != null ? "Elimino el cliente " + cliente.Nombre : "Elimino el cliente #" + id,
+                id);
+        }
+
+        private static string CompararClientes(Cliente a, Cliente b)
+        {
+            return AuditService.FormatearCambios(
+                AuditService.Campo("Nombre", a.Nombre, b.Nombre),
+                AuditService.Campo("Telefono", a.Telefono, b.Telefono),
+                AuditService.Campo("Email", a.Email, b.Email),
+                AuditService.Campo("Direccion", a.Direccion, b.Direccion),
+                AuditService.Campo("Notas", a.Notas, b.Notas));
         }
     }
 }

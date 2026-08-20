@@ -38,8 +38,21 @@ namespace JKTurnos.Services
             if (actual == null)
             {
                 _configRepo.Add(model);
+
+                new AuditService().Registrar(
+                    AuditService.A_Editar,
+                    AuditService.E_Configuracion,
+                    "Configuro los datos del negocio");
+
                 return;
             }
+
+            var cambios = AuditService.FormatearCambios(
+                AuditService.Campo("NombreComercial", actual.NombreComercial, model.NombreComercial),
+                AuditService.Campo("Telefono", actual.Telefono, model.Telefono),
+                AuditService.Campo("Email", actual.Email, model.Email),
+                AuditService.Campo("Direccion", actual.Direccion, model.Direccion),
+                AuditService.Campo("LogoUrl", actual.LogoUrl, model.LogoUrl));
 
             actual.NombreComercial = model.NombreComercial;
             actual.Telefono = model.Telefono;
@@ -47,6 +60,13 @@ namespace JKTurnos.Services
             actual.Direccion = model.Direccion;
             actual.LogoUrl = model.LogoUrl;
             _configRepo.Update(actual);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Configuracion,
+                "Actualizo los datos del negocio",
+                null,
+                cambios);
         }
 
         // Plantilla del recordatorio por WhatsApp (forma NotificacionesWhatsApp).
@@ -63,6 +83,11 @@ namespace JKTurnos.Services
             actual.WhatsAppTemplate = model.WhatsAppTemplate;
             actual.WhatsAppTemplateDia = model.WhatsAppTemplateDia;
             _configRepo.Update(actual);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Configuracion,
+                "Actualizo las plantillas de recordatorio por WhatsApp");
         }
 
         // Email SMTP (forma NotificacionesEmail). La password en blanco conserva
@@ -89,6 +114,11 @@ namespace JKTurnos.Services
                 actual.SmtpPassword = model.SmtpPassword.Trim();
 
             _configRepo.Update(actual);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Configuracion,
+                "Actualizo la configuracion de email");
         }
 
         // Claves de recordatorios ocultos con "Marcar todas leidas".
@@ -122,11 +152,19 @@ namespace JKTurnos.Services
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre del estado es obligatorio.");
 
-            _estadoRepo.Add(new EstadoTurno
+            var estado = new EstadoTurno
             {
                 Nombre = nombre.Trim(),
                 Color = NormalizarColor(color)
-            });
+            };
+
+            _estadoRepo.Add(estado);
+
+            new AuditService().Registrar(
+                AuditService.A_Crear,
+                AuditService.E_EstadoTurno,
+                "Creo el estado de turno " + estado.Nombre,
+                estado.Id);
         }
 
         public void ActualizarEstado(int id, string nombre, string color)
@@ -139,14 +177,33 @@ namespace JKTurnos.Services
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre del estado es obligatorio.");
 
+            var cambios = AuditService.FormatearCambios(
+                AuditService.Campo("Nombre", actual.Nombre, nombre.Trim()),
+                AuditService.Campo("Color", actual.Color, NormalizarColor(color)));
+
             actual.Nombre = nombre.Trim();
             actual.Color = NormalizarColor(color);
             _estadoRepo.Update(actual);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_EstadoTurno,
+                "Edito el estado de turno " + actual.Nombre,
+                id,
+                cambios);
         }
 
         public void EliminarEstado(int id)
         {
+            var actual = _estadoRepo.GetById(id);
+
             _estadoRepo.Delete(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Eliminar,
+                AuditService.E_EstadoTurno,
+                actual != null ? "Elimino el estado de turno " + actual.Nombre : "Elimino el estado de turno #" + id,
+                id);
         }
 
         private static string NormalizarColor(string color)

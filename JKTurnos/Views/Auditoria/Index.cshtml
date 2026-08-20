@@ -1,0 +1,265 @@
+@model List<JKTurnos.Models.Entities.Auditoria>
+
+@helper AccionBadge(string accion) {
+    switch (accion)
+    {
+        case "Crear":
+            <span class="jk-badge jk-badge-success">@accion</span>
+            break;
+        case "Editar":
+            <span class="jk-badge jk-badge-accent">@accion</span>
+            break;
+        case "Eliminar":
+        case "Anular":
+        case "LoginFallido":
+            <span class="jk-badge jk-badge-danger">@accion</span>
+            break;
+        case "Pago":
+        case "ResetPassword":
+            <span class="jk-badge jk-badge-warning">@accion</span>
+            break;
+        default:
+            <span class="jk-badge jk-badge-neutral">@accion</span>
+            break;
+    }
+}
+
+@helper DetalleCell(JKTurnos.Models.Entities.Auditoria item) {
+    if (string.IsNullOrWhiteSpace(item.Cambios))
+    {
+        <div class="jk-audit-detalle">@item.Detalle</div>
+    }
+    else
+    {
+        <div class="jk-audit-detalle">@item.Detalle</div>
+        <details class="jk-audit-detalle-expand">
+            <summary>Ver cambios</summary>
+            <div class="jk-audit-cambios">@item.Cambios</div>
+        </details>
+    }
+}
+
+@helper ListContent() {
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Accion</th>
+                        <th>Entidad</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="jk-nowrap">@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @item.UsuarioNombre
+                                @if (!string.IsNullOrWhiteSpace(item.Rol))
+                                {
+                                    <span class="jk-small"> &middot; @item.Rol</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(item.Ip))
+                                {
+                                    <div class="jk-small">IP: @item.Ip</div>
+                                }
+                            </td>
+                            <td>@AccionBadge(item.Accion)</td>
+                            <td>
+                                <span class="jk-badge jk-badge-neutral">@item.Entidad</span>
+                                @if (item.EntidadId.HasValue)
+                                {
+                                    <span class="jk-small"> #@item.EntidadId</span>
+                                }
+                            </td>
+                            <td>@DetalleCell(item)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@item.UsuarioNombre</strong>
+                    @AccionBadge(item.Accion)
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-clock"></i> @item.Fecha.ToString("dd/MM/yyyy HH:mm")
+                </div>
+                <div class="jk-mt-4 jk-small">
+                    <span class="jk-badge jk-badge-neutral">@item.Entidad</span>
+                    @if (item.EntidadId.HasValue)
+                    {
+                        <span> #@item.EntidadId</span>
+                    }
+                </div>
+                <div class="jk-mt-8">@DetalleCell(item)</div>
+            </div>
+        }
+    </div>
+}
+
+@helper PaginationContent() {
+    int pagina = ViewBag.Pagina;
+    int totalPaginas = ViewBag.TotalPaginas;
+
+    if (totalPaginas > 1)
+    {
+        <nav class="jk-pagination" aria-label="Paginacion de la auditoria">
+            @if (pagina > 1)
+            {
+                <a class="jk-btn jk-btn-sm jk-btn-ghost" href="@PagUrl(pagina - 1)" aria-label="Pagina anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            }
+
+            @for (int i = 1; i <= totalPaginas; i++)
+            {
+                if (i == pagina)
+                {
+                    <span class="jk-btn jk-btn-sm jk-btn-primary" aria-current="page">@i</span>
+                }
+                else
+                {
+                    <a class="jk-btn jk-btn-sm jk-btn-ghost" href="@PagUrl(i)">@i</a>
+                }
+            }
+
+            @if (pagina < totalPaginas)
+            {
+                <a class="jk-btn jk-btn-sm jk-btn-ghost" href="@PagUrl(pagina + 1)" aria-label="Pagina siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            }
+        </nav>
+    }
+}
+
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar jk-filter-bar-wrap">
+        @Html.Partial("~/Views/Shared/Components/_DateFilter.cshtml",
+            new ViewDataDictionary {
+                { "InicioName", "fechaDesde" },
+                { "FinName", "fechaHasta" },
+                { "InicioValue", ViewBag.FechaDesde },
+                { "FinValue", ViewBag.FechaHasta },
+                { "InicioLabel", "Desde" },
+                { "FinLabel", "Hasta" }
+            })
+
+        <div class="jk-form-group jk-filter-field">
+            <label class="jk-label" for="usuarioId">Usuario</label>
+            <select id="usuarioId" name="usuarioId" class="jk-select">
+                <option value="">Todos</option>
+                @foreach (var u in (ViewBag.Usuarios as List<SelectListItem>) ?? new List<SelectListItem>())
+                {
+                    <option value="@u.Value" @(ViewBag.UsuarioId != null && ((int)ViewBag.UsuarioId).ToString() == u.Value ? "selected" : "")>@u.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="jk-form-group jk-filter-field">
+            <label class="jk-label" for="entidad">Entidad</label>
+            <select id="entidad" name="entidad" class="jk-select">
+                <option value="">Todas</option>
+                @foreach (var e in (ViewBag.Entidades as List<SelectListItem>) ?? new List<SelectListItem>())
+                {
+                    <option value="@e.Value" @((ViewBag.Entidad as string) == e.Value ? "selected" : "")>@e.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="jk-form-group jk-filter-field">
+            <label class="jk-label" for="accion">Accion</label>
+            <select id="accion" name="accion" class="jk-select">
+                <option value="">Todas</option>
+                @foreach (var a in (ViewBag.Acciones as List<SelectListItem>) ?? new List<SelectListItem>())
+                {
+                    <option value="@a.Value" @((ViewBag.Accion as string) == a.Value ? "selected" : "")>@a.Text</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-funnel"></i> Filtrar
+        </button>
+
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </a>
+    </form>
+}
+
+@helper EmptyContent() {
+    bool hayFiltros = (ViewBag.FechaDesde as DateTime?).HasValue
+        || (ViewBag.FechaHasta as DateTime?).HasValue
+        || ViewBag.UsuarioId != null
+        || !string.IsNullOrWhiteSpace(ViewBag.Entidad as string)
+        || !string.IsNullOrWhiteSpace(ViewBag.Accion as string);
+
+    string icon = "journal-text";
+    string title = "Aun no hay registros de auditoria";
+    string description = "Las acciones de los usuarios apareceran aqui a medida que se usen los modulos.";
+    string actionText = "";
+    string actionUrl = "";
+
+    if (hayFiltros)
+    {
+        icon = "search";
+        title = "Sin resultados";
+        description = "No hay registros que coincidan con los filtros aplicados.";
+        actionText = "Ver todos los registros";
+        actionUrl = Url.Action("Index");
+    }
+
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", icon },
+            { "Title", title },
+            { "Description", description },
+            { "ActionText", actionText },
+            { "ActionUrl", actionUrl }
+        })
+}
+
+@functions {
+    string PagUrl(int p)
+    {
+        return Url.Action("Index", new
+        {
+            fechaDesde = ViewBag.FechaDesde,
+            fechaHasta = ViewBag.FechaHasta,
+            usuarioId = ViewBag.UsuarioId,
+            entidad = ViewBag.Entidad,
+            accion = ViewBag.Accion,
+            pagina = p
+        });
+    }
+}
+
+@{
+    ViewBag.Title = "Auditoria";
+    ViewBag.Subtitle = "Historial completo de acciones de los usuarios";
+
+    ViewBag.ToolbarContent = FilterContent();
+
+    string listado = Model.Any() ? ListContent().ToString() : EmptyContent().ToString();
+    string paginacion = Model.Any() ? PaginationContent().ToString() : "";
+
+    ViewBag.PageContent = MvcHtmlString.Create(listado + paginacion);
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-auditoria.css" rel="stylesheet" />
+}

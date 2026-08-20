@@ -1,0 +1,44 @@
+/* Auditoria - listado con filtros y paginacion */
+
+.jk-filter-bar-wrap {
+    flex-wrap: wrap;
+    row-gap: var(--jk-space-12);
+}
+
+.jk-nowrap {
+    white-space: nowrap;
+}
+
+.jk-audit-detalle {
+    color: var(--jk-text-primary);
+}
+
+.jk-audit-detalle-expand {
+    margin-top: var(--jk-space-8);
+}
+
+.jk-audit-detalle-expand summary {
+    cursor: pointer;
+    color: var(--jk-accent);
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-medium);
+}
+
+.jk-audit-cambios {
+    margin-top: var(--jk-space-8);
+    padding: var(--jk-space-8) var(--jk-space-12);
+    background: var(--jk-bg);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-sm);
+    font-size: var(--jk-text-sm);
+    color: var(--jk-text-secondary);
+    white-space: pre-wrap;
+}
+
+.jk-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--jk-space-4);
+    margin-top: var(--jk-space-24);
+}

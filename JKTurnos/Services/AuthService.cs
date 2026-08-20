@@ -24,10 +24,18 @@ namespace JKTurnos.Services
                 .FirstOrDefault(x => x.Email == email);
 
             if (user == null)
+            {
+                new AuditService().RegistrarLogin(0, null, null, null, email, false);
                 return false;
+            }
 
             if (!PasswordHasher.Verify(password, user.PasswordHash))
+            {
+                new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
                 return false;
+            }
+
+            new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, true);
 
             SignIn(user);
 

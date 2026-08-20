@@ -109,6 +109,13 @@ namespace JKTurnos.Services
 
             user.PasswordHash = PasswordHasher.Hash(password);
             _repo.Add(user);
+
+            new AuditService().Registrar(
+                AuditService.A_Crear,
+                AuditService.E_Usuario,
+                "Creo el usuario " + (user.Nombre ?? user.Email) +
+                " (rol " + user.Role + ", tenant " + user.TenantId + ")",
+                user.Id);
         }
 
         public void Update(User user, string password = null)
@@ -117,6 +124,11 @@ namespace JKTurnos.Services
 
             if (existente == null)
                 throw new InvalidOperationException("Usuario no encontrado.");
+
+            var antesNombre = existente.Nombre;
+            var antesEmail = existente.Email;
+            var antesRol = existente.Role;
+            var antesTenant = existente.TenantId;
 
             user.Email = (user.Email ?? "").Trim();
 
@@ -151,6 +163,20 @@ namespace JKTurnos.Services
                 existente.PasswordHash = PasswordHasher.Hash(password);
 
             _repo.Update(existente);
+
+            var cambios = AuditService.FormatearCambios(
+                AuditService.Campo("Nombre", antesNombre, existente.Nombre),
+                AuditService.Campo("Email", antesEmail, existente.Email),
+                AuditService.Campo("Rol", antesRol, existente.Role),
+                AuditService.Campo("Tenant", antesTenant.ToString(), existente.TenantId.ToString()),
+                AuditService.Campo("Password", string.IsNullOrWhiteSpace(password) ? null : "(no se registra)", string.IsNullOrWhiteSpace(password) ? null : "(cambiado)"));
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Usuario,
+                "Edito el usuario " + (existente.Nombre ?? existente.Email),
+                existente.Id,
+                cambios);
         }
 
         public void Delete(int id)
@@ -167,6 +193,12 @@ namespace JKTurnos.Services
                 throw new InvalidOperationException("No puedes eliminar tu propia cuenta.");
 
             _repo.Delete(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Eliminar,
+                AuditService.E_Usuario,
+                "Elimino el usuario " + (user.Nombre ?? user.Email),
+                id);
         }
 
         public void ResetPassword(int userId, string newPassword)
@@ -181,6 +213,12 @@ namespace JKTurnos.Services
 
             user.PasswordHash = PasswordHasher.Hash(newPassword);
             _repo.Update(user);
+
+            new AuditService().Registrar(
+                AuditService.A_ResetPassword,
+                AuditService.E_Usuario,
+                "Restablecio la contrasena de " + (user.Nombre ?? user.Email),
+                user.Id);
         }
 
         public void CambiarMiPassword(int userId, string currentPassword, string newPassword)
@@ -199,6 +237,12 @@ namespace JKTurnos.Services
 
             user.PasswordHash = PasswordHasher.Hash(newPassword);
             _repo.Update(user);
+
+            new AuditService().Registrar(
+                AuditService.A_ResetPassword,
+                AuditService.E_Usuario,
+                "Cambio su propia contrasena",
+                user.Id);
         }
     }
 }

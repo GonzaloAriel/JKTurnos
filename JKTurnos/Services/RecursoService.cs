@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JKTurnos.Data;
 using JKTurnos.Models.Entities;
@@ -50,16 +51,53 @@ namespace JKTurnos.Services
         public void Create(Recurso recurso)
         {
             _repo.Add(recurso);
+
+            new AuditService().Registrar(
+                AuditService.A_Crear,
+                AuditService.E_Recurso,
+                "Creo el recurso " + recurso.Nombre,
+                recurso.Id);
         }
 
         public void Update(Recurso recurso)
         {
+            var existente = _repo.GetById(recurso.Id);
+
+            if (existente == null)
+                throw new ArgumentException("Recurso no encontrado.");
+
+            var cambios = CompararRecursos(existente, recurso);
+
             _repo.Update(recurso);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Recurso,
+                "Edito el recurso " + recurso.Nombre,
+                recurso.Id,
+                cambios);
         }
 
         public void Delete(int id)
         {
+            var recurso = _repo.GetById(id);
+
             _repo.Delete(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Eliminar,
+                AuditService.E_Recurso,
+                recurso != null ? "Elimino el recurso " + recurso.Nombre : "Elimino el recurso #" + id,
+                id);
+        }
+
+        private static string CompararRecursos(Recurso a, Recurso b)
+        {
+            return AuditService.FormatearCambios(
+                AuditService.Campo("Nombre", a.Nombre, b.Nombre),
+                AuditService.Campo("Descripcion", a.Descripcion, b.Descripcion),
+                AuditService.Campo("Tipo", a.Tipo.ToString(), b.Tipo.ToString()),
+                AuditService.Campo("Color", a.Color, b.Color));
         }
     }
 }

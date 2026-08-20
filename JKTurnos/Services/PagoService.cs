@@ -35,7 +35,7 @@ namespace JKTurnos.Services
                 _repo.GetAll().Any(p => p.TurnoId == turnoId && p.TipoPago == TipoPago.Senia))
                 throw new InvalidOperationException("La senia se registra una sola vez.");
 
-            _repo.Add(new Pago
+            var pago = new Pago
             {
                 TurnoId = turnoId,
                 Monto = monto,
@@ -43,9 +43,18 @@ namespace JKTurnos.Services
                 TipoPago = tipo,
                 Observacion = (observacion ?? "").Trim(),
                 UsuarioId = usuarioId
-            });
+            };
+
+            _repo.Add(pago);
 
             new NotificacionSistemaService().RegistrarPagoRegistrado(turnoId, monto, NombreTipoPago(tipo));
+
+            new AuditService().Registrar(
+                AuditService.A_Pago,
+                AuditService.E_Pago,
+                "Registro un pago de $" + monto.ToString("0.##") +
+                " (" + NombreTipoPago(tipo) + ") para el turno #" + turnoId,
+                pago.Id);
         }
 
         public List<Pago> GetPagos(int turnoId)
@@ -106,6 +115,15 @@ namespace JKTurnos.Services
             _repo.Delete(pagoId);
 
             new NotificacionSistemaService().RegistrarPagoAnulado(turnoIdAnulado, montoAnulado);
+
+            var motivoTxt = string.IsNullOrWhiteSpace(motivo) ? "" : " - Motivo: " + motivo.Trim();
+
+            new AuditService().Registrar(
+                AuditService.A_Anular,
+                AuditService.E_Pago,
+                "Anulo un pago de $" + montoAnulado.ToString("0.##") +
+                " del turno #" + turnoIdAnulado + motivoTxt,
+                pagoId);
         }
 
         // Edicion del monto/tipo/observacion (D-031): corrige un error de carga.
@@ -119,9 +137,23 @@ namespace JKTurnos.Services
             if (pago == null)
                 throw new ArgumentException("Pago no encontrado.");
 
+            var cambios = AuditService.FormatearCambios(
+                AuditService.Campo("Monto", pago.Monto.ToString("0.##"), monto.ToString("0.##")),
+                AuditService.Campo("Tipo", NombreTipoPago(pago.TipoPago), NombreTipoPago(tipo)),
+                AuditService.Campo("Observacion", pago.Observacion, (observacion ?? "").Trim()));
+
             pago.Monto = monto;
             pago.TipoPago = tipo;
             pago.Observacion = (observacion ?? "").Trim();
+
+            _repo.Update(pago);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Pago,
+                "Edito un pago del turno #" + pago.TurnoId,
+                pagoId,
+                cambios);
         }
 
         // Autocomplete del registro de pagos: busca turnos por cliente/recurso.
