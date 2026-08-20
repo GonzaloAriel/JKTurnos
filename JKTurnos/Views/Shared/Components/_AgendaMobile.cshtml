@@ -2,8 +2,8 @@
     JKTurnos - Agenda Mobile Component (tarjetas por Recurso + horarios libres)
     Variante mobile (< 768px) de la Agenda: acordeon por Recurso usando
     <details>/<summary> (sin JS obligatorio). Cada recurso lista sus turnos
-    del dia y los horarios libres (franjas de 30 min desocupadas 08:00-19:30
-    fusionadas en rangos continuos). D-019.
+    del dia y los horarios libres (franjas de 30 min desocupadas en el rango
+    del dia, fusionadas en rangos continuos). D-019.
     La grilla desktop sigue en _AgendaGrid (se oculta por media query).
     El clic en un turno abre el mismo Drawer de detalle (jk-agenda.js).
     El calculo de horarios libres vive en la vista; si D-017 (quick-create)
@@ -20,6 +20,27 @@
 
     var gridInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, 8, 0, 0);
     var gridFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, 19, 30, 0);
+
+    if (turnos.Count > 0)
+    {
+        var minInicio = turnos.Min(t => t.FechaHoraInicio);
+        var maxFin = turnos.Max(t => t.FechaHoraFin);
+
+        var inicioAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day,
+            minInicio.Hour, minInicio.Minute >= 30 ? 30 : 0, 0);
+        if (inicioAjustado < gridInicio)
+        {
+            gridInicio = inicioAjustado;
+        }
+
+        int finMinutos = maxFin.Minute > 30 ? 60 : (maxFin.Minute > 0 ? 30 : 0);
+        var finAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day, maxFin.Hour, 0, 0).AddMinutes(finMinutos);
+        if (finAjustado > gridFin)
+        {
+            gridFin = finAjustado;
+        }
+    }
+
     int index = 0;
 }
 

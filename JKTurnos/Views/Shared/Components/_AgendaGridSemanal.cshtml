@@ -1,7 +1,8 @@
 ﻿@*
     JKTurnos - Agenda Weekly Grid Component
     Vista semanal tipo calendario: 7 columnas (Lun a Dom) con eje de tiempo
-    08:00-19:30 (franjas de 30 min). Los turnos se posicionan por hora/duracion,
+    dinamico segun los turnos de la semana (default 08:00-19:30, franjas de
+    30 min). Los turnos se posicionan por hora/duracion,
     se pintan con el color del recurso (borde izquierdo) y las superposiciones
     dentro de un mismo dia se resuelven en carriles (lanes) para que queden
     lado a lado. Click en un turno abre el drawer de detalle; click en el
@@ -23,7 +24,31 @@
 
     double pxPorHora = 48;
     double pxPorMinuto = pxPorHora / 60.0;
-    int bodyHeight = (int)(11.5 * pxPorHora);
+
+    var semanaInicio = new DateTime(Model.Fecha.Year, Model.Fecha.Month, Model.Fecha.Day, 8, 0, 0);
+    var semanaFin = new DateTime(Model.Fecha.Year, Model.Fecha.Month, Model.Fecha.Day, 19, 30, 0);
+
+    if (turnos.Count > 0)
+    {
+        var minInicio = turnos.Min(t => t.FechaHoraInicio);
+        var maxFin = turnos.Max(t => t.FechaHoraFin);
+
+        var inicioAjustado = new DateTime(minInicio.Year, minInicio.Month, minInicio.Day,
+            minInicio.Hour, minInicio.Minute >= 30 ? 30 : 0, 0);
+        if (inicioAjustado < semanaInicio)
+        {
+            semanaInicio = inicioAjustado;
+        }
+
+        int finMinutos = maxFin.Minute > 30 ? 60 : (maxFin.Minute > 0 ? 30 : 0);
+        var finAjustado = new DateTime(maxFin.Year, maxFin.Month, maxFin.Day, maxFin.Hour, 0, 0).AddMinutes(finMinutos);
+        if (finAjustado > semanaFin)
+        {
+            semanaFin = finAjustado;
+        }
+    }
+
+    int bodyHeight = Math.Max(1, (int)((semanaFin - semanaInicio).TotalHours * pxPorHora));
 
     var turnosPorDia = new Dictionary<int, List<Turno>>();
     for (int i = 0; i < 7; i++)
@@ -73,8 +98,10 @@
             totalLanes = laneEnds.Count;
         }
 
-        var inicioDia = new DateTime(dia.Year, dia.Month, dia.Day, 8, 0, 0);
-        var finDia = new DateTime(dia.Year, dia.Month, dia.Day, 19, 30, 0);
+        var inicioDia = new DateTime(dia.Year, dia.Month, dia.Day,
+            semanaInicio.Hour, semanaInicio.Minute, 0);
+        var finDia = new DateTime(dia.Year, dia.Month, dia.Day,
+            semanaFin.Hour, semanaFin.Minute, 0);
 
         <div class="jk-agenda-week-day@(esHoy ? " is-today" : "")" role="gridcell">
             <a class="jk-agenda-week-day-header"

@@ -259,7 +259,7 @@
 .jk-agenda-grid {
     display: grid;
     grid-template-columns: 64px repeat(var(--jk-resource-count, 3), minmax(180px, 1fr));
-    grid-template-rows: 44px repeat(24, 48px);
+    grid-template-rows: 44px repeat(var(--jk-grid-filas, 24), 48px);
     min-width: 100%;
     width: max-content;
     position: relative;

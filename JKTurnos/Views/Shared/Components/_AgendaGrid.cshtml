@@ -16,17 +16,39 @@
 
     var gridInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, 8, 0, 0);
     var gridFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, 19, 30, 0);
-    int franjaMinutos = 30;
-    int filasFranja = 24;
-    int filasTotal = filasFranja + 1;
 
-    var hours = new List<string>();
-    for (int h = 8; h <= 19; h++)
+    if (turnos.Count > 0)
     {
-        hours.Add(h.ToString("D2") + ":00");
-        hours.Add(h.ToString("D2") + ":30");
+        var minInicio = turnos.Min(t => t.FechaHoraInicio);
+        var maxFin = turnos.Max(t => t.FechaHoraFin);
+
+        var inicioAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day,
+            minInicio.Hour, minInicio.Minute >= 30 ? 30 : 0, 0);
+        if (inicioAjustado < gridInicio)
+        {
+            gridInicio = inicioAjustado;
+        }
+
+        int finMinutos = maxFin.Minute > 30 ? 60 : (maxFin.Minute > 0 ? 30 : 0);
+        var finAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day, maxFin.Hour, 0, 0).AddMinutes(finMinutos);
+        if (finAjustado > gridFin)
+        {
+            gridFin = finAjustado;
+        }
     }
-    int hourCount = hours.Count;
+
+    int franjaMinutos = 30;
+
+    var horas = new List<DateTime>();
+    var cursor = gridInicio;
+    while (cursor < gridFin)
+    {
+        horas.Add(cursor);
+        cursor = cursor.AddMinutes(franjaMinutos);
+    }
+    int hourCount = horas.Count;
+    int filasFranja = hourCount;
+    int filasTotal = filasFranja + 1;
 
     var columnaRecurso = new Dictionary<int, int>();
     for (int i = 0; i < recursos.Count; i++)
@@ -49,7 +71,7 @@
 else
 {
     <div class="jk-agenda-grid-wrap" role="grid" aria-label="Grilla de agenda">
-        <div class="jk-agenda-grid" style="--jk-resource-count: @recursos.Count;">
+        <div class="jk-agenda-grid" style="--jk-resource-count: @recursos.Count; --jk-grid-filas: @filasFranja;">
 
             @* Corner cell (fila 1, columna 1) *@
             <div class="jk-agenda-corner" style="grid-row: 1; grid-column: 1;" role="presentation"></div>
@@ -67,26 +89,27 @@ else
             @* Hour rows + cells (filas 2..25) *@
             @for (int h = 0; h < hourCount; h++)
             {
-                var hour = hours[h];
+                var hour = horas[h];
+                var horaTexto = hour.ToString("HH:mm");
                 int fila = h + 2;
 
-                <div class="jk-agenda-hour" style="grid-row: @fila; grid-column: 1;" role="rowheader" aria-label="@hour">
-                    @if (hour.EndsWith(":00"))
+                <div class="jk-agenda-hour" style="grid-row: @fila; grid-column: 1;" role="rowheader" aria-label="@horaTexto">
+                    @if (hour.Minute == 0)
                     {
-                        <span class="jk-agenda-hour-text">@hour</span>
+                        <span class="jk-agenda-hour-text">@horaTexto</span>
                     }
                 </div>
 
                 for (int i = 0; i < recursos.Count; i++)
                 {
                     var rec = recursos[i];
-                    if (hour.EndsWith(":00"))
+                    if (hour.Minute == 0)
                     {
-                        @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
+                        @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@horaTexto" aria-label="@rec.Nombre @horaTexto"></div>
                     }
                     else
                     {
-                        @:<div class="jk-agenda-cell" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@hour" aria-label="@rec.Nombre @hour"></div>
+                        @:<div class="jk-agenda-cell" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@horaTexto" aria-label="@rec.Nombre @horaTexto"></div>
                     }
                 }
             }

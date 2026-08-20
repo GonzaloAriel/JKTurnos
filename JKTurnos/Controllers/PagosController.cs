@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using JKTurnos.Models.Entities;
@@ -95,11 +96,22 @@ namespace JKTurnos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditarPago(int id, decimal Monto, TipoPago TipoPago, string Observacion)
+        public ActionResult EditarPago(int id, string Monto, JKTurnos.Models.Entities.TipoPago? TipoPago, string Observacion)
         {
+            decimal monto;
+            bool montoValido =
+                decimal.TryParse(Monto, NumberStyles.Number, CultureInfo.InvariantCulture, out monto)
+                || decimal.TryParse(Monto, NumberStyles.Number, CultureInfo.CurrentCulture, out monto);
+
+            if (!montoValido || monto <= 0)
+            {
+                TempData["PagoError"] = "El monto debe ser mayor a 0.";
+                return RedirectToAction("Index");
+            }
+
             try
             {
-                _pagoService.ActualizarPago(id, Monto, TipoPago, Observacion);
+                _pagoService.ActualizarPago(id, monto, TipoPago.GetValueOrDefault(JKTurnos.Models.Entities.TipoPago.PagoParcial), Observacion);
                 TempData["PagoOk"] = "Pago actualizado.";
             }
             catch (Exception ex)
