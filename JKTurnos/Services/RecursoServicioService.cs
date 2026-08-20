@@ -23,6 +23,39 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
+        public void Vincular(int servicioId, int recursoId, int tenantId)
+        {
+            using (var db = new JKContext())
+            {
+                var relation = db.RecursoServicios
+                    .FirstOrDefault(rs => rs.ServicioId == servicioId
+                                          && rs.RecursoId == recursoId
+                                          && rs.TenantId == tenantId);
+
+                if (relation != null)
+                {
+                    if (!relation.IsActive)
+                    {
+                        relation.IsActive = true;
+                        relation.UpdatedAt = DateTime.Now;
+                    }
+                }
+                else
+                {
+                    db.RecursoServicios.Add(new RecursoServicio
+                    {
+                        ServicioId = servicioId,
+                        RecursoId = recursoId,
+                        TenantId = tenantId,
+                        IsActive = true,
+                        CreatedAt = DateTime.Now
+                    });
+                }
+
+                db.SaveChanges();
+            }
+        }
+
         public List<int> GetRecursoIdsPorServicio(int servicioId)
         {
             return _repo.GetAll()

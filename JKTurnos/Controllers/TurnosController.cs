@@ -262,6 +262,9 @@ namespace JKTurnos.Controllers
             try
             {
                 _turnoService.Crear(turno);
+
+                if (turno.ServicioId.HasValue)
+                    _recursoServicioService.Vincular(turno.ServicioId.Value, turno.RecursoId, TenantId);
             }
             catch (InvalidOperationException ex)
             {
@@ -302,6 +305,9 @@ namespace JKTurnos.Controllers
             try
             {
                 _turnoService.Crear(turno);
+
+                if (turno.ServicioId.HasValue)
+                    _recursoServicioService.Vincular(turno.ServicioId.Value, turno.RecursoId, TenantId);
             }
             catch (InvalidOperationException ex)
             {

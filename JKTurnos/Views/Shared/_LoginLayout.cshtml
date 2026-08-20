@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>@ViewBag.Title - JKTurnos</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- JK Design System v2 -->
+    <link href="~/Content/DesignSystem/jk-tokens.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-base.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-layout.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-components.css" rel="stylesheet" />
+    <link href="~/Content/DesignSystem/jk-utilities.css" rel="stylesheet" />
+
+    <link href="~/Content/Pages/jk-login.css" rel="stylesheet" />
+
+    @if (IsSectionDefined("PageStyles"))
+    {
+        @RenderSection("PageStyles", required: false)
+    }
+</head>
+<body>
+    <div class="jk-login">
+        <div class="jk-login-brand">
+            <div class="jk-login-brand-inner">
+                <div class="jk-login-logo">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>JKTurnos</span>
+                </div>
+
+                <h1 class="jk-login-title">Gestiona tus turnos y clientes</h1>
+                <p class="jk-login-tagline">Agenda, turnos, pagos y clientes en un solo lugar, para que tu negocio no pierda el ritmo.</p>
+
+                <ul class="jk-login-features">
+                    <li><i class="bi bi-calendar3"></i><span>Agenda y turnos en tiempo real</span></li>
+                    <li><i class="bi bi-people"></i><span>Gestion de clientes y servicios</span></li>
+                    <li><i class="bi bi-cash-coin"></i><span>Control de pagos integrado</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="jk-login-panel">
+            <div class="jk-login-card">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

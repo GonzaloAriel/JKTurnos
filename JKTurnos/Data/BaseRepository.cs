@@ -50,7 +50,29 @@ public class BaseRepository<TEntity>
     public void Update(TEntity entity)
     {
         entity.UpdatedAt = DateTime.Now;
-        _context.Entry(entity).State = EntityState.Modified;
+
+        var existing = _context.Set<TEntity>().Local.FirstOrDefault(e => e.Id == entity.Id);
+
+        if (existing != null && !ReferenceEquals(existing, entity))
+        {
+            var createdAt = existing.CreatedAt;
+            var isActive = existing.IsActive;
+            var tenantId = existing.TenantId;
+
+            _context.Entry(existing).CurrentValues.SetValues(entity);
+
+            existing.CreatedAt = createdAt;
+            existing.IsActive = isActive;
+            existing.TenantId = tenantId;
+            existing.UpdatedAt = DateTime.Now;
+
+            _context.Entry(existing).State = EntityState.Modified;
+        }
+        else
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+
         _context.SaveChanges();
     }
 
@@ -61,7 +83,28 @@ public class BaseRepository<TEntity>
         foreach (var entity in list)
         {
             entity.UpdatedAt = DateTime.Now;
-            _context.Entry(entity).State = EntityState.Modified;
+
+            var existing = _context.Set<TEntity>().Local.FirstOrDefault(e => e.Id == entity.Id);
+
+            if (existing != null && !ReferenceEquals(existing, entity))
+            {
+                var createdAt = existing.CreatedAt;
+                var isActive = existing.IsActive;
+                var tenantId = existing.TenantId;
+
+                _context.Entry(existing).CurrentValues.SetValues(entity);
+
+                existing.CreatedAt = createdAt;
+                existing.IsActive = isActive;
+                existing.TenantId = tenantId;
+                existing.UpdatedAt = DateTime.Now;
+
+                _context.Entry(existing).State = EntityState.Modified;
+            }
+            else
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+            }
         }
 
         _context.SaveChanges();

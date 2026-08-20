@@ -1,55 +1,43 @@
 ﻿@model JKTurnos.Models.ViewModels.LoginVM
 
 @{
-    ViewBag.Title = "Login";
+    ViewBag.Title = "Ingresar";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
 }
 
-<div class="container mt-5">
+<div class="jk-login-card-head">
+    <h1>Bienvenido</h1>
+    <p>Ingresa tus credenciales para continuar.</p>
+</div>
 
-    <div class="row justify-content-center">
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="jk-form-error">
+        @Html.ValidationSummary(true)
+    </div>
+}
 
-        <div class="col-md-4">
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
 
-            <div class="card">
-
-                <div class="card-header">
-                    <h4>JKTurnos</h4>
-                </div>
-
-                <div class="card-body">
-
-                    @using (Html.BeginForm())
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="mb-3">
-                            @Html.LabelFor(x => x.Email)
-                            @Html.TextBoxFor(
-                                x => x.Email,
-                                new { @class = "form-control" })
-                        </div>
-
-                        <div class="mb-3">
-                            @Html.LabelFor(x => x.Password)
-                            @Html.PasswordFor(
-                                x => x.Password,
-                                new { @class = "form-control" })
-                        </div>
-
-                        <button type="submit"
-                                class="btn btn-primary w-100">
-
-                            Ingresar
-
-                        </button>
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
-
+    <div class="jk-login-field">
+        <label class="jk-label" for="Email">Email</label>
+        @Html.TextBoxFor(
+            x => x.Email,
+            new { @class = "jk-input", placeholder = "tu@correo.com", autocomplete = "username" })
+        @Html.ValidationMessageFor(x => x.Email, "", new { @class = "jk-field-error" })
     </div>
 
-</div>
+    <div class="jk-login-field">
+        <label class="jk-label" for="Password">Contrasena</label>
+        @Html.PasswordFor(
+            x => x.Password,
+            new { @class = "jk-input", placeholder = "••••••••", autocomplete = "current-password" })
+        @Html.ValidationMessageFor(x => x.Password, "", new { @class = "jk-field-error" })
+    </div>
+
+    <button type="submit" class="jk-btn jk-btn-primary jk-login-submit">
+        Ingresar
+    </button>
+}

@@ -1,0 +1,161 @@
+/* 
+   JKTurnos - Login page
+   Dependencies: jk-tokens.css, jk-base.css, jk-components.css
+*/
+
+.jk-login {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    min-height: 100vh;
+    background: var(--jk-bg);
+}
+
+/* ===== BRAND PANEL ===== */
+
+.jk-login-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--jk-space-48);
+    background: linear-gradient(160deg, var(--jk-text-primary) 0%, var(--jk-accent) 100%);
+    color: var(--jk-white);
+}
+
+.jk-login-brand-inner {
+    max-width: 440px;
+}
+
+.jk-login-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    font-size: var(--jk-text-2xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--jk-space-64);
+}
+
+.jk-login-logo i {
+    font-size: 2rem;
+}
+
+.jk-login-title {
+    font-size: var(--jk-text-3xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.02em;
+    line-height: var(--jk-leading-tight);
+    margin: 0 0 var(--jk-space-16) 0;
+}
+
+.jk-login-tagline {
+    font-size: var(--jk-text-lg);
+    line-height: var(--jk-leading-relaxed);
+    color: color-mix(in srgb, var(--jk-white) 80%, transparent);
+    margin: 0 0 var(--jk-space-48) 0;
+}
+
+.jk-login-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-20);
+}
+
+.jk-login-features li {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    font-size: var(--jk-text-base);
+    font-weight: var(--jk-weight-medium);
+}
+
+.jk-login-features li i {
+    font-size: 1.15rem;
+    color: color-mix(in srgb, var(--jk-white) 85%, transparent);
+}
+
+/* ===== FORM PANEL ===== */
+
+.jk-login-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--jk-space-48);
+}
+
+.jk-login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--jk-surface);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-xl);
+    box-shadow: var(--jk-shadow-lg);
+    padding: var(--jk-space-48);
+}
+
+.jk-login-card-head {
+    margin-bottom: var(--jk-space-32);
+}
+
+.jk-login-card-head h1 {
+    font-size: var(--jk-text-2xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--jk-space-8) 0;
+}
+
+.jk-login-card-head p {
+    color: var(--jk-text-secondary);
+    margin: 0;
+}
+
+.jk-login-field {
+    margin-bottom: var(--jk-space-20);
+}
+
+.jk-login-field .jk-label {
+    display: block;
+    margin-bottom: var(--jk-space-8);
+}
+
+.jk-login-submit {
+    width: 100%;
+    padding: var(--jk-space-12) var(--jk-space-16);
+    margin-top: var(--jk-space-8);
+    font-size: var(--jk-text-base);
+    font-weight: var(--jk-weight-semibold);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+    .jk-login {
+        grid-template-columns: 1fr;
+    }
+
+    .jk-login-brand {
+        padding: var(--jk-space-32) var(--jk-space-24);
+    }
+
+    .jk-login-logo {
+        margin-bottom: var(--jk-space-32);
+    }
+
+    .jk-login-title {
+        font-size: var(--jk-text-2xl);
+    }
+
+    .jk-login-tagline {
+        margin-bottom: var(--jk-space-32);
+    }
+
+    .jk-login-features {
+        display: none;
+    }
+
+    .jk-login-panel {
+        padding: var(--jk-space-24);
+    }
+}

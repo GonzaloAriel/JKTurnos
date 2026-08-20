@@ -291,6 +291,7 @@
     <Content Include="Content\Pages\jk-dashboard-section.css" />
     <Content Include="Content\Pages\jk-ayuda.css" />
     <Content Include="Content\Pages\jk-auditoria.css" />
+    <Content Include="Content\Pages\jk-login.css" />
     <Content Include="Content\jk-components.css" />
     <Content Include="Content\jk-dashboard.css" />
     <Content Include="Content\jk-ds.css" />
@@ -343,6 +344,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_LoginLayout.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />

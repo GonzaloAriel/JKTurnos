@@ -31,12 +31,17 @@
 </head>
 <body>
     <div class="app-container jk-app-shell" id="app-container">
-        @Html.Partial("_Sidebar")
-        
-        <div class="jk-sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @Html.Partial("_Sidebar")
+            <div class="jk-sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+        }
         
         <div id="main-content">
-            @Html.Partial("_Topbar")
+            @if (User.Identity.IsAuthenticated)
+            {
+                @Html.Partial("_Topbar")
+            }
             
             <main class="content-area jk-content-zone">
                 @RenderBody()
