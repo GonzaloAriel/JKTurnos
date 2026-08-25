@@ -1,45 +1,58 @@
 ﻿/* 
    JKTurnos - Design Tokens
    Single source of truth for all visual variables.
-   Inspiration: Apple (colors, radius), Linear (accent), Vercel (shadows).
+   Palette (colors): warm retro-contemporary (crema/sage/marron) per D-035.
+   Inspiration: Apple (radius), Vercel (shadows).
    Do NOT hardcode values. Use these variables everywhere.
 */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
 
 :root {
 
     /* ===== COLOR PALETTE ===== */
 
-    /* Neutral (Apple-inspired) */
+    /* Neutral (calido: crema / marfil / beige) */
     --jk-white: #ffffff;
-    --jk-bg: #f5f5f7;
-    --jk-surface: #ffffff;
-    --jk-sidebar-bg: #fcfcfd;
+    --jk-bg: #F6F1E8;
+    --jk-surface: #FFFDF8;
+    --jk-sidebar-bg: #DCE9D7;
 
-    /* Text (Apple) */
-    --jk-text-primary: #1d1d1f;
-    --jk-text-secondary: #86868b;
-    --jk-text-tertiary: #aeaeb2;
+    /* Texto (marron profundo, sin negro absoluto) */
+    --jk-text-primary: #4A4038;
+    --jk-text-secondary: #7B6F65;
+    --jk-text-tertiary: #A09287;
 
-    /* Borders */
-    --jk-border: #e8e8ed;
-    --jk-border-light: #f0f0f0;
+    /* Borders (beige calido) */
+    --jk-border: #E4D8C8;
+    --jk-border-light: #EEE5D8;
 
-    /* Brand / Accent (Linear blue) */
-    --jk-accent: #2563eb;
-    --jk-accent-hover: #1d4ed8;
-    --jk-accent-light: #f0f5ff;
+    /* Brand / Accent (sage profundo, AA sobre texto blanco) */
+    --jk-accent: #5F7A5D;
+    --jk-accent-hover: #4C624A;
+    --jk-accent-light: #DCE9D7;
 
-    /* Semantic (Apple) */
-    --jk-success: #34c759;
-    --jk-success-light: #e8f8ed;
-    --jk-warning: #ff9500;
-    --jk-warning-light: #fff3e0;
-    --jk-danger: #ff3b30;
-    --jk-danger-light: #ffe8e6;
+    /* Semantic (suaves; accent/success/warning/danger no colapsan) */
+    --jk-success: #759572;
+    --jk-success-light: #E4EEDF;
+    --jk-warning: #D9A441;
+    --jk-warning-light: #F8EFCB;
+    --jk-danger: #BE5B50;
+    --jk-danger-light: #F6DCD6;
+
+    /* Alias legacy (compatibilidad con CSS previo al DS v2; NO usar en CSS nuevo) */
+    --jk-primary: var(--jk-accent);
+    --jk-primary-hover: var(--jk-accent-hover);
+    --jk-bg-app: var(--jk-bg);
+    --jk-text-main: var(--jk-text-primary);
+    --jk-text-muted: var(--jk-text-secondary);
 
     /* ===== TYPOGRAPHY ===== */
 
     --jk-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+    /* Display (titulos/jerarquia): redondeada y calida; cuerpo sigue en sans */
+    --jk-font-display: 'Nunito', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
     /* Font sizes (4px scale) */
     --jk-text-xs: 0.75rem;    /* 12px */
@@ -74,19 +87,19 @@
     --jk-space-48: 48px;
     --jk-space-64: 64px;
 
-    /* ===== BORDER RADIUS ===== */
+    /* ===== BORDER RADIUS (amable / tarjeta acolchada) ===== */
 
-    --jk-radius-sm: 6px;
-    --jk-radius: 10px;
-    --jk-radius-lg: 12px;
-    --jk-radius-xl: 16px;
+    --jk-radius-sm: 8px;
+    --jk-radius: 14px;
+    --jk-radius-lg: 18px;
+    --jk-radius-xl: 22px;
     --jk-radius-full: 9999px;
 
-    /* ===== SHADOWS ===== */
+    /* ===== SHADOWS (calidas, difusas; tinte marron del texto, sin negro puro) ===== */
 
-    --jk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-    --jk-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --jk-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --jk-shadow-sm: 0 1px 2px rgba(74, 64, 56, 0.04);
+    --jk-shadow: 0 4px 14px rgba(74, 64, 56, 0.07);
+    --jk-shadow-lg: 0 10px 28px rgba(74, 64, 56, 0.11);
 
     /* ===== Z-INDEX SCALE ===== */
 

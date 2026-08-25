@@ -31,6 +31,10 @@
     outline-offset: 2px;
 }
 
+.jk-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
 .jk-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -39,14 +43,14 @@
 
 /* Variants */
 .jk-btn-primary {
-    background: var(--jk-text-primary);
+    background: var(--jk-accent);
     color: var(--jk-white);
-    border-color: var(--jk-text-primary);
+    border-color: var(--jk-accent);
 }
 
 .jk-btn-primary:hover {
-    background: #2c2c2e;
-    border-color: #2c2c2e;
+    background: var(--jk-accent-hover);
+    border-color: var(--jk-accent-hover);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -80,7 +84,7 @@
 }
 
 .jk-btn-danger:hover {
-    background: #e6352b;
+    background: color-mix(in srgb, var(--jk-danger) 85%, black);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -92,7 +96,7 @@
 }
 
 .jk-btn-success:hover {
-    background: #2db84e;
+    background: color-mix(in srgb, var(--jk-success) 85%, black);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -194,7 +198,7 @@
 
 .jk-fab:hover {
     transform: scale(1.05);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    box-shadow: 0 12px 32px rgba(74, 64, 56, 0.12);
 }
 
 @media (min-width: 768px) {
@@ -287,6 +291,7 @@
 }
 
 .jk-kpi-value {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-xl);
     font-weight: var(--jk-weight-bold);
     color: var(--jk-text-primary);
@@ -299,8 +304,8 @@
     margin-top: var(--jk-space-4);
 }
 
-.jk-kpi-trend-up { color: var(--jk-success); }
-.jk-kpi-trend-down { color: var(--jk-danger); }
+.jk-kpi-trend-up { color: color-mix(in srgb, var(--jk-success) 55%, black); }
+.jk-kpi-trend-down { color: color-mix(in srgb, var(--jk-danger) 55%, black); }
 
 /* ================================================================
    BADGES
@@ -324,22 +329,22 @@
 
 .jk-badge-success {
     background: var(--jk-success-light);
-    color: var(--jk-success);
+    color: color-mix(in srgb, var(--jk-success) 55%, black);
 }
 
 .jk-badge-warning {
     background: var(--jk-warning-light);
-    color: var(--jk-warning);
+    color: color-mix(in srgb, var(--jk-warning) 55%, black);
 }
 
 .jk-badge-danger {
     background: var(--jk-danger-light);
-    color: var(--jk-danger);
+    color: color-mix(in srgb, var(--jk-danger) 55%, black);
 }
 
 .jk-badge-accent {
     background: var(--jk-accent-light);
-    color: var(--jk-accent);
+    color: color-mix(in srgb, var(--jk-accent) 60%, black);
 }
 
 /* Status Dot */
@@ -424,6 +429,7 @@
 }
 
 .jk-card-title {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-md);
     font-weight: var(--jk-weight-semibold);
     color: var(--jk-text-primary);
@@ -619,7 +625,7 @@
     background: var(--jk-surface);
     z-index: var(--jk-z-drawer);
     transition: right var(--jk-transition);
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+    box-shadow: -4px 0 24px rgba(74, 64, 56, 0.08);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -639,6 +645,7 @@
 }
 
 .jk-drawer-title {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-lg);
     font-weight: var(--jk-weight-semibold);
     color: var(--jk-text-primary);
@@ -760,6 +767,7 @@
 }
 
 .jk-modal-title {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-lg);
     font-weight: var(--jk-weight-semibold);
     color: var(--jk-text-primary);
@@ -834,9 +842,9 @@
     flex-shrink: 0;
 }
 
-.jk-toast-success i { color: var(--jk-success); }
-.jk-toast-error i { color: var(--jk-danger); }
-.jk-toast-warning i { color: var(--jk-warning); }
+.jk-toast-success i { color: color-mix(in srgb, var(--jk-success) 55%, black); }
+.jk-toast-error i { color: color-mix(in srgb, var(--jk-danger) 55%, black); }
+.jk-toast-warning i { color: color-mix(in srgb, var(--jk-warning) 55%, black); }
 .jk-toast-info i { color: var(--jk-accent); }
 
 /* ================================================================
@@ -876,7 +884,7 @@
 .jk-select:focus {
     outline: none;
     border-color: var(--jk-accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--jk-accent) 15%, transparent);
 }
 
 .jk-input::placeholder,
@@ -891,7 +899,7 @@
 
 .jk-input.error:focus,
 .jk-textarea.error:focus {
-    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.08);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--jk-danger) 12%, transparent);
 }
 
 .jk-textarea {
@@ -1009,7 +1017,7 @@
     background: var(--jk-white);
     border-radius: 50%;
     transition: transform var(--jk-transition-fast);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 3px rgba(74, 64, 56, 0.15);
 }
 
 .jk-switch input:checked + .jk-switch-track {
@@ -1041,7 +1049,7 @@
 .jk-floating-input:focus {
     outline: none;
     border-color: var(--jk-accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--jk-accent) 15%, transparent);
 }
 
 .jk-floating-label {
@@ -1143,7 +1151,7 @@
 .jk-search input:focus {
     outline: none;
     border-color: var(--jk-accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--jk-accent) 15%, transparent);
     background: var(--jk-surface);
 }
 
@@ -1307,6 +1315,11 @@
     border-radius: var(--jk-radius);
     text-decoration: none;
     color: var(--jk-text-primary);
+}
+
+/* Separacion minima entre notificaciones/recordatorios consecutivos (Posta 6) */
+.jk-notif-item + .jk-notif-item {
+    margin-top: var(--jk-space-4);
 }
 
 a.jk-notif-item:hover {
@@ -1474,22 +1487,22 @@ a.jk-notif-item:hover {
 
 .jk-notif-icon-accent {
     background: var(--jk-accent-light);
-    color: var(--jk-accent);
+    color: color-mix(in srgb, var(--jk-accent) 60%, black);
 }
 
 .jk-notif-icon-warning {
     background: var(--jk-warning-light);
-    color: var(--jk-warning);
+    color: color-mix(in srgb, var(--jk-warning) 55%, black);
 }
 
 .jk-notif-icon-success {
     background: var(--jk-success-light);
-    color: var(--jk-success);
+    color: color-mix(in srgb, var(--jk-success) 55%, black);
 }
 
 .jk-notif-icon-danger {
     background: var(--jk-danger-light);
-    color: var(--jk-danger);
+    color: color-mix(in srgb, var(--jk-danger) 55%, black);
 }
 
 .jk-notif-icon-muted {

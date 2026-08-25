@@ -39,7 +39,12 @@ button {
 
 /* === TYPOGRAPHY === */
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--jk-font-display);
+}
+
 .jk-hero {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-3xl);
     font-weight: var(--jk-weight-bold);
     letter-spacing: -0.03em;
@@ -47,6 +52,7 @@ button {
 }
 
 .jk-h1 {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-2xl);
     font-weight: var(--jk-weight-bold);
     letter-spacing: -0.02em;
@@ -54,18 +60,21 @@ button {
 }
 
 .jk-h2 {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-xl);
     font-weight: var(--jk-weight-semibold);
     letter-spacing: -0.02em;
 }
 
 .jk-h3 {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-lg);
     font-weight: var(--jk-weight-semibold);
     letter-spacing: -0.01em;
 }
 
 .jk-h4 {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-md);
     font-weight: var(--jk-weight-semibold);
 }

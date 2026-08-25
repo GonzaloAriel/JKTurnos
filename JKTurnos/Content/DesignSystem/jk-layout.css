@@ -66,6 +66,7 @@
 }
 
 .jk-page-title {
+    font-family: var(--jk-font-display);
     font-size: var(--jk-text-2xl);
     font-weight: var(--jk-weight-bold);
     letter-spacing: -0.02em;
@@ -308,7 +309,7 @@
     #sidebar.is-open,
     .jk-sidebar.is-open {
         left: 0;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+        box-shadow: 4px 0 24px rgba(74, 64, 56, 0.12);
     }
 
     #sidebar.is-open .jk-nav-item span,

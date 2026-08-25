@@ -48,8 +48,9 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-030 | Modulo Pagos: listado SOLO LECTURA + filtros (rango de fecha del pago y busqueda por cliente/recurso) + "Anular" con motivo (baja logica, D-008; el registro queda conservado con el motivo en Observacion). Sin edicion ni borrado de montos (registro financiero). Sidebar "Pagos" en grupo Gestion (Admin y Operador). Acceso rapido desde los Time Blocks/cards de la Agenda: el icono de pago abre el Drawer en modo pago (D-003). "Ver turno" desde el listado abre la Agenda y auto-abre el Drawer del turno (parametro openTurnoId). El selector de turnos del registro es un AUTOCOMPLETE ajax (busqueda por cliente/recurso, top 20) en vez de un dropdown estatico (escalable a cientos de turnos) | 2026-08-19 | VIGENTE |
 | D-031 | Edicion de pagos: se permite CORREGIR Monto, TipoPago y Observacion de un pago (modifica la clausula "sin edicion" de D-030, pedido del TEAM LEAD). Registro financiero: NO se permite borrar el pago (se anula con motivo, D-008) ni cambiar el Turno o el UsuarioId. Acceso: Admin y Operador | 2026-08-19 | VIGENTE |
 | D-032 | Encoding UTF-8 habilitado en todo el proyecto: `<globalization requestEncoding/responseEncoding/fileEncoding="utf-8">` en Web.config + archivos fuente (.cs, .cshtml, .css, .js, .config) guardados en UTF-8 con BOM. Los textos pueden usar ñ y acentos con normalidad. Reemplaza la regla D-009 de "textos sin acentos" | 2026-08-19 | VIGENTE |
-| D-033 | Modulo Notificaciones al Cliente (Docs/14 seccion 8), canales por fases sin infraestructura externa al inicio. Fase 1 CONSOLIDADA (2026-08-19): WhatsApp via link `wa.me` con mensaje prellenado (boton "Recordar por WhatsApp" desde el Drawer del turno + plantillas configurables en Configuracion). Fase 2 (implementada 2026-08-19, pendiente de confirmacion): email SMTP — boton "Enviar recordatorio por email" en el Drawer (solo si el cliente tiene email), asunto y cuerpo editables, credenciales SMTP + switch de habilitado en `ConfiguracionTenant`. Fase 3: centro de notificaciones in-app y recordatorios programados. Los disparadores nacen de los eventos del turno (auditoria TurnoHistorial de V2) | 2026-08-19 | VIGENTE (Fase 1 CONSOLIDADA, Fase 2 pendiente de confirmacion) |
+| D-033 | Modulo Notificaciones al Cliente (Docs/14 seccion 8), canales por fases sin infraestructura externa al inicio. Fase 1 CONSOLIDADA (2026-08-19): WhatsApp via link `wa.me` con mensaje prellenado (boton "Recordar por WhatsApp" desde el Drawer del turno + plantillas configurables en Configuracion). Fase 2 CONSOLIDADA (2026-08-25): email SMTP — boton "Enviar recordatorio por email" en el Drawer (solo si el cliente tiene email), asunto y cuerpo editables, credenciales SMTP + switch de habilitado en `ConfiguracionTenant`. Fase 3: centro de notificaciones in-app y recordatorios programados. Los disparadores nacen de los eventos del turno (auditoria TurnoHistorial de V2) | 2026-08-19 | VIGENTE (Fases 1 y 2 CONSOLIDADAS) |
 | D-034 | Modulo Dashboard en SECCION APARTE (decidido por TEAM LEAD 2026-08-19: nada en el Command Center). Fase 1 CONSOLIDADA (2026-08-19): KPIs del mes, ocupacion semanal (grafica CSS sin librerias), ingresos del mes por dia, proximos turnos y sin confirmar (click abre el drawer en la MISMA seccion via `jk-dashboard.js`), ranking de servicios, cobrado por recurso y saldo pendiente. Fase 2 CONSOLIDADA (2026-08-19): KPI de ingresos con variacion vs mes anterior, evolucion de ingresos 12 meses, ingresos por recurso (barras con %), pagos por tipo (Senia/Parcial/Total) y saldo pendiente. Fase 3: exportacion CSV/PDF | 2026-08-19 | VIGENTE (Fases 1 y 2 CONSOLIDADAS) |
+| D-035 | Evolucion visual Fase 1 (isla segura): nueva identidad cromatica calida cambiando SOLO los valores de los tokens existentes en jk-tokens.css (prohibida taxonomia nueva `--jk-color-*`). Regla: accent/success/warning/danger no colapsan semanticamente; colores futuros (coral, mantequilla, dorado) NO se tokenizan sin consumidor real | 2026-08-25 | VIGENTE |
 
 ## Detalle
 
@@ -463,7 +464,7 @@ Estado: VIGENTE
 
 Fecha: 2026-08-19
 
-Decision: Modulo Notificaciones al Cliente (Docs/14 seccion 8), canales por fases SIN infraestructura externa al inicio. Fase 1: WhatsApp via link `wa.me` con mensaje prellenado — boton "Recordar por WhatsApp" desde el Drawer del turno (y los listados) + plantillas de mensaje configurables por tenant en el modulo Configuracion (roles placeholder: nombre, servicio, fecha, hora). Fase 2 (implementada 2026-08-19, pendiente de confirmacion): email SMTP con envio real — boton "Enviar recordatorio por email" en el Drawer del turno (solo si el cliente tiene email), asunto y cuerpo editables en Configuracion, credenciales SMTP (servidor, puerto, usuario, password, remitente) + switch de habilitado en `ConfiguracionTenant`. La password no se re-renderiza en el form y en blanco conserva la actual. Fase 3: centro de notificaciones in-app y recordatorios programados. Los disparadores nacen de los eventos del turno: la auditoria `TurnoHistorial` del Drawer V2 (confirmar, cancelar, reagendar, iniciar, finalizar, Docs/14 seccion 8). El cliente se contacta por su Telefono/Email existentes (no requiere registro ni perfil).
+Decision: Modulo Notificaciones al Cliente (Docs/14 seccion 8), canales por fases SIN infraestructura externa al inicio. Fase 1: WhatsApp via link `wa.me` con mensaje prellenado — boton "Recordar por WhatsApp" desde el Drawer del turno (y los listados) + plantillas de mensaje configurables por tenant en el modulo Configuracion (roles placeholder: nombre, servicio, fecha, hora). Fase 2 CONSOLIDADA (2026-08-25, aprobado por TEAM LEAD; implementada 2026-08-19): email SMTP con envio real — boton "Enviar recordatorio por email" en el Drawer del turno (solo si el cliente tiene email), asunto y cuerpo editables en Configuracion, credenciales SMTP (servidor, puerto, usuario, password, remitente) + switch de habilitado en `ConfiguracionTenant`. La password no se re-renderiza en el form y en blanco conserva la actual. Fase 3: centro de notificaciones in-app y recordatorios programados. Los disparadores nacen de los eventos del turno: la auditoria `TurnoHistorial` del Drawer V2 (confirmar, cancelar, reagendar, iniciar, finalizar, Docs/14 seccion 8). El cliente se contacta por su Telefono/Email existentes (no requiere registro ni perfil).
 
 Motivo: dar valor de negocio inmediato (reducir no-shows) sin APIs de pago ni jobs de segundo plano; Docs/14 deja los canales "por definir".
 
@@ -471,7 +472,7 @@ Consecuencias: se agrega a `ConfiguracionTenant` el telefono del negocio y las p
 
 Reemplaza a: ninguna
 
-Estado: VIGENTE (Fase 1 CONSOLIDADA, Fase 2 implementada pendiente de confirmacion)
+Estado: VIGENTE (Fases 1 y 2 CONSOLIDADAS)
 
 ### D-034
 
@@ -486,6 +487,22 @@ Consecuencias: nuevas consultas en `DashboardService` (usa `PagoService.GetPagos
 Reemplaza a: la redaccion previa de D-034 que evolucionaba el Home (nunca implementada).
 
 Estado: VIGENTE (Fase 1 y Fase 2 CONSOLIDADAS)
+
+### D-035
+
+Fecha: 2026-08-25
+
+Decision: Evolucion visual del sistema por fases con POSTAS SEGURAS (isla segura: pocos archivos, reversible, sin logica ni markup). Primera etapa (Fase 1 del roadmap visual, aprobada por TEAM LEAD): cambiar UNICAMENTE los VALORES de los tokens cromáticos existentes en `Content/DesignSystem/jk-tokens.css`. PROHIBIDO crear taxonomia nueva (`--jk-color-bg-body`, `--jk-color-surface-base`, etc.): se conservan los nombres actuales (`--jk-bg`, `--jk-surface`, `--jk-sidebar-bg`, `--jk-text-*`, `--jk-border*`, `--jk-accent*`, `--jk-success*`, `--jk-warning*`, `--jk-danger*`) para no duplicar la fuente de verdad. Nueva direccion: estetica calida retro-contemporanea — crema/marfil/beige (`--jk-bg #F6F1E8`, `--jk-surface #FFFDF8`), sidebar sage muy claro (`#DCE9D7`), texto marron profundo `#4A4038` en lugar de negro absoluto, accent sage profundo `#5F7A5D` (blanco encima ≈ 4.7:1, AA) con hover `#4C624A`, semanticos suavizados (success `#759572`, warning `#D9A441`, danger `#BE5B50`). Los colores de identidad FUTUROS (coral/terracota `#D98272`, amarillo mantequilla `#E8C96A`, dorado, rosa empolvado, sage adicional, colores de graficos) quedan como PALETA DE REFERENCIA: NO se tokenizan hasta que exista un consumidor real (evita tokens huerfanos).
+
+Regla de estados: los colores semanticos NO colapsan entre si ni con la identidad. `accent` = identidad/accion principal; `success` = exito; `warning` = advertencia; `danger` = error/peligro. El futuro coral de identidad NO reemplaza automaticamente a `danger`; se diferencian por luminosidad/saturacion.
+
+Motivo: evolucionar la personalidad visual de la app sin tocar componentes, layouts, Razor ni JS; cambio minimo, verificable visualmente y reversible. El sage `#759572` fue descartado como accent por contraste insuficiente con texto blanco (≈3.3:1, reprueba WCAG AA).
+
+Consecuencias: cada fase posterior (tipografia, radius, sombras, buttons, forms, feedback) exige posta segura y aprobacion del TEAM LEAD antes de avanzar. Al cerrar la paleta deben actualizarse Docs/05_DESIGN_SYSTEM.md, Docs/06_MIGRACION_DS.md y JKTurnosDictionary.md (hoy documentan `--jk-accent #2563eb`). Los hex hardcodeados detectados en inventario NO se corrigen en esta fase (deuda registrada). La Agenda conserva su semantica de color por Recurso (D-004/D-011): los colores de recurso viven en datos, no en tokens.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
 
 Al tomar una decision nueva, agregar una ficha con el ID siguiente y actualizar el indice.
 
