@@ -17,8 +17,13 @@
     align-items: center;
     justify-content: center;
     padding: var(--jk-space-48);
-    background: linear-gradient(160deg, var(--jk-text-primary) 0%, var(--jk-accent) 100%);
-    color: var(--jk-white);
+    background:
+        radial-gradient(circle at 15% 18%, rgba(217, 165, 179, 0.45), transparent 42%),
+        radial-gradient(circle at 85% 12%, rgba(230, 200, 104, 0.42), transparent 45%),
+        radial-gradient(circle at 82% 86%, rgba(232, 168, 124, 0.48), transparent 45%),
+        radial-gradient(circle at 18% 92%, rgba(111, 179, 184, 0.52), transparent 45%),
+        linear-gradient(160deg, var(--jk-sidebar-bg) 0%, var(--jk-bg) 100%);
+    color: var(--jk-text-primary);
 }
 
 .jk-login-brand-inner {
@@ -36,7 +41,16 @@
 }
 
 .jk-login-logo i {
-    font-size: 2rem;
+    font-size: 1.4rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--jk-surface);
+    color: var(--jk-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--jk-shadow);
 }
 
 .jk-login-title {
@@ -47,10 +61,21 @@
     margin: 0 0 var(--jk-space-16) 0;
 }
 
+/* Firma tricolor pastel bajo el titulo */
+.jk-login-title::after {
+    content: '';
+    display: block;
+    width: 72px;
+    height: 6px;
+    border-radius: var(--jk-radius-full);
+    margin-top: var(--jk-space-12);
+    background: linear-gradient(90deg, #E88A6F 0%, #E6C868 50%, #6FB3B8 100%);
+}
+
 .jk-login-tagline {
     font-size: var(--jk-text-lg);
     line-height: var(--jk-leading-relaxed);
-    color: color-mix(in srgb, var(--jk-white) 80%, transparent);
+    color: var(--jk-text-secondary);
     margin: 0 0 var(--jk-space-48) 0;
 }
 
@@ -72,8 +97,30 @@
 }
 
 .jk-login-features li i {
-    font-size: 1.15rem;
-    color: color-mix(in srgb, var(--jk-white) 85%, transparent);
+    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--jk-radius-full);
+    flex-shrink: 0;
+}
+
+/* Chips de color vivos-pastel, uno por feature */
+.jk-login-features li:nth-child(1) i {
+    background: rgba(111, 179, 184, 0.30);
+    color: #3E6E70;
+}
+
+.jk-login-features li:nth-child(2) i {
+    background: rgba(156, 175, 136, 0.38);
+    color: #54703F;
+}
+
+.jk-login-features li:nth-child(3) i {
+    background: rgba(230, 200, 104, 0.45);
+    color: #7D6218;
 }
 
 /* ===== FORM PANEL ===== */

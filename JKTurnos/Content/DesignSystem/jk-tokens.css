@@ -12,11 +12,11 @@
 
     /* ===== COLOR PALETTE ===== */
 
-    /* Neutral (calido: crema / marfil / beige) */
+    /* Neutral (calido-fresco: crema / menta palida / beige) */
     --jk-white: #ffffff;
     --jk-bg: #F6F1E8;
-    --jk-surface: #FFFDF8;
-    --jk-sidebar-bg: #DCE9D7;
+    --jk-surface: #F1FAFA;
+    --jk-sidebar-bg: #D7F0EF;
 
     /* Texto (marron profundo, sin negro absoluto) */
     --jk-text-primary: #4A4038;
