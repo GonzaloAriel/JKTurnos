@@ -6,7 +6,13 @@
 
 /* ===== SECTION SPACING ===== */
 .home-section {
-    margin-bottom: 40px;
+    margin-bottom: 24px;
+}
+
+/* Separador punteado estilo cuaderno entre secciones (D-035) */
+.home-section + .home-section {
+    padding-top: 16px;
+    border-top: 1px dotted var(--jk-border);
 }
 
 .section-header {
@@ -29,6 +35,15 @@
 /* ===== WELCOME ===== */
 .welcome-section {
     margin-bottom: 28px;
+}
+
+.contextual-date {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--jk-text-tertiary);
+    margin-bottom: 4px;
 }
 
 .contextual-greeting {
@@ -88,9 +103,9 @@
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
-    background: var(--jk-white);
+    background: var(--jk-surface);
     border: 1px solid var(--jk-border);
-    border-radius: 10px;
+    border-radius: var(--jk-radius);
     color: var(--jk-text-main);
     font-size: 0.88rem;
     font-weight: 500;
@@ -100,7 +115,7 @@
 }
 
 .quick-action-link:hover {
-    border-color: #d1d5db;
+    border-color: var(--jk-border);
     box-shadow: var(--jk-shadow-sm);
     color: var(--jk-text-main);
 }
@@ -125,9 +140,9 @@
 
 /* ===== MI DIA WIDGET ===== */
 .mi-dia {
-    background: var(--jk-white);
+    background: var(--jk-surface);
     border: 1px solid var(--jk-border);
-    border-radius: 12px;
+    border-radius: var(--jk-radius-lg);
     overflow: hidden;
 }
 
@@ -179,7 +194,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #f0f5ff;
+    background: var(--jk-accent-light);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -339,6 +354,7 @@
 }
 
 .kpi-value {
+    font-family: var(--jk-font-display);
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--jk-text-main);
@@ -369,14 +385,14 @@
     align-items: flex-start;
     gap: 14px;
     padding: 18px;
-    background: var(--jk-white);
+    background: var(--jk-surface);
     border: 1px solid var(--jk-border);
-    border-radius: 10px;
+    border-radius: var(--jk-radius);
     transition: all 0.2s ease;
 }
 
 .suggestion-card:hover {
-    border-color: #d1d5db;
+    border-color: var(--jk-border);
     box-shadow: var(--jk-shadow-sm);
 }
 
@@ -395,7 +411,7 @@
 }
 
 .suggestion-icon-blue {
-    background: #f0f5ff;
+    background: var(--jk-accent-light);
 }
 
 .suggestion-icon-blue i {
@@ -403,7 +419,7 @@
 }
 
 .suggestion-icon-green {
-    background: #ecfdf5;
+    background: var(--jk-success-light);
 }
 
 .suggestion-icon-green i {
@@ -411,7 +427,7 @@
 }
 
 .suggestion-icon-amber {
-    background: #fffbeb;
+    background: var(--jk-warning-light);
 }
 
 .suggestion-icon-amber i {

@@ -604,7 +604,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(74, 64, 56, 0.4);
     z-index: var(--jk-z-overlay);
     opacity: 0;
     transition: opacity var(--jk-transition);
@@ -623,6 +623,7 @@
     max-width: 100vw;
     height: 100vh;
     background: var(--jk-surface);
+    border-radius: var(--jk-radius-lg) 0 0 var(--jk-radius-lg);
     z-index: var(--jk-z-drawer);
     transition: right var(--jk-transition);
     box-shadow: -4px 0 24px rgba(74, 64, 56, 0.08);
@@ -640,7 +641,7 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--jk-space-20) var(--jk-space-24);
-    border-bottom: 1px solid var(--jk-border);
+    border-bottom: 1px solid var(--jk-border-light);
     flex-shrink: 0;
 }
 
@@ -654,7 +655,7 @@
 
 .jk-drawer-close {
     padding: var(--jk-space-8);
-    border-radius: var(--jk-radius-sm);
+    border-radius: var(--jk-radius-full);
     background: none;
     border: none;
     color: var(--jk-text-secondary);
@@ -677,6 +678,15 @@
 .jk-drawer-section {
     padding: var(--jk-space-16) 0;
     border-bottom: 1px solid var(--jk-border-light);
+}
+
+/* Seccion economica (Pagos/Senia) del drawer como mini-card destacada (slot SIEMPRE visible, D-015) */
+.jk-drawer-section-economica {
+    margin-top: var(--jk-space-8);
+    padding: var(--jk-space-16);
+    background: var(--jk-bg);
+    border-bottom: none;
+    border-radius: var(--jk-radius);
 }
 
 .jk-drawer-section:last-child {
@@ -723,7 +733,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(74, 64, 56, 0.45);
     z-index: var(--jk-z-modal);
     opacity: 0;
     transition: opacity var(--jk-transition);

@@ -484,7 +484,7 @@ JKTurnos desarrolla identidad propia utilizando el Design System existente.
 - La Agenda ocupa la mayor parte del viewport
 - Los Time Blocks tienen bordes suaves y sombras sutiles
 - Los colores son pastel, nunca saturados
-- El fondo general es claro (#f5f5f7 del DS)
+- El fondo general es claro (#F6F1E8 del DS)
 - Los textos usan la tipografia Inter del DS
 - No existen bordes agresivos ni contrastes fuertes
 - Todo debe sentirse aireado y calmo

@@ -33,6 +33,7 @@
                      class="welcome-brand-logo" />
             </div>
         }
+        <p class="contextual-date">@todayDate</p>
         <h1 class="contextual-greeting">@greeting, @User.Identity.Name.</h1>
         @if (Model.TurnosHoy > 0)
         {
@@ -96,7 +97,7 @@
                         @foreach (var grupo in gruposPorRecurso)
                         {
                             var recursoNombre = grupo.Key != null ? grupo.Key.Nombre : "Sin recurso";
-                            var recursoColor = grupo.Key != null && !string.IsNullOrEmpty(grupo.Key.Color) ? grupo.Key.Color : "#2563eb";
+                            var recursoColor = grupo.Key != null && !string.IsNullOrEmpty(grupo.Key.Color) ? grupo.Key.Color : "#7295B5";
 
                             <div class="mi-dia-lane" style="--jk-block-color: @recursoColor;">
                                 <div class="mi-dia-lane-header">

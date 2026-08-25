@@ -35,18 +35,20 @@ Estado: Fase 2 completada. Listo para Fase 3.
 
 ## VALORES DE TOKENS (consensuados)
 
-| Token | Valor | Inspiracion |
+Actualizado 2026-08-25 (D-035): identidad calida retro-contemporanea. Valores vigentes en `Content/DesignSystem/jk-tokens.css`.
+
+| Token | Valor | Identidad |
 |-------|-------|-------------|
-| `--jk-bg` | `#f5f5f7` | Apple |
-| `--jk-accent` | `#2563eb` | Linear |
-| `--jk-text-primary` | `#1d1d1f` | Apple |
-| `--jk-text-secondary` | `#86868b` | Apple |
-| `--jk-border` | `#e8e8ed` | Apple |
-| `--jk-success` | `#34c759` | Apple |
-| `--jk-warning` | `#ff9500` | Apple |
-| `--jk-danger` | `#ff3b30` | Apple |
-| `--jk-radius` | `10px` | Stripe |
-| `--jk-radius-lg` | `12px` | Vercel |
+| `--jk-bg` | `#F6F1E8` | Crema calido |
+| `--jk-accent` | `#5F7A5D` | Sage profundo |
+| `--jk-text-primary` | `#4A4038` | Marron profundo |
+| `--jk-text-secondary` | `#7B6F65` | Marron medio |
+| `--jk-border` | `#E4D8C8` | Beige calido |
+| `--jk-success` | `#759572` | Sage fresco |
+| `--jk-warning` | `#D9A441` | Dorado suave |
+| `--jk-danger` | `#BE5B50` | Terracota rojiza |
+| `--jk-radius` | `14px` | Amable |
+| `--jk-radius-lg` | `18px` | Amable |
 
 ---
 

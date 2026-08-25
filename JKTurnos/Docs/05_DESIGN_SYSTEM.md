@@ -56,47 +56,55 @@ Confianza.
 
 # Paleta
 
-Primary
+Identidad calida retro-contemporanea (D-035, 2026-08-25).
 
-#2563EB
+Primary / Accent
+
+#5F7A5D
 
 Background
 
-#F8FAFC
+#F6F1E8
 
 Surface
 
-#FFFFFF
+#FFFDF8
+
+Sidebar
+
+#DCE9D7
 
 Texto
 
-#0F172A
+#4A4038
 
 Texto secundario
 
-#64748B
+#7B6F65
 
 Success
 
-Verde
+#759572
 
 Warning
 
-Amarillo
+#D9A441
 
 Danger
 
-Rojo
+#BE5B50
+
+Fuente unica de verdad: Content/DesignSystem/jk-tokens.css.
 
 ---
 
 # Tipografia
 
-Inter
+Titulos: Nunito (--jk-font-display).
 
-Sans Serif
+Cuerpo: Inter (--jk-font-sans).
 
-Escala 8px.
+Sans Serif.
 
 ---
 
@@ -104,9 +112,11 @@ Escala 8px.
 
 8px
 
-12px
+14px
 
-16px
+18px
+
+22px
 
 Segun componente.
 
@@ -115,6 +125,8 @@ Segun componente.
 # Sombras
 
 Muy suaves.
+
+Tinte marron calido (rgba(74,64,56,...)).
 
 Nunca exageradas.
 

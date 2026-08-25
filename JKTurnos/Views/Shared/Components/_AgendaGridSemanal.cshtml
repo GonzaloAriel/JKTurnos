@@ -16,7 +16,7 @@
 @{
     var recursos = Model.Recursos != null ? Model.Recursos.ToList() : new List<Recurso>();
     var turnos = Model.Turnos != null ? Model.Turnos.ToList() : new List<Turno>();
-    var colorRecurso = recursos.ToDictionary(r => r.Id, r => r.Color ?? "#2563eb");
+    var colorRecurso = recursos.ToDictionary(r => r.Id, r => r.Color ?? "#7295B5");
 
     int diff = ((int)DayOfWeek.Monday - (int)Model.Fecha.DayOfWeek + 7) % 7;
     var lunes = Model.Fecha.AddDays(diff);
@@ -132,7 +132,7 @@
 
                         var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Sin cliente";
                         var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado";
-                        var recursoColor = colorRecurso.ContainsKey(t.RecursoId) ? colorRecurso[t.RecursoId] : "#2563eb";
+                        var recursoColor = colorRecurso.ContainsKey(t.RecursoId) ? colorRecurso[t.RecursoId] : "#7295B5";
                         var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
                         var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
 

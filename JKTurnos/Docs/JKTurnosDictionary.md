@@ -663,17 +663,19 @@ Nunca se usan valores hardcodeados.
 
 ### Valores principales
 
+Actualizado 2026-08-25 (D-035): paleta calida. Titulos usan `--jk-font-display` (Nunito); cuerpo `--jk-font-sans` (Inter).
+
 | Token | Valor |
 |-------|-------|
-| `--jk-bg` | `#f5f5f7` |
-| `--jk-accent` | `#2563eb` |
-| `--jk-text-primary` | `#1d1d1f` |
-| `--jk-text-secondary` | `#86868b` |
-| `--jk-border` | `#e8e8ed` |
-| `--jk-success` | `#34c759` |
-| `--jk-warning` | `#ff9500` |
-| `--jk-danger` | `#ff3b30` |
-| `--jk-radius` | `10px` |
+| `--jk-bg` | `#F6F1E8` |
+| `--jk-accent` | `#5F7A5D` |
+| `--jk-text-primary` | `#4A4038` |
+| `--jk-text-secondary` | `#7B6F65` |
+| `--jk-border` | `#E4D8C8` |
+| `--jk-success` | `#759572` |
+| `--jk-warning` | `#D9A441` |
+| `--jk-danger` | `#BE5B50` |
+| `--jk-radius` | `14px` |
 
 ---
 

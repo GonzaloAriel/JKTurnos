@@ -89,9 +89,9 @@ else
                 libres.Add(Tuple.Create(rangoStart.Value, gridFin));
             }
 
-            <details class="jk-agenda-mobile-resource" data-recurso-id="@rec.Id" style="--jk-block-color: @(rec.Color ?? "#2563eb");" @(rec.Id == Model.OpenRecursoId ? "open" : "")>
+            <details class="jk-agenda-mobile-resource" data-recurso-id="@rec.Id" style="--jk-block-color: @(rec.Color ?? "#7295B5");" @(rec.Id == Model.OpenRecursoId ? "open" : "")>
                 <summary class="jk-agenda-mobile-resource-header" role="button" aria-label="@rec.Nombre, @turnosRec.Count turnos">
-                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb");"></span>
+                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#7295B5");"></span>
                     <span class="jk-agenda-mobile-resource-name">@rec.Nombre</span>
                     <span class="jk-agenda-mobile-resource-count" aria-hidden="true">@turnosRec.Count</span>
                     <i class="bi bi-chevron-down jk-agenda-mobile-resource-chevron" aria-hidden="true"></i>
@@ -114,7 +114,7 @@ else
                                  role="button"
                                  tabindex="0"
                                  data-turno-id="@t.Id"
-                                 style="--jk-block-color: @(rec.Color ?? "#2563eb");"
+                                 style="--jk-block-color: @(rec.Color ?? "#7295B5");"
                                  aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                                 <div class="jk-agenda-time-block-band">
                                     <span class="jk-agenda-time-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>

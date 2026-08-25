@@ -81,7 +81,7 @@ else
             {
                 var rec = recursos[i];
                 <div class="jk-agenda-resource-header" data-recurso-id="@rec.Id" style="grid-row: 1; grid-column: @(i + 2);" role="columnheader" aria-label="@rec.Nombre">
-                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#2563eb")"></span>
+                    <span class="jk-agenda-resource-dot" style="background-color: @(rec.Color ?? "#7295B5")"></span>
                     <span class="jk-agenda-resource-name">@rec.Nombre</span>
                 </div>
             }
@@ -151,7 +151,7 @@ else
                 var recurso = recursos[colIdx];
                 var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Sin cliente";
                 var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado";
-                var recursoColor = recurso.Color ?? "#2563eb";
+                var recursoColor = recurso.Color ?? "#7295B5";
                 var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
                 var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
 
