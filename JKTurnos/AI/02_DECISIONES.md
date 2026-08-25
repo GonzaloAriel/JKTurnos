@@ -51,6 +51,7 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-033 | Modulo Notificaciones al Cliente (Docs/14 seccion 8), canales por fases sin infraestructura externa al inicio. Fase 1 CONSOLIDADA (2026-08-19): WhatsApp via link `wa.me` con mensaje prellenado (boton "Recordar por WhatsApp" desde el Drawer del turno + plantillas configurables en Configuracion). Fase 2 CONSOLIDADA (2026-08-25): email SMTP — boton "Enviar recordatorio por email" en el Drawer (solo si el cliente tiene email), asunto y cuerpo editables, credenciales SMTP + switch de habilitado en `ConfiguracionTenant`. Fase 3: centro de notificaciones in-app y recordatorios programados. Los disparadores nacen de los eventos del turno (auditoria TurnoHistorial de V2) | 2026-08-19 | VIGENTE (Fases 1 y 2 CONSOLIDADAS) |
 | D-034 | Modulo Dashboard en SECCION APARTE (decidido por TEAM LEAD 2026-08-19: nada en el Command Center). Fase 1 CONSOLIDADA (2026-08-19): KPIs del mes, ocupacion semanal (grafica CSS sin librerias), ingresos del mes por dia, proximos turnos y sin confirmar (click abre el drawer en la MISMA seccion via `jk-dashboard.js`), ranking de servicios, cobrado por recurso y saldo pendiente. Fase 2 CONSOLIDADA (2026-08-19): KPI de ingresos con variacion vs mes anterior, evolucion de ingresos 12 meses, ingresos por recurso (barras con %), pagos por tipo (Senia/Parcial/Total) y saldo pendiente. Fase 3: exportacion CSV/PDF | 2026-08-19 | VIGENTE (Fases 1 y 2 CONSOLIDADAS) |
 | D-035 | Evolucion visual Fase 1 (isla segura): nueva identidad cromatica calida cambiando SOLO los valores de los tokens existentes en jk-tokens.css (prohibida taxonomia nueva `--jk-color-*`). Regla: accent/success/warning/danger no colapsan semanticamente; colores futuros (coral, mantequilla, dorado) NO se tokenizan sin consumidor real | 2026-08-25 | VIGENTE |
+| D-036 | Capa decorativa de marca sistematizada: firma tricolor (`.jk-signature` + `--jk-gradient-tricolor`), chips circulares de icono por accion/feature, brand del sidebar en chip y blobs pastel en bienvenida/login. Se tokenizan los colores de identidad que ya tienen consumidor real: coral, butter, teal (+ lights). Ajuste posterior aprobado por TEAM LEAD: superficies y nav con tinte menta palida (`--jk-surface #F1FAFA`, `--jk-sidebar-bg #D7F0EF`) | 2026-08-25 | VIGENTE |
 
 ## Detalle
 
@@ -499,6 +500,20 @@ Regla de estados: los colores semanticos NO colapsan entre si ni con la identida
 Motivo: evolucionar la personalidad visual de la app sin tocar componentes, layouts, Razor ni JS; cambio minimo, verificable visualmente y reversible. El sage `#759572` fue descartado como accent por contraste insuficiente con texto blanco (≈3.3:1, reprueba WCAG AA).
 
 Consecuencias: cada fase posterior (tipografia, radius, sombras, buttons, forms, feedback) exige posta segura y aprobacion del TEAM LEAD antes de avanzar. Al cerrar la paleta deben actualizarse Docs/05_DESIGN_SYSTEM.md, Docs/06_MIGRACION_DS.md y JKTurnosDictionary.md (hoy documentan `--jk-accent #2563eb`). Los hex hardcodeados detectados en inventario NO se corrigen en esta fase (deuda registrada). La Agenda conserva su semantica de color por Recurso (D-004/D-011): los colores de recurso viven en datos, no en tokens.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-036
+
+Fecha: 2026-08-25
+
+Decision: Capa decorativa de marca sistematizada dentro del DS, aprobada por TEAM LEAD tras aprobarse el nuevo login. Cuatro dispositivos: (1) FIRMA TRICOLOR — utility `.jk-signature` (pill 72x6 con `--jk-gradient-tricolor`) bajo titulos destacados; aplicada al login y al saludo del Command Center. (2) CHIPS CIRCULARES DE ICONO — iconos de acciones/features en circulos con tinte pastel y glifo oscurecido via `color-mix(...55%, black)`; aplicados a quick actions y features del login; los iconos cuadrados de suggestion cards pasan a circulo. (3) BRAND DEL SIDEBAR EN CHIP — el icono fallback vive en un chip 38px con superficie/borde/sombra (el logo por URL no cambia). (4) BLOBS PASTEL — halos radiales suaves en la bienvenida del Command Center y el panel del login. Se TOKENIZAN los colores de identidad decorativa porque ya tienen consumidores reales (cumple la regla de D-035): `--jk-coral #E88A6F`, `--jk-coral-light`, `--jk-butter #E6C868`, `--jk-butter-light`, `--jk-teal #5FA8AD`, `--jk-teal-light` y `--jk-gradient-tricolor`. Ajuste cromatico aprobado por TEAM LEAD en la misma sesion: superficies y nav toman tinte menta palida (`--jk-surface #F1FAFA`, `--jk-sidebar-bg #D7F0EF`, derivado de #AFEEEE aclarado).
+
+Motivo: dar personalidad alegre y reconocible al sistema sin perder la calma pastel; centralizar la firma/chips como componentes reutilizables en vez de CSS suelto por pagina.
+
+Consecuencias: los nuevos tokens son parte de la fuente unica de verdad (jk-tokens.css). La firma tricolor es utilidad global: cualquier titulo destacado puede usarla. No aplicar blobs ni firma en la Agenda (zona de foco). Docs/05 y Dictionary deben reflejar los tokens nuevos.
 
 Reemplaza a: ninguna
 

@@ -663,11 +663,13 @@ Nunca se usan valores hardcodeados.
 
 ### Valores principales
 
-Actualizado 2026-08-25 (D-035): paleta calida. Titulos usan `--jk-font-display` (Nunito); cuerpo `--jk-font-sans` (Inter).
+Actualizado 2026-08-25 (D-035/D-036): paleta calida con superficies menta palida. Titulos usan `--jk-font-display` (Nunito); cuerpo `--jk-font-sans` (Inter). Tokens decorativos con consumidores reales: `--jk-coral #E88A6F`, `--jk-butter #E6C868`, `--jk-teal #5FA8AD` (+ `-light`) y `--jk-gradient-tricolor`.
 
 | Token | Valor |
 |-------|-------|
 | `--jk-bg` | `#F6F1E8` |
+| `--jk-surface` | `#F1FAFA` |
+| `--jk-sidebar-bg` | `#D7F0EF` |
 | `--jk-accent` | `#5F7A5D` |
 | `--jk-text-primary` | `#4A4038` |
 | `--jk-text-secondary` | `#7B6F65` |
@@ -676,6 +678,8 @@ Actualizado 2026-08-25 (D-035): paleta calida. Titulos usan `--jk-font-display` 
 | `--jk-warning` | `#D9A441` |
 | `--jk-danger` | `#BE5B50` |
 | `--jk-radius` | `14px` |
+
+Paleta VINTAGE del selector de recursos (`_ColorSelector.cshtml`): Azul `#7295B5`, Verde `#9CAF88`, Rojo `#C97B6D`, Naranja `#E8A87C`, Amarillo `#E6C868`, Violeta `#A594C5`, Rosa `#D9A5B3`, Turquesa `#6FB3B8`, Gris `#A89F91`, Marron `#B08968`, Indigo `#8784B8`, Cian `#92C7AF`.
 
 ---
 

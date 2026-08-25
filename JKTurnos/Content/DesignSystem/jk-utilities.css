@@ -113,3 +113,16 @@
     clip: rect(0, 0, 0, 0);
     border: 0;
 }
+
+/* ===== FIRMA TRICOLOR DE LA MARCA (D-036) =====
+   Pill decorativa bajo titulos destacados. Uso: <h1 class="jk-signature"> */
+
+.jk-signature::after {
+    content: '';
+    display: block;
+    width: 72px;
+    height: 6px;
+    border-radius: var(--jk-radius-full);
+    margin-top: var(--jk-space-12);
+    background: var(--jk-gradient-tricolor);
+}

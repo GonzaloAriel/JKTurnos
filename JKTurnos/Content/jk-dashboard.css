@@ -33,6 +33,7 @@
 }
 
 /* ===== WELCOME ===== */
+/* Fondo transparente: el lavado pastel lo aporta el lienzo global (.jk-app-shell) */
 .welcome-section {
     margin-bottom: 28px;
 }
@@ -44,6 +45,13 @@
     letter-spacing: 0.08em;
     color: var(--jk-text-tertiary);
     margin-bottom: 4px;
+}
+
+@media (max-width: 575.98px) {
+    .welcome-section .jk-signature::after {
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 
 .contextual-greeting {
@@ -121,9 +129,35 @@
 }
 
 .quick-action-link i {
-    font-size: 1.15rem;
-    color: var(--jk-accent);
+    font-size: 0.95rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--jk-radius-full);
     flex-shrink: 0;
+}
+
+/* Chips de color por accion (lenguaje decorativo D-036) */
+.quick-action-link:nth-child(1) i {
+    background: var(--jk-coral-light);
+    color: color-mix(in srgb, var(--jk-coral) 55%, black);
+}
+
+.quick-action-link:nth-child(2) i {
+    background: var(--jk-teal-light);
+    color: color-mix(in srgb, var(--jk-teal) 55%, black);
+}
+
+.quick-action-link:nth-child(3) i {
+    background: var(--jk-accent-light);
+    color: color-mix(in srgb, var(--jk-accent) 55%, black);
+}
+
+.quick-action-link:nth-child(4) i {
+    background: var(--jk-butter-light);
+    color: color-mix(in srgb, var(--jk-warning) 55%, black);
 }
 
 @media (max-width: 767.98px) {
@@ -399,7 +433,7 @@
 .suggestion-icon {
     width: 36px;
     height: 36px;
-    border-radius: 8px;
+    border-radius: var(--jk-radius-full);
     display: flex;
     align-items: center;
     justify-content: center;

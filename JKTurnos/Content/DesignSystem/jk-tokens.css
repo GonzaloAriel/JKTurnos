@@ -40,6 +40,15 @@
     --jk-danger: #BE5B50;
     --jk-danger-light: #F6DCD6;
 
+    /* Identidad decorativa (con consumidores reales: chips, blobs, firma - D-036) */
+    --jk-coral: #E88A6F;
+    --jk-coral-light: #F9E7DF;
+    --jk-butter: #E6C868;
+    --jk-butter-light: #F7EDD2;
+    --jk-teal: #5FA8AD;
+    --jk-teal-light: #DAF0EF;
+    --jk-gradient-tricolor: linear-gradient(90deg, #E88A6F 0%, #E6C868 50%, #6FB3B8 100%);
+
     /* Alias legacy (compatibilidad con CSS previo al DS v2; NO usar en CSS nuevo) */
     --jk-primary: var(--jk-accent);
     --jk-primary-hover: var(--jk-accent-hover);

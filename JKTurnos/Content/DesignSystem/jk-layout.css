@@ -14,6 +14,12 @@
     display: flex;
     min-height: 100vh;
     background-color: var(--jk-bg);
+    background-image:
+        radial-gradient(circle at 96% 4%, rgba(230, 200, 104, 0.30), transparent 32%),
+        radial-gradient(circle at 92% 96%, rgba(232, 168, 124, 0.26), transparent 34%),
+        radial-gradient(circle at 4% 94%, rgba(111, 179, 184, 0.28), transparent 36%),
+        radial-gradient(circle at 2% 6%, rgba(217, 165, 179, 0.24), transparent 30%);
+    background-attachment: fixed;
 }
 
 #main-content {
@@ -146,7 +152,16 @@
 }
 
 .jk-sidebar-brand-icon {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--jk-radius);
+    background: var(--jk-surface);
+    border: 1px solid var(--jk-border-light);
+    box-shadow: var(--jk-shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--jk-accent);
     flex-shrink: 0;
 }

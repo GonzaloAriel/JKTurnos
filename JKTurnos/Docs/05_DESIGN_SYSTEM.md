@@ -68,11 +68,11 @@ Background
 
 Surface
 
-#FFFDF8
+#F1FAFA
 
 Sidebar
 
-#DCE9D7
+#D7F0EF
 
 Texto
 
@@ -93,6 +93,12 @@ Warning
 Danger
 
 #BE5B50
+
+Decorativos (D-036)
+
+Coral #E88A6F · Butter #E6C868 · Teal #5FA8AD (+ variantes light)
+
+Firma tricolor: --jk-gradient-tricolor (coral -> butter -> teal)
 
 Fuente unica de verdad: Content/DesignSystem/jk-tokens.css.
 
