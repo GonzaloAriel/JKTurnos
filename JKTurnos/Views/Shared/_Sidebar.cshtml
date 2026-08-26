@@ -117,6 +117,13 @@
                     <i class="bi bi-building"></i>
                     <span>Tenants</span>
                 </a>
+                <a href="@Url.Action("Index", "PagosSuscripcion")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "PagosSuscripcion" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "PagosSuscripcion" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-credit-card"></i>
+                    <span>Pagos Plataforma</span>
+                </a>
                 <a href="@Url.Action("Index", "Usuarios")"
                    class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "active" : "")"
                    data-sidebar-item

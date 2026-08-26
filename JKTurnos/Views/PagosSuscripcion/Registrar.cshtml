@@ -1,51 +1,54 @@
-@model JKTurnos.Controllers.PagoSuscripcionController
+@model JKTurnos.Models.ViewModels.RegistrarPagoViewModel
 
-<div class="jk-card">
-    <div class="jk-card-header">
-        <h3 class="jk-card-title">Registrar Pago de Plataforma</h3>
+@helper FormContent() {
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.TenantId)">Tenant</label>
+        @Html.DropDownListFor(m => m.TenantId,
+            ViewBag.Tenants as SelectList,
+            "Seleccione un tenant",
+            new { @class = "jk-input", required = "required" })
+        @Html.ValidationMessageFor(m => m.TenantId, "", new { @class = "jk-field-error" })
     </div>
-    @using (Html.BeginForm("Registrar", "PagosSuscripcion", FormMethod.Post, new { @class = "jk-form" }))
-    {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <div class="jk-form-group">
-            <label>Tenant</label>
-            @Html.DropDownList("tenantId", (SelectList)ViewBag.Tenants, "Seleccione un tenant", new { @class = "jk-input", required = "required" })
-        </div>
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.PlanCodigo)">Plan</label>
+        @Html.DropDownListFor(m => m.PlanCodigo,
+            ViewBag.Planes as SelectList,
+            "Seleccione un plan",
+            new { @class = "jk-input", required = "required" })
+        @Html.ValidationMessageFor(m => m.PlanCodigo, "", new { @class = "jk-field-error" })
+    </div>
 
-        <div class="jk-form-group">
-            <label>Plan</label>
-            <select name="planCodigo" class="jk-input" required>
-                @foreach (var plan in JKTurnos.Models.Entities.PlanesSuscripcion.Todos)
-                {
-                    <option value="@plan.Codigo">@plan.Nombre</option>
-                }
-            </select>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.Monto)">Monto ($)</label>
+                @Html.TextBoxFor(m => m.Monto, new { @class = "jk-input", type = "number", step = "0.01", min = "0", required = "required" })
+                @Html.ValidationMessageFor(m => m.Monto, "", new { @class = "jk-field-error" })
+            </div>
         </div>
+        <div class="col-md-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.Fecha)">Fecha</label>
+                @Html.TextBoxFor(m => m.Fecha, "{0:yyyy-MM-dd}", new { @class = "jk-input", type = "date", required = "required" })
+                @Html.ValidationMessageFor(m => m.Fecha, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
+    </div>
 
-        <div class="jk-form-group">
-            <label>Monto</label>
-            <input type="number" name="monto" class="jk-input" step="0.01" required />
-        </div>
-
-        <div class="jk-form-group">
-            <label>Fecha</label>
-            <input type="date" name="fecha" class="jk-input" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
-        </div>
-
-        <div class="jk-form-group">
-            <label>Observación</label>
-            <textarea name="observacion" class="jk-input" maxlength="500"></textarea>
-        </div>
-
-        <div class="jk-form-actions">
-            <button type="submit" class="jk-btn jk-btn-primary">Registrar Pago</button>
-            <a href="@Url.Action("Index", "AdminGlobalDashboard")" class="jk-btn jk-btn-ghost">Cancelar</a>
-        </div>
-    }
-</div>
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Observacion)">Observacion</label>
+        @Html.TextAreaFor(m => m.Observacion, new { @class = "jk-input", maxlength = "500", rows = "3", placeholder = "Referencia, comprobante o nota (opcional)" })
+        @Html.ValidationMessageFor(m => m.Observacion, "", new { @class = "jk-field-error" })
+    </div>
+}
 
 @{
-    ViewBag.Title = "Registrar Pago";
+    ViewBag.Title = "Registrar Pago de Plataforma";
+    ViewBag.Subtitle = "Registra un pago de suscripcion y actualiza la vigencia del tenant";
+    ViewBag.SubmitText = "Registrar Pago";
+    ViewBag.CancelUrl = Url.Action("Index");
+    ViewBag.FormContent = FormContent();
 }
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")

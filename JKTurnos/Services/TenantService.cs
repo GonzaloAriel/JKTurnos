@@ -53,6 +53,15 @@ namespace JKTurnos.Services
         }
 
         /// <summary>
+        /// AG-8: historial de pagos de suscripcion del propio tenant (para Configuracion).
+        /// </summary>
+        public List<PagoSuscripcion> GetPagosTenant(int tenantId)
+        {
+            var service = new PagoSuscripcionService();
+            return service.GetByTenant(tenantId);
+        }
+
+        /// <summary>
         /// AG-7: suscripciones de TODOS los tenants para la grilla del Admin Global.
         /// Un solo query (sin N+1): cada VM se construye desde la entidad ya cargada.
         /// </summary>

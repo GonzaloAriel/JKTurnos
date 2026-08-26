@@ -1,0 +1,101 @@
+@model List<JKTurnos.Models.ViewModels.PagoSuscripcionItemViewModel>
+
+@helper ListContent() {
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tenant</th>
+                        <th>Plan</th>
+                        <th>Monto</th>
+                        <th>Observacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td><strong>@item.TenantNombre</strong></td>
+                            <td>@item.PlanNombre</td>
+                            <td>$@item.Monto.ToString("N2")</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Observacion) ? "-" : item.Observacion)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@item.TenantNombre</strong>
+                    <span class="jk-small text-secondary">@item.Fecha.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    Plan: @item.PlanNombre · $@item.Monto.ToString("N2")
+                </div>
+                @if (!string.IsNullOrWhiteSpace(item.Observacion))
+                {
+                    <div class="jk-mt-4 jk-small text-secondary">
+                        @item.Observacion
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@helper EmptyContent() {
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "cash-stack" },
+            { "Title", "No hay pagos registrados" },
+            { "Description", "Registra el primer pago de suscripcion de un tenant." },
+            { "ActionText", "Registrar Pago" },
+            { "ActionUrl", Url.Action("Registrar") }
+        })
+}
+
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-flex jk-gap-12 jk-mt-16 jk-flex-wrap">
+        <div class="jk-form-group jk-mb-0">
+            <label class="jk-label">Tenant</label>
+            @Html.DropDownList("tenantId",
+                ViewBag.Tenants as SelectList,
+                "Todos",
+                new { @class = "jk-input" })
+        </div>
+        <div class="jk-form-group jk-mb-0">
+            <label class="jk-label">Desde</label>
+            <input type="date" name="fechaDesde" class="jk-input" value="@ViewBag.FiltroFechaDesde" />
+        </div>
+        <div class="jk-form-group jk-mb-0">
+            <label class="jk-label">Hasta</label>
+            <input type="date" name="fechaHasta" class="jk-input" value="@ViewBag.FiltroFechaHasta" />
+        </div>
+        <div class="jk-form-group jk-mb-0" style="align-self: flex-end;">
+            <button type="submit" class="jk-btn jk-btn-primary jk-btn-sm">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+        </div>
+    </form>
+}
+
+@{
+    ViewBag.Title = "Pagos de Plataforma";
+    ViewBag.Subtitle = "Historial de pagos de suscripcion de la plataforma";
+    ViewBag.PrimaryAction = Url.Action("Registrar");
+    ViewBag.PrimaryActionLabel = "Registrar Pago";
+    ViewBag.PrimaryActionIcon = "plus-lg";
+
+    ViewBag.ToolbarContent = FilterContent();
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")

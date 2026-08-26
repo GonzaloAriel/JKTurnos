@@ -1,13 +1,15 @@
 ﻿@model List<JKTurnos.Models.Entities.EstadoTurno>
 
 @using JKTurnos.Models.Entities
+@using JKTurnos.Models.ViewModels
 
 @{
     ViewBag.Title = "Configuracion";
     ViewBag.Subtitle = "Ajusta los datos y el funcionamiento de tu negocio";
 
     var config = ViewBag.Configuracion as JKTurnos.Models.Entities.ConfiguracionTenant;
-    var suscripcion = ViewBag.Suscripcion as JKTurnos.Models.ViewModels.SuscripcionTenantViewModel;
+    var suscripcion = ViewBag.Suscripcion as SuscripcionTenantViewModel;
+    var pagos = ViewBag.PagosSuscripcion as List<JKTurnos.Models.Entities.PagoSuscripcion>;
 }
 
 @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
@@ -54,6 +56,69 @@
         <p class="jk-small text-secondary jk-mb-0">
             Tu negocio todavia no tiene una suscripcion asignada.
             @(suscripcion.SuspendidoManual ? "Ademas, la cuenta esta suspendida manualmente." : "")
+        </p>
+    }
+</div>
+
+<!-- ===== HISTORIAL DE PAGOS (AG-8) ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Historial de pagos</h3>
+    </div>
+
+    @if (pagos != null && pagos.Any())
+    {
+        <div class="jk-hide-mobile">
+            <div class="jk-table-wrap">
+                <table class="jk-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Plan</th>
+                            <th>Monto</th>
+                            <th>Observacion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pago in pagos)
+                        {
+                            var plan = PlanesSuscripcion.Obtener(pago.PlanCodigo);
+                            <tr>
+                                <td>@pago.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@plan.Nombre</td>
+                                <td>$@pago.Monto.ToString("N2")</td>
+                                <td>@(string.IsNullOrWhiteSpace(pago.Observacion) ? "-" : pago.Observacion)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+            @foreach (var pago in pagos)
+            {
+                var plan = PlanesSuscripcion.Obtener(pago.PlanCodigo);
+                <div class="jk-card jk-card-compact">
+                    <div class="jk-flex-between">
+                        <strong>@plan.Nombre</strong>
+                        <span class="jk-small text-secondary">@pago.Fecha.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="jk-mt-4 jk-small">
+                        $@pago.Monto.ToString("N2")
+                        @if (!string.IsNullOrWhiteSpace(pago.Observacion))
+                        {
+                            <text> · @pago.Observacion</text>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">
+            No hay pagos de suscripcion registrados para tu negocio.
         </p>
     }
 </div>

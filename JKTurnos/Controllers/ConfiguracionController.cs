@@ -25,6 +25,9 @@ namespace JKTurnos.Controllers
             // AG-5: card de suscripcion del propio tenant (solo lectura, estado derivado en server)
             ViewBag.Suscripcion = _tenantService.GetSuscripcionTenant(TenantId);
 
+            // AG-8: historial de pagos de suscripcion del tenant
+            ViewBag.PagosSuscripcion = _tenantService.GetPagosTenant(TenantId);
+
             return View(_service.GetEstados());
         }
 

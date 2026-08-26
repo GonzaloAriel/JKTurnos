@@ -66,6 +66,9 @@
                             <td>@item.TiempoRestanteTexto</td>
                             <td>
                                 <span class="jk-flex jk-gap-8">
+                                    <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-icon" title="Registrar pago">
+                                        <i class="bi bi-cash-stack"></i>
+                                    </a>
                                     @using (Html.BeginForm(item.SuspendidoManual ? "Activar" : "Desactivar", "Tenants", new { id = item.TenantId }, FormMethod.Post, new { onsubmit = "return confirm('¿" + (item.SuspendidoManual ? "Activar" : "Desactivar") + " el tenant " + item.Nombre + "?');" }))
                                     {
                                         @Html.AntiForgeryToken()
@@ -104,6 +107,7 @@
                     @item.TiempoRestanteTexto
                 </div>
                 <div class="jk-mt-8 jk-flex jk-gap-8">
+                    <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-cash-stack"></i> Pago</a>
                     @using (Html.BeginForm(item.SuspendidoManual ? "Activar" : "Desactivar", "Tenants", new { id = item.TenantId }, FormMethod.Post, new { onsubmit = "return confirm('¿" + (item.SuspendidoManual ? "Activar" : "Desactivar") + " el tenant " + item.Nombre + "?');" }))
                     {
                         @Html.AntiForgeryToken()
