@@ -21,14 +21,15 @@ namespace JKTurnos.Controllers
         public ActionResult Index()
         {
             ViewBag.Configuracion = _service.GetConfiguracion();
-
-            // AG-5: card de suscripcion del propio tenant (solo lectura, estado derivado en server)
-            ViewBag.Suscripcion = _tenantService.GetSuscripcionTenant(TenantId);
-
-            // AG-8: historial de pagos de suscripcion del tenant
-            ViewBag.PagosSuscripcion = _tenantService.GetPagosTenant(TenantId);
-
             return View(_service.GetEstados());
+        }
+
+        // GET: Configuracion/Suscripcion
+        public ActionResult Suscripcion()
+        {
+            ViewBag.Suscripcion = _tenantService.GetSuscripcionTenant(TenantId);
+            ViewBag.PagosSuscripcion = _tenantService.GetPagosTenant(TenantId);
+            return View();
         }
 
         // GET: Configuracion/DatosNegocio

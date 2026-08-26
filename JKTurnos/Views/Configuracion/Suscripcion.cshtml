@@ -1,0 +1,121 @@
+@using JKTurnos.Models.Entities
+@using JKTurnos.Models.ViewModels
+
+@{
+    ViewBag.Title = "Suscripcion";
+    ViewBag.Subtitle = "Estado de la suscripcion e historial de pagos";
+
+    var suscripcion = ViewBag.Suscripcion as SuscripcionTenantViewModel;
+    var pagos = ViewBag.PagosSuscripcion as List<PagoSuscripcion>;
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<!-- ===== ESTADO DE SUSCRIPCION ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Estado de suscripcion</h3>
+        @if (suscripcion != null)
+        {
+            @Html.Partial("~/Views/Shared/Components/_BadgeEstadoSuscripcion.cshtml", suscripcion.Estado)
+        }
+    </div>
+
+    @if (suscripcion != null && !string.IsNullOrEmpty(suscripcion.PlanCodigo))
+    {
+        <div class="jk-grid">
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Plan actual</p>
+                <p class="jk-mt-4">
+                    @(suscripcion.PlanNombre ?? suscripcion.PlanCodigo)
+                    @if (suscripcion.SuspendidoManual)
+                    {
+                        <text> · suspendido manualmente</text>
+                    }
+                </p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Inicio</p>
+                <p class="jk-mt-4">@(suscripcion.FechaInicioPeriodo.HasValue ? suscripcion.FechaInicioPeriodo.Value.ToString("dd/MM/yyyy") : "-")</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Vencimiento</p>
+                <p class="jk-mt-4">@(suscripcion.FechaVencimiento.HasValue ? suscripcion.FechaVencimiento.Value.ToString("dd/MM/yyyy") : "-")</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Tiempo restante</p>
+                <p class="jk-mt-4">@suscripcion.TiempoRestanteTexto</p>
+            </div>
+        </div>
+    }
+    else if (suscripcion != null)
+    {
+        <p class="jk-small text-secondary jk-mb-0">
+            Tu negocio todavia no tiene una suscripcion asignada.
+            @(suscripcion.SuspendidoManual ? "Ademas, la cuenta esta suspendida manualmente." : "")
+        </p>
+    }
+</div>
+
+<!-- ===== HISTORIAL DE PAGOS ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Historial de pagos</h3>
+    </div>
+
+    @if (pagos != null && pagos.Any())
+    {
+        <div class="jk-hide-mobile">
+            <div class="jk-table-wrap">
+                <table class="jk-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Plan</th>
+                            <th>Monto</th>
+                            <th>Observacion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pago in pagos)
+                        {
+                            var plan = PlanesSuscripcion.Obtener(pago.PlanCodigo);
+                            <tr>
+                                <td>@pago.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@plan.Nombre</td>
+                                <td>$@pago.Monto.ToString("N2")</td>
+                                <td>@(string.IsNullOrWhiteSpace(pago.Observacion) ? "-" : pago.Observacion)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+            @foreach (var pago in pagos)
+            {
+                var plan = PlanesSuscripcion.Obtener(pago.PlanCodigo);
+                <div class="jk-card jk-card-compact">
+                    <div class="jk-flex-between">
+                        <strong>@plan.Nombre</strong>
+                        <span class="jk-small text-secondary">@pago.Fecha.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="jk-mt-4 jk-small">
+                        $@pago.Monto.ToString("N2")
+                        @if (!string.IsNullOrWhiteSpace(pago.Observacion))
+                        {
+                            <text> · @pago.Observacion</text>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="jk-small text-secondary jk-mb-0">
+            No hay pagos de suscripcion registrados para tu negocio.
+        </p>
+    }
+</div>

@@ -1,10 +1,10 @@
 # SESION 2026-08-26: PLAN AG - SUSCRIPCIONES, PAGOS DE PLATAFORMA Y ADMIN GLOBAL
 
-ESTADO: PLAN APROBADO POR TEAM LEAD (2026-08-26, con modificaciones). NO IMPLEMENTADO.
+ESTADO: PLAN EN PROGRESO (AG-0..AG-5, AG-7, AG-8 implementadas; AG-6 EXCLUIDA; AG-9/AG-10 pendientes).
 
 Decisiones marco: D-037 (estructura y alcance) / D-038 (sin suspension automatica; AG-6 EXCLUIDA).
 
-Proximo paso: POSTA AG-8 (gestion de pagos de plataforma: form que ejecuta el flujo AG-4 + listado; agrega el boton "Registrar pago" en la grilla de Tenants). Requiere autorizacion del TEAM LEAD para iniciar.
+Proximo paso: POSTA AG-9 (Dashboard Admin Global minimo) o confirmacion del TEAM LEAD sobre AG-1..AG-8.
 
 AG-0 CONGELADA (2026-08-26): ver seccion "AG-0 ESPECIFICACION FUNCIONAL" al final de este archivo.
 
@@ -53,7 +53,7 @@ El Tenant ve su propia suscripcion en una card persistente (Configuracion/Negoci
 | AG-5 | Card Suscripcion lado Tenant | Bajo | IMPLEMENTADA (2026-08-26, pendiente confirmacion) |
 | AG-6 | EXCLUIDA por TEAM LEAD (bloqueo automatico). Ver D-038 | - | EXCLUIDA |
 | AG-7 | Shell Admin Global + grilla Tenants (reusa existente) | Medio | IMPLEMENTADA (2026-08-26, pendiente confirmacion) |
-| AG-8 | Gestion de pagos UI (expone el flujo AG-4) | Alto | PENDIENTE (siguiente) |
+| AG-8 | Gestion de pagos UI (expone el flujo AG-4) | Alto | IMPLEMENTADA (2026-08-26, pendiente confirmacion) |
 | AG-9 | Dashboard Admin Global minimo | Bajo | PENDIENTE |
 | AG-10 | Prueba integral + matriz de seguridad | Alto | PENDIENTE |
 

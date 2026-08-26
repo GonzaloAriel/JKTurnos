@@ -408,6 +408,7 @@
     <Content Include="Views\Configuracion\Notificaciones.cshtml" />
     <Content Include="Views\Configuracion\NotificacionesWhatsApp.cshtml" />
     <Content Include="Views\Configuracion\NotificacionesEmail.cshtml" />
+    <Content Include="Views\Configuracion\Suscripcion.cshtml" />
     <Content Include="Views\Recursos\Create.cshtml" />
     <Content Include="Views\Recursos\Delete.cshtml" />
     <Content Include="Views\Recursos\Edit.cshtml" />

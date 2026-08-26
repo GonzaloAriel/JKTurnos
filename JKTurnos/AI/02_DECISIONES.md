@@ -547,7 +547,7 @@ Consecuencias: AG-6 excluida del alcance (ver D-038). Los detalles funcionales f
 
 Reemplaza a: ninguna
 
-Estado: VIGENTE (implementacion pendiente)
+Estado: VIGENTE (implementacion EN PROGRESO: AG-0..AG-5, AG-7, AG-8 implementadas; AG-6 EXCLUIDA; AG-9/AG-10 pendientes)
 
 ### D-038
 

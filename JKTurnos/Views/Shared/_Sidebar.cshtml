@@ -14,11 +14,13 @@
             }
             else
             {
-                <i class="bi bi-calendar-check jk-sidebar-brand-icon"></i>
+                 <i class="bi bi-calendar-check jk-sidebar-brand-icon"></i>
             }
-            <span class="jk-sidebar-name">JKTurnos</span>
+            @if (!string.IsNullOrWhiteSpace(ViewBag.ConfiguracionNombre))
+            {
+                <span class="jk-sidebar-subtitle">@ViewBag.ConfiguracionNombre</span>
+            }
         </a>
-        <span class="jk-sidebar-subtitle">Asistente de tiempo</span>
     </div>
 
     <div class="jk-sidebar-menu flex-grow-1">
@@ -47,8 +49,8 @@
                @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Agenda" ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-calendar3"></i>
                 <span>Mi Agenda</span>
-            </a>
-        </div>
+        </a>
+    </div>
 
         <div class="jk-nav-group">
             <span class="jk-nav-label">Gestion</span>
