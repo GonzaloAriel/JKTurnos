@@ -52,13 +52,15 @@ namespace JKTurnos.Services
                 AuditService.Campo("Telefono", actual.Telefono, model.Telefono),
                 AuditService.Campo("Email", actual.Email, model.Email),
                 AuditService.Campo("Direccion", actual.Direccion, model.Direccion),
-                AuditService.Campo("LogoUrl", actual.LogoUrl, model.LogoUrl));
+                AuditService.Campo("LogoUrl", actual.LogoUrl, model.LogoUrl),
+                AuditService.Campo("AvatarUrl", actual.AvatarUrl, model.AvatarUrl));
 
             actual.NombreComercial = model.NombreComercial;
             actual.Telefono = model.Telefono;
             actual.Email = model.Email;
             actual.Direccion = model.Direccion;
             actual.LogoUrl = model.LogoUrl;
+            actual.AvatarUrl = model.AvatarUrl;
             _configRepo.Update(actual);
 
             new AuditService().Registrar(

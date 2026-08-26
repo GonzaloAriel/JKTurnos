@@ -25,9 +25,44 @@
     </div>
 
     <div class="jk-form-group">
-        <label class="jk-label" for="LogoUrl">Logo (URL)</label>
+        <label class="jk-label" for="AvatarUrl">Avatar</label>
+        @{
+            var avatares = ViewBag.Avatares as List<JKTurnos.Models.Entities.AvatarPlataforma> ?? new List<JKTurnos.Models.Entities.AvatarPlataforma>();
+            var avatarItems = new List<System.Web.Mvc.SelectListItem> {
+                new System.Web.Mvc.SelectListItem { Value = "", Text = "(Ninguno)" }
+            };
+            foreach (var a in avatares)
+            {
+                avatarItems.Add(new System.Web.Mvc.SelectListItem {
+                    Value = a.Url,
+                    Text = a.Nombre,
+                    Selected = Model.AvatarUrl == a.Url
+                });
+            }
+        }
+        @Html.DropDownListFor(m => m.AvatarUrl, avatarItems, new { @class = "jk-input", id = "AvatarUrl" })
+        <small class="jk-small text-secondary">Elegi un avatar de la plataforma. Se muestra en el menu lateral.</small>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label">Preview del avatar</label>
+        <div id="avatarPreviewWrap" style="display:flex;align-items:center;gap:var(--jk-space-12);">
+            <div id="avatarPreviewImgWrap" style="display:none;">
+                <img id="avatarPreviewImg" src="" alt="Preview"
+                     style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--jk-border-light);" />
+            </div>
+            <div id="avatarPreviewIcon" style="width:56px;height:56px;border-radius:50%;background:var(--jk-surface);border:2px dashed var(--jk-border-light);display:flex;align-items:center;justify-content:center;color:var(--jk-text-secondary);">
+                <i class="bi bi-person" style="font-size:1.4rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="LogoUrl">Logo propio (URL)</label>
         @Html.TextBoxFor(m => m.LogoUrl, new { @class = "jk-input", placeholder = "https://tu-sitio.com/logo.png", id = "LogoUrl" })
-        <small class="jk-small text-secondary">Se muestra en el menu lateral y en la bienvenida.</small>
+        <small class="jk-small text-secondary">Se muestra en el menu lateral y en la bienvenida. Si elegiste un avatar, este campo se ignora.</small>
     </div>
 
     <div class="jk-note">
@@ -51,3 +86,33 @@
 }
 
 @Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
+
+<script>
+    (function () {
+        var ddl = document.getElementById('AvatarUrl');
+        var imgWrap = document.getElementById('avatarPreviewImgWrap');
+        var img = document.getElementById('avatarPreviewImg');
+        var icon = document.getElementById('avatarPreviewIcon');
+
+        function updatePreview() {
+            var url = ddl.value;
+            if (url) {
+                img.src = url;
+                img.onload = function () {
+                    imgWrap.style.display = 'block';
+                    icon.style.display = 'none';
+                };
+                img.onerror = function () {
+                    imgWrap.style.display = 'none';
+                    icon.style.display = 'flex';
+                };
+            } else {
+                imgWrap.style.display = 'none';
+                icon.style.display = 'flex';
+            }
+        }
+
+        ddl.addEventListener('change', updatePreview);
+        updatePreview();
+    })();
+</script>

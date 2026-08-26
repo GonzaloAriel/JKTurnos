@@ -74,7 +74,9 @@ namespace JKTurnos.Controllers
 
             ViewBag.ConfiguracionLogo =
                 config != null
-                    ? config.LogoUrl
+                    ? (!string.IsNullOrWhiteSpace(config.AvatarUrl)
+                        ? config.AvatarUrl
+                        : config.LogoUrl)
                     : null;
 
             ViewBag.ConfiguracionNombre =

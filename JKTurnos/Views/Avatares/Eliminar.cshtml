@@ -1,0 +1,32 @@
+@model JKTurnos.Models.Entities.AvatarPlataforma
+
+@{
+    ViewBag.Title = "Eliminar Avatar";
+    ViewBag.Subtitle = "Confirmar eliminacion";
+}
+
+<div class="jk-card" style="max-width:480px;">
+    <div class="jk-card-body">
+        <div class="jk-flex jk-gap-16" style="align-items:center;margin-bottom:var(--jk-space-16);">
+            <img src="@Model.Url" alt="@Model.Nombre"
+                 style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--jk-border-light);"
+                 onerror="this.style.display='none'" />
+            <div>
+                <div style="font-weight:var(--jk-weight-bold);font-size:var(--jk-text-md);">@Model.Nombre</div>
+                <div class="jk-small text-secondary" style="word-break:break-all;">@Model.Url</div>
+            </div>
+        </div>
+
+        <p class="jk-text-muted">
+            Si eliminas este avatar, los clientes que lo tengan seleccionado perderan la referencia.
+        </p>
+
+        <form method="post" action="@Url.Action("Eliminar", new { id = Model.Id })">
+            @Html.AntiForgeryToken()
+            <div class="jk-flex jk-gap-8" style="justify-content:flex-end;">
+                <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">Cancelar</a>
+                <button type="submit" class="jk-btn jk-btn-danger">Eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>

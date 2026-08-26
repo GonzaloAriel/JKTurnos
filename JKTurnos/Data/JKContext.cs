@@ -25,6 +25,7 @@ namespace JKTurnos.Data
         public DbSet<PagoSuscripcion> PagosSuscripciones { get; set; }
         public DbSet<NotificacionSistema> NotificacionesSistema { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
+        public DbSet<AvatarPlataforma> AvataresPlataforma { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -43,6 +44,14 @@ namespace JKTurnos.Data
             // D-037 / AG-0: observacion del pago de plataforma limitada a 500 caracteres.
             modelBuilder.Entity<PagoSuscripcion>()
                 .Property(x => x.Observacion)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<AvatarPlataforma>()
+                .Property(x => x.Nombre)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<AvatarPlataforma>()
+                .Property(x => x.Url)
                 .HasMaxLength(500);
         }
     }

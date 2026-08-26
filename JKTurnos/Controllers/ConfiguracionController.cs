@@ -37,6 +37,7 @@ namespace JKTurnos.Controllers
         {
             var config = _service.GetConfiguracion() ?? new ConfiguracionTenant();
             config.SmtpPassword = null; // nunca se re-renderiza la password almacenada
+            ViewBag.Avatares = new AvatarPlataformaService().GetAll();
             return View(config);
         }
 
@@ -46,7 +47,10 @@ namespace JKTurnos.Controllers
         public ActionResult DatosNegocio(ConfiguracionTenant model)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.Avatares = new AvatarPlataformaService().GetAll();
                 return View(model);
+            }
 
             try
             {

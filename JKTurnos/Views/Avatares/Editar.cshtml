@@ -1,0 +1,69 @@
+@model JKTurnos.Models.ViewModels.AvatarPlataformaViewModel
+
+@helper FormContent() {
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Nombre)">Nombre</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "jk-input", placeholder = "ej: Avatar Profesional", required = "required" })
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Url)">URL de la imagen</label>
+        @Html.TextBoxFor(m => m.Url, new { @class = "jk-input", placeholder = "https://ejemplo.com/avatar.png", required = "required", id = "avatarUrlInput" })
+        @Html.ValidationMessageFor(m => m.Url, "", new { @class = "jk-field-error" })
+        <small class="jk-small text-secondary">Pega el link directo de una imagen (png, jpg, gif, svg).</small>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label">Preview</label>
+        <div id="avatarPreview" style="display:none;">
+            <img id="avatarPreviewImg" src="" alt="Preview"
+                 style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--jk-border-light);" />
+        </div>
+        <div id="avatarPreviewEmpty" style="width:80px;height:80px;border-radius:50%;background:var(--jk-surface);border:2px dashed var(--jk-border-light);display:flex;align-items:center;justify-content:center;color:var(--jk-text-secondary);">
+            <i class="bi bi-image" style="font-size:1.5rem;"></i>
+        </div>
+    </div>
+}
+
+@{
+    ViewBag.Title = "Editar Avatar";
+    ViewBag.Subtitle = "Actualizar nombre o URL del avatar";
+    ViewBag.SubmitText = "Guardar Cambios";
+    ViewBag.CancelUrl = Url.Action("Index");
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
+
+<script>
+    (function () {
+        var input = document.getElementById('avatarUrlInput');
+        var img = document.getElementById('avatarPreviewImg');
+        var preview = document.getElementById('avatarPreview');
+        var empty = document.getElementById('avatarPreviewEmpty');
+
+        function updatePreview() {
+            var url = input.value.trim();
+            if (url) {
+                img.src = url;
+                img.onload = function () {
+                    preview.style.display = 'block';
+                    empty.style.display = 'none';
+                };
+                img.onerror = function () {
+                    preview.style.display = 'none';
+                    empty.style.display = 'flex';
+                };
+            } else {
+                preview.style.display = 'none';
+                empty.style.display = 'flex';
+            }
+        }
+
+        input.addEventListener('input', updatePreview);
+        updatePreview();
+    })();
+</script>

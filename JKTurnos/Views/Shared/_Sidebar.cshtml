@@ -119,6 +119,13 @@
                     <i class="bi bi-building"></i>
                     <span>Tenants</span>
                 </a>
+                <a href="@Url.Action("Index", "Avatares")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Avatares" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Avatares" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-images"></i>
+                    <span>Avatares</span>
+                </a>
                 <a href="@Url.Action("Index", "PagosSuscripcion")"
                    class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "PagosSuscripcion" ? "active" : "")"
                    data-sidebar-item

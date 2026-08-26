@@ -23,6 +23,9 @@ namespace JKTurnos.Models.Entities
         [StringLength(500)]
         public string LogoUrl { get; set; }
 
+        [StringLength(500)]
+        public string AvatarUrl { get; set; }
+
         // D-033: plantilla del recordatorio por WhatsApp (placeholders: {nombre}, {servicio}, {fecha}, {hora}).
         [StringLength(500)]
         public string WhatsAppTemplate { get; set; }

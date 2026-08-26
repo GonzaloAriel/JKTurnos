@@ -1,0 +1,89 @@
+@model List<JKTurnos.Models.Entities.AvatarPlataforma>
+
+@helper ListContent() {
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Preview</th>
+                        <th>Nombre</th>
+                        <th>URL</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@item.Url" alt="@item.Nombre"
+                                     style="width:40px;height:40px;border-radius:50%;object-fit:cover;"
+                                     onerror="this.style.display='none'" />
+                            </td>
+                            <td><strong>@item.Nombre</strong></td>
+                            <td class="jk-small text-secondary" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                @item.Url
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Editar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="@Url.Action("Eliminar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm jk-text-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <div class="jk-flex jk-gap-8" style="align-items:center;">
+                        <img src="@item.Url" alt="@item.Nombre"
+                             style="width:36px;height:36px;border-radius:50%;object-fit:cover;"
+                             onerror="this.style.display='none'" />
+                        <strong>@item.Nombre</strong>
+                    </div>
+                    <div>
+                        <a href="@Url.Action("Editar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="@Url.Action("Eliminar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm jk-text-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@helper EmptyContent() {
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "images" },
+            { "Title", "No hay avatares cargados" },
+            { "Description", "Subi links de imagenes para que los clientes elijan un avatar." },
+            { "ActionText", "Crear Avatar" },
+            { "ActionUrl", Url.Action("Crear") }
+        })
+}
+
+@{
+    ViewBag.Title = "Avatares de Plataforma";
+    ViewBag.Subtitle = "Imagenes disponibles para que los clientes elijan su avatar";
+    ViewBag.PrimaryAction = Url.Action("Crear");
+    ViewBag.PrimaryActionLabel = "Crear Avatar";
+    ViewBag.PrimaryActionIcon = "plus-lg";
+
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")
