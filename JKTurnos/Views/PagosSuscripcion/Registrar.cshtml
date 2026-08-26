@@ -1,0 +1,51 @@
+@model JKTurnos.Controllers.PagoSuscripcionController
+
+<div class="jk-card">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Registrar Pago de Plataforma</h3>
+    </div>
+    @using (Html.BeginForm("Registrar", "PagosSuscripcion", FormMethod.Post, new { @class = "jk-form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="jk-form-group">
+            <label>Tenant</label>
+            @Html.DropDownList("tenantId", (SelectList)ViewBag.Tenants, "Seleccione un tenant", new { @class = "jk-input", required = "required" })
+        </div>
+
+        <div class="jk-form-group">
+            <label>Plan</label>
+            <select name="planCodigo" class="jk-input" required>
+                @foreach (var plan in JKTurnos.Models.Entities.PlanesSuscripcion.Todos)
+                {
+                    <option value="@plan.Codigo">@plan.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="jk-form-group">
+            <label>Monto</label>
+            <input type="number" name="monto" class="jk-input" step="0.01" required />
+        </div>
+
+        <div class="jk-form-group">
+            <label>Fecha</label>
+            <input type="date" name="fecha" class="jk-input" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+        </div>
+
+        <div class="jk-form-group">
+            <label>Observación</label>
+            <textarea name="observacion" class="jk-input" maxlength="500"></textarea>
+        </div>
+
+        <div class="jk-form-actions">
+            <button type="submit" class="jk-btn jk-btn-primary">Registrar Pago</button>
+            <a href="@Url.Action("Index", "AdminGlobalDashboard")" class="jk-btn jk-btn-ghost">Cancelar</a>
+        </div>
+    }
+</div>
+
+@{
+    ViewBag.Title = "Registrar Pago";
+}

@@ -160,10 +160,12 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminGlobalDashboardController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PagosController.cs" />
+    <Compile Include="Controllers\PagosSuscripcionController.cs" />
     <Compile Include="Controllers\RecursosController.cs" />
     <Compile Include="Controllers\ServiciosController.cs" />
     <Compile Include="Controllers\TurnosController.cs" />
@@ -215,12 +217,22 @@
     <Compile Include="Migrations\202608201550056_AddAuditoria.Designer.cs">
       <DependentUpon>202608201550056_AddAuditoria.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608261138281_AddSuscripciones.cs" />
+    <Compile Include="Migrations\202608261138281_AddSuscripciones.Designer.cs">
+      <DependentUpon>202608261138281_AddSuscripciones.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608261240430_AddPagosSuscripciones.cs" />
+    <Compile Include="Migrations\202608261240430_AddPagosSuscripciones.Designer.cs">
+      <DependentUpon>202608261240430_AddPagosSuscripciones.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\EstadoTurno.cs" />
     <Compile Include="Models\Entities\Pago.cs" />
+    <Compile Include="Models\Entities\PagoSuscripcion.cs" />
+    <Compile Include="Models\Entities\PlanesSuscripcion.cs" />
     <Compile Include="Models\Entities\Recurso.cs" />
     <Compile Include="Models\Entities\RecursoServicio.cs" />
     <Compile Include="Models\Entities\Roles.cs" />
@@ -233,13 +245,16 @@
     <Compile Include="Models\Entities\Tenant.cs" />
     <Compile Include="Models\Entities\Turno.cs" />
     <Compile Include="Models\Entities\User.cs" />
+    <Compile Include="Models\ViewModels\AdminGlobalDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\AgendaViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PagoItemViewModel.cs" />
+    <Compile Include="Models\ViewModels\PanelTenantsViewModel.cs" />
     <Compile Include="Models\ViewModels\PagoViewModel.cs" />
     <Compile Include="Models\ViewModels\LoginVM.cs" />
     <Compile Include="Models\ViewModels\RecursoViewModel.cs" />
     <Compile Include="Models\ViewModels\ServicioViewModel.cs" />
+    <Compile Include="Models\ViewModels\SuscripcionTenantViewModel.cs" />
     <Compile Include="Models\ViewModels\TurnoViewModel.cs" />
     <Compile Include="Models\ViewModels\TurnoDetailViewModel.cs" />
     <Compile Include="Models\ViewModels\DashboardViewModel.cs" />
@@ -249,8 +264,10 @@
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\ClienteService.cs" />
+    <Compile Include="Services\DashboardAdminGlobalService.cs" />
     <Compile Include="Services\HomeService.cs" />
     <Compile Include="Services\PagoService.cs" />
+    <Compile Include="Services\PagoSuscripcionService.cs" />
     <Compile Include="Services\RecursoService.cs" />
     <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
@@ -318,6 +335,7 @@
     <Content Include="AI\SESION_20260813_CONTEXTO.md" />
     <Content Include="Docs\16_DRAWER_TURNO_FUTURO.md" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Scripts\jk-layout.js.modified" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -361,6 +379,7 @@
     <Content Include="Views\Shared\_Topbar.cshtml" />
     <Content Include="Views\Shared\Components\_ActionCard.cshtml" />
     <Content Include="Views\Shared\Components\_Avatar.cshtml" />
+    <Content Include="Views\Shared\Components\_BadgeEstadoSuscripcion.cshtml" />
     <Content Include="Views\Shared\Components\_Drawer.cshtml" />
     <Content Include="Views\Shared\Components\_EmptyState.cshtml" />
     <Content Include="Views\Shared\Components\_FloatingButton.cshtml" />
@@ -422,6 +441,10 @@
     <Content Include="Views\Shared\Components\_SearchFilter.cshtml" />
     <Content Include="Views\Shared\Components\_ServiceQuickCreateDrawer.cshtml" />
     <Content Include="Views\Shared\Components\_DeleteLayout.cshtml" />
+    <Content Include="Views\AdminGlobalDashboard\Index.cshtml" />
+    <Content Include="Views\AdminGlobalDashboard\_AlertasTenants.cshtml" />
+    <Content Include="Views\AdminGlobalDashboard\_UltimosPagos.cshtml" />
+    <Content Include="Views\PagosSuscripcion\Registrar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -474,6 +497,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608201550056_AddAuditoria.resx">
       <DependentUpon>202608201550056_AddAuditoria.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608261138281_AddSuscripciones.resx">
+      <DependentUpon>202608261138281_AddSuscripciones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608261240430_AddPagosSuscripciones.resx">
+      <DependentUpon>202608261240430_AddPagosSuscripciones.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608191913508_AddNotificacionesWhatsApp.resx">
       <DependentUpon>202608191913508_AddNotificacionesWhatsApp.cs</DependentUpon>

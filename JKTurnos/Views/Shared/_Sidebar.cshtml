@@ -103,6 +103,13 @@
         {
             <div class="jk-nav-group">
                 <span class="jk-nav-label">Sistema</span>
+                <a href="@Url.Action("Index", "AdminGlobalDashboard")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "AdminGlobalDashboard" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "AdminGlobalDashboard" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard Global</span>
+                </a>
                 <a href="@Url.Action("Index", "Tenants")"
                    class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Tenants" ? "active" : "")"
                    data-sidebar-item

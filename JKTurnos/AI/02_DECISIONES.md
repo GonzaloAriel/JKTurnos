@@ -52,6 +52,8 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-034 | Modulo Dashboard en SECCION APARTE (decidido por TEAM LEAD 2026-08-19: nada en el Command Center). Fase 1 CONSOLIDADA (2026-08-19): KPIs del mes, ocupacion semanal (grafica CSS sin librerias), ingresos del mes por dia, proximos turnos y sin confirmar (click abre el drawer en la MISMA seccion via `jk-dashboard.js`), ranking de servicios, cobrado por recurso y saldo pendiente. Fase 2 CONSOLIDADA (2026-08-19): KPI de ingresos con variacion vs mes anterior, evolucion de ingresos 12 meses, ingresos por recurso (barras con %), pagos por tipo (Senia/Parcial/Total) y saldo pendiente. Fase 3: exportacion CSV/PDF | 2026-08-19 | VIGENTE (Fases 1 y 2 CONSOLIDADAS) |
 | D-035 | Evolucion visual Fase 1 (isla segura): nueva identidad cromatica calida cambiando SOLO los valores de los tokens existentes en jk-tokens.css (prohibida taxonomia nueva `--jk-color-*`). Regla: accent/success/warning/danger no colapsan semanticamente; colores futuros (coral, mantequilla, dorado) NO se tokenizan sin consumidor real | 2026-08-25 | VIGENTE |
 | D-036 | Capa decorativa de marca sistematizada: firma tricolor (`.jk-signature` + `--jk-gradient-tricolor`), chips circulares de icono por accion/feature, brand del sidebar en chip y blobs pastel en bienvenida/login. Se tokenizan los colores de identidad que ya tienen consumidor real: coral, butter, teal (+ lights). Ajuste posterior aprobado por TEAM LEAD: superficies y nav con tinte menta palida (`--jk-surface #F1FAFA`, `--jk-sidebar-bg #D7F0EF`) | 2026-08-25 | VIGENTE |
+| D-037 | Plan AG Suscripciones/Pagos de Plataforma/AdminGlobal aprobado: modelo plano sin entidad Subscription v1 (campos sobre Tenant), catalogo estatico de planes en codigo, pago de plataforma = confirmado (sin pendientes), sin notificaciones nuevas ni SignalR (card persistente + dashboard), postas AG-0..AG-10. Plan: AI/SESION_20260826_PLAN_SUSCRIPCIONES.md | 2026-08-26 | VIGENTE |
+| D-038 | Sin suspension/bloqueo automatico por vencimiento (posta AG-6 EXCLUIDA): estado derivado de fechas SOLO para mostrar; la unica suspension efectiva es manual. Riesgo aceptado por TEAM LEAD | 2026-08-26 | VIGENTE |
 
 ## Detalle
 
@@ -461,6 +463,20 @@ Reemplaza a: D-021 en lo referente al calculo de IngresosHoy.
 
 Estado: VIGENTE
 
+### D-032
+
+Fecha: 2026-08-19
+
+Decision: Encoding UTF-8 habilitado en todo el proyecto: `<globalization requestEncoding/responseEncoding/fileEncoding="utf-8">` en Web.config + archivos fuente (.cs, .cshtml, .css, .js, .config) guardados en UTF-8 con BOM. Los textos pueden usar ñ y acentos con normalidad.
+
+Motivo: eliminar la restriccion de escribir sin acentos (que generaba textos pobres) resolviendo el problema de raiz.
+
+Consecuencias: los textos visibles nuevos pueden usar acentos y ñ. La regla D-009 (textos sin acentos) queda sin efecto.
+
+Reemplaza a: D-009
+
+Estado: VIGENTE
+
 ### D-033
 
 Fecha: 2026-08-19
@@ -514,6 +530,34 @@ Decision: Capa decorativa de marca sistematizada dentro del DS, aprobada por TEA
 Motivo: dar personalidad alegre y reconocible al sistema sin perder la calma pastel; centralizar la firma/chips como componentes reutilizables en vez de CSS suelto por pagina.
 
 Consecuencias: los nuevos tokens son parte de la fuente unica de verdad (jk-tokens.css). La firma tricolor es utilidad global: cualquier titulo destacado puede usarla. No aplicar blobs ni firma en la Agenda (zona de foco). Docs/05 y Dictionary deben reflejar los tokens nuevos.
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-037
+
+Fecha: 2026-08-26
+
+Decision: Plan AG - Gestion de Tenants, Suscripciones y Pagos de Plataforma + area Admin Global (plan completo aprobado por TEAM LEAD en AI/SESION_20260826_PLAN_SUSCRIPCIONES.md; postas AG-0..AG-10, una decision por posta con cierre formal). Estructura: (1) MODELO PLANO sin entidad Subscription en v1: la suscripcion son campos sobre Tenant (PlanCodigo, FechaInicioPeriodo, FechaVencimiento; nombres definitivos tras auditoria AG-1); historial = los propios pagos. (2) Catalogo de planes ESTATICO en codigo (patron Roles.cs): Mensual/Trimestral/Semestral/Anual; sin tabla ni CRUD de planes ni hardcodeo en controllers/views. (3) Pago de plataforma como entidad NUEVA separada del Pago de turno (D-028): registrar = confirmar (sin estados pendientes); renovacion anticipada extiende desde el vencimiento vigente. (4) SIN notificaciones nuevas NI SignalR: visibilidad via card persistente de Suscripcion en Configuracion/Negocio (nunca Command Center, D-034) + Dashboard Admin Global. Dias de gracia como constante de plataforma en codigo. Reuso obligatorio: GlobalRepository (D-022), [Authorize(Roles=AdminGlobal)], grupo Sistema del sidebar, migraciones aditivas (D-027).
+
+Motivo: gestion comercial de la plataforma (altas, cobros, control de tenants) sin infraestructura externa (jobs/pasarelas/push) y minimizando riesgo por postas pequenas.
+
+Consecuencias: AG-6 excluida del alcance (ver D-038). Los detalles funcionales finos se congelan en la posta AG-0 dentro del archivo del plan. Nombre definitivo de la entidad de pago de plataforma se fija en auditoria (AG-1/AG-3).
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE (implementacion pendiente)
+
+### D-038
+
+Fecha: 2026-08-26
+
+Decision: NO existe suspension/bloqueo automatico por vencimiento de suscripcion (posta AG-6 EXCLUIDA por TEAM LEAD). El estado de suscripcion (Activo/Por vencer/En gracia/Vencido) se DERIVA de fechas unicamente para MOSTRARLO (cards/dashboard); ningun mecanismo corta el acceso. La unica suspension efectiva es la desactivacion manual del tenant (posta AG-2).
+
+Motivo: .NET Framework 4.7 MVC 5 no ofrece hosted services confiables en el hosting actual; un job diario que falla deja vencidos operando, mientras un chequeo derivado nunca falla. El TEAM LEAD prefiere gestionar vencidos manualmente apoyandose en el Dashboard Admin Global y evitar friccion en el desarrollo.
+
+Consecuencias: RIESGO ACEPTADO por TEAM LEAD: un tenant vencido sigue plenamente operativo hasta desactivacion manual; el Dashboard Admin Global debe volver visible el vencimiento (contadores/alertas). Si en el futuro se desea enforcement, se agrega como posta independiente (gate en BaseController.OnActionExecuting) sin cambiar el modelo.
 
 Reemplaza a: ninguna
 

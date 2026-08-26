@@ -15,11 +15,10 @@ namespace JKTurnos.Controllers
             _service = new TenantService();
         }
 
-        // GET: Tenants
+        // GET: Tenants (AG-7: panel de operacion del Admin Global)
         public ActionResult Index()
         {
-            var tenants = _service.GetAll();
-            return View(tenants);
+            return View(_service.GetPanelTenants());
         }
 
         // GET: Tenants/Create
@@ -98,6 +97,26 @@ namespace JKTurnos.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             _service.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+
+        // POST: Tenants/Desactivar/5 (D-038: suspension manual e informativa)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Desactivar(int id)
+        {
+            _service.Desactivar(id);
+
+            return RedirectToAction("Index");
+        }
+
+        // POST: Tenants/Activar/5 (D-038: quita la suspension; no toca fechas ni pagos)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Activar(int id)
+        {
+            _service.Activar(id);
 
             return RedirectToAction("Index");
         }

@@ -22,6 +22,7 @@ namespace JKTurnos.Data
         public DbSet<Recurso> Recursos { get; set; }
         public DbSet<RecursoServicio> RecursoServicios { get; set; }
         public DbSet<Pago> Pagos { get; set; }
+        public DbSet<PagoSuscripcion> PagosSuscripciones { get; set; }
         public DbSet<NotificacionSistema> NotificacionesSistema { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
 
@@ -38,6 +39,11 @@ namespace JKTurnos.Data
                 .HasRequired(p => p.Turno)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            // D-037 / AG-0: observacion del pago de plataforma limitada a 500 caracteres.
+            modelBuilder.Entity<PagoSuscripcion>()
+                .Property(x => x.Observacion)
+                .HasMaxLength(500);
         }
     }
 }

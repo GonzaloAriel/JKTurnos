@@ -9,16 +9,22 @@ namespace JKTurnos.Controllers
     public class ConfiguracionController : BaseController
     {
         private readonly ConfiguracionService _service;
+        private readonly TenantService _tenantService;
 
         public ConfiguracionController()
         {
             _service = new ConfiguracionService();
+            _tenantService = new TenantService();
         }
 
         // GET: Configuracion
         public ActionResult Index()
         {
             ViewBag.Configuracion = _service.GetConfiguracion();
+
+            // AG-5: card de suscripcion del propio tenant (solo lectura, estado derivado en server)
+            ViewBag.Suscripcion = _tenantService.GetSuscripcionTenant(TenantId);
+
             return View(_service.GetEstados());
         }
 

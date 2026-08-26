@@ -1,0 +1,28 @@
+@model List<JKTurnos.Models.ViewModels.PagoSuscripcionDTO>
+
+<div class="jk-card">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Últimos Pagos</h3>
+    </div>
+    <div class="jk-table-wrap">
+        <table class="jk-table">
+            <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Monto</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Tenant</td>
+                        <td>@item.Monto.ToString("C")</td>
+                        <td>@item.Fecha.ToShortDateString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

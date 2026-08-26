@@ -1,0 +1,41 @@
+@model JKTurnos.Models.ViewModels.AdminGlobalDashboardViewModel
+
+<div class="jk-card jk-mb-24">
+    <div class="jk-grid">
+        @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+            new ViewDataDictionary {
+                { "Label", "Tenants Totales" },
+                { "Value", Model.TotalTenants.ToString() }
+            })
+        @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+            new ViewDataDictionary {
+                { "Label", "Activos" },
+                { "Value", Model.TotalActivos.ToString() }
+            })
+        @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+            new ViewDataDictionary {
+                { "Label", "En Gracia" },
+                { "Value", Model.TotalEnGracia.ToString() }
+            })
+        @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+            new ViewDataDictionary {
+                { "Label", "Suspendidos" },
+                { "Value", Model.TotalSuspendidos.ToString() }
+            })
+        @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+            new ViewDataDictionary {
+                { "Label", "Pagos Hoy" },
+                { "Value", Model.TotalPagosHoy.ToString() }
+            })
+    </div>
+</div>
+
+<div class="jk-grid jk-grid-2">
+    @Html.Partial("_AlertasTenants", Model.TenantsEnRiesgo)
+    @Html.Partial("_UltimosPagos", Model.UltimosPagos)
+</div>
+
+@{
+    ViewBag.Title = "Dashboard Global";
+    ViewBag.Subtitle = "Gestión centralizada de la plataforma";
+}

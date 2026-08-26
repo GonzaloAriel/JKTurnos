@@ -22,6 +22,13 @@ namespace JKTurnos.Data
             _context = new JKContext();
         }
 
+        // AG-4: modo contexto compartido para flujos transaccionales multi-entidad
+        // (varios repositorios sobre UNA conexion y UNA Database.BeginTransaction).
+        internal GlobalRepository(JKContext contextCompartido)
+        {
+            _context = contextCompartido;
+        }
+
         public IQueryable<TEntity> GetAll()
         {
             return _context.Set<TEntity>()

@@ -1,0 +1,28 @@
+@model List<JKTurnos.Models.ViewModels.TenantAlertDTO>
+
+<div class="jk-card">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Alertas de Tenants</h3>
+    </div>
+    <div class="jk-table-wrap">
+        <table class="jk-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Nombre</td>
+                        <td><span class="jk-badge jk-badge-warning">@item.Estado</span></td>
+                        <td><a href="@Url.Action("Index", "Tenants")" class="jk-btn jk-btn-sm jk-btn-ghost">Ver</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

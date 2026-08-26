@@ -4,6 +4,7 @@ using System.Linq;
 using JKTurnos.Data;
 using JKTurnos.Infrastructure;
 using JKTurnos.Models.Entities;
+using JKTurnos.Models.ViewModels;
 
 namespace JKTurnos.Services
 {
@@ -38,6 +39,107 @@ namespace JKTurnos.Services
         public Tenant GetById(int id)
         {
             return _tenantRepo.GetById(id);
+        }
+
+        /// <summary>
+        /// AG-5: suscripcion del tenant calculada para mostrar (card de Configuracion).
+        /// Solo lectura: aplica la derivacion de estado congelada en AG-0 (D-038:
+        /// nunca persiste ni bloquea acceso).
+        /// </summary>
+        public SuscripcionTenantViewModel GetSuscripcionTenant(int tenantId)
+        {
+            var tenant = _tenantRepo.GetById(tenantId);
+            return BuildSuscripcionVm(tenant, DateTime.Today);
+        }
+
+        /// <summary>
+        /// AG-7: suscripciones de TODOS los tenants para la grilla del Admin Global.
+        /// Un solo query (sin N+1): cada VM se construye desde la entidad ya cargada.
+        /// </summary>
+        public List<SuscripcionTenantViewModel> GetSuscripciones()
+        {
+            var hoy = DateTime.Today;
+
+            return _tenantRepo.GetAll()
+                              .OrderBy(t => t.Nombre)
+                              .ToList()
+                              .Select(t => BuildSuscripcionVm(t, hoy))
+                              .ToList();
+        }
+
+        /// <summary>
+        /// AG-7: panel completo (grilla + contadores por estado) del Admin Global.
+        /// </summary>
+        public PanelTenantsViewModel GetPanelTenants()
+        {
+            var tenants = GetSuscripciones();
+
+            return new PanelTenantsViewModel
+            {
+                Tenants = tenants,
+                TotalActivos = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoActivo),
+                TotalPorVencer = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoPorVencer),
+                TotalEnGracia = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoEnGracia),
+                TotalVencidos = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoVencido),
+                TotalSuspendidos = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoSuspendidoManual),
+                TotalSinPlan = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoSinPlan)
+            };
+        }
+
+        private static SuscripcionTenantViewModel BuildSuscripcionVm(Tenant tenant, DateTime hoy)
+        {
+            var vm = new SuscripcionTenantViewModel
+            {
+                Estado = PlanesSuscripcion.EstadoSinPlan,
+                TiempoRestanteTexto = "Sin plan asignado"
+            };
+
+            if (tenant == null)
+                return vm;
+
+            vm.TenantId = tenant.Id;
+            vm.Nombre = tenant.Nombre;
+            vm.Subdominio = tenant.Subdominio;
+            vm.SuspendidoManual = tenant.SuspendidoManual;
+            vm.PlanCodigo = tenant.PlanCodigo;
+            vm.FechaInicioPeriodo = tenant.FechaInicioPeriodo;
+            vm.FechaVencimiento = tenant.FechaVencimiento;
+            vm.Estado = PlanesSuscripcion.CalcularEstado(tenant.SuspendidoManual, tenant.PlanCodigo, tenant.FechaVencimiento, hoy);
+
+            PlanSuscripcion plan = null;
+
+            if (!string.IsNullOrEmpty(tenant.PlanCodigo))
+            {
+                foreach (var p in PlanesSuscripcion.Todos)
+                {
+                    if (p.Codigo == tenant.PlanCodigo)
+                    {
+                        plan = p;
+                        break;
+                    }
+                }
+            }
+
+            vm.PlanNombre = plan != null ? plan.Nombre : null;
+
+            if (vm.Estado == PlanesSuscripcion.EstadoSuspendidoManual)
+            {
+                vm.TiempoRestanteTexto = "Cuenta suspendida manualmente";
+                return vm;
+            }
+
+            if (!tenant.FechaVencimiento.HasValue)
+                return vm;
+
+            var dias = (tenant.FechaVencimiento.Value.Date - hoy).Days;
+            vm.DiasRestantes = dias;
+
+            if (vm.Estado == PlanesSuscripcion.EstadoEnGracia || vm.Estado == PlanesSuscripcion.EstadoVencido)
+                vm.TiempoRestanteTexto = "Vencido hace " + Math.Abs(dias) + " dias";
+            else
+                vm.TiempoRestanteTexto = dias + " dias restantes";
+
+            return vm;
         }
 
         public void Create(Tenant tenant, string adminNombre = null, string adminEmail = null, string adminPassword = null)
@@ -98,6 +200,39 @@ namespace JKTurnos.Services
         public void Delete(int id)
         {
             _tenantRepo.Delete(id);
+        }
+
+        /// <summary>
+        /// D-038 / AG-2: suspension SOLO manual e informativa. Toca unicamente
+        /// SuspendidoManual; NUNCA modifica IsActive, fechas de suscripcion ni pagos.
+        /// El corte real de uso se hace desactivando usuarios desde UsuariosController.
+        /// </summary>
+        public void Desactivar(int id)
+        {
+            SetSuspendidoManual(id, true);
+        }
+
+        /// <summary>
+        /// D-038 / AG-2: quita la suspension manual. NO modifica fechas ni pagos;
+        /// para extender vigencia se registra un pago (AG-4).
+        /// </summary>
+        public void Activar(int id)
+        {
+            SetSuspendidoManual(id, false);
+        }
+
+        private void SetSuspendidoManual(int id, bool suspendido)
+        {
+            var tenant = _tenantRepo.GetById(id);
+
+            if (tenant == null)
+                return;
+
+            if (tenant.SuspendidoManual == suspendido)
+                return;
+
+            tenant.SuspendidoManual = suspendido;
+            _tenantRepo.Update(tenant);
         }
 
         private void SeedBaseData(Tenant tenant, string adminEmail)

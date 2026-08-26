@@ -1,0 +1,28 @@
+@*
+    AG-5 / AG-7: badge de estado de suscripcion (mapeo estado -> color del DS).
+    Usage:
+    @Html.Partial("~/Views/Shared/Components/_BadgeEstadoSuscripcion.cshtml", "ACTIVO")
+*@
+
+@model string
+
+@{
+    var clase = "jk-badge jk-badge-neutral";
+
+    if (Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoActivo)
+    {
+        clase = "jk-badge jk-badge-success";
+    }
+    else if (Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoPorVencer
+        || Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoEnGracia)
+    {
+        clase = "jk-badge jk-badge-warning";
+    }
+    else if (Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoVencido
+        || Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoSuspendidoManual)
+    {
+        clase = "jk-badge jk-badge-danger";
+    }
+}
+
+<span class="@clase">@Model</span>

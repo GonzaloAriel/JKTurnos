@@ -67,7 +67,8 @@ Despues del arranque, lee segun corresponda:
     Docs\ENVIRONMENT_TOGGLE.md (cambio local <-> produccion)
 
 - AUTORIZACION / ROLES / TENANTS:
-    AI\SESION_20260814_PLAN_ROLES.md (plan de Roles/Cuentas/Tenants, D-022/D-023, NO implementado)
+    AI\SESION_20260814_PLAN_ROLES.md (plan de Roles/Cuentas/Tenants, D-022/D-023, CONSOLIDADO)
+    AI\SESION_20260826_PLAN_SUSCRIPCIONES.md (plan AG Suscripciones/Pagos/Admin Global, D-037/D-038, aprobado NO implementado)
 
 =====================================================
 REGLAS OBLIGATORIAS (aplicar siempre)

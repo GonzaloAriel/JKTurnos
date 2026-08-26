@@ -1,13 +1,62 @@
 ﻿@model List<JKTurnos.Models.Entities.EstadoTurno>
 
+@using JKTurnos.Models.Entities
+
 @{
     ViewBag.Title = "Configuracion";
     ViewBag.Subtitle = "Ajusta los datos y el funcionamiento de tu negocio";
 
     var config = ViewBag.Configuracion as JKTurnos.Models.Entities.ConfiguracionTenant;
+    var suscripcion = ViewBag.Suscripcion as JKTurnos.Models.ViewModels.SuscripcionTenantViewModel;
 }
 
 @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<!-- ===== SUSCRIPCION (AG-5) ===== -->
+<div class="jk-card jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Suscripcion</h3>
+        @if (suscripcion != null)
+        {
+            @Html.Partial("~/Views/Shared/Components/_BadgeEstadoSuscripcion.cshtml", suscripcion.Estado)
+        }
+    </div>
+
+    @if (suscripcion != null && !string.IsNullOrEmpty(suscripcion.PlanCodigo))
+    {
+        <div class="jk-grid">
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Plan actual</p>
+                <p class="jk-mt-4">
+                    @(suscripcion.PlanNombre ?? suscripcion.PlanCodigo)
+                    @if (suscripcion.SuspendidoManual)
+                    {
+                        <text> · suspendido manualmente</text>
+                    }
+                </p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Inicio</p>
+                <p class="jk-mt-4">@(suscripcion.FechaInicioPeriodo.HasValue ? suscripcion.FechaInicioPeriodo.Value.ToString("dd/MM/yyyy") : "-")</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Vencimiento</p>
+                <p class="jk-mt-4">@(suscripcion.FechaVencimiento.HasValue ? suscripcion.FechaVencimiento.Value.ToString("dd/MM/yyyy") : "-")</p>
+            </div>
+            <div class="jk-col-4">
+                <p class="jk-small text-secondary jk-mb-0">Tiempo restante</p>
+                <p class="jk-mt-4">@suscripcion.TiempoRestanteTexto</p>
+            </div>
+        </div>
+    }
+    else if (suscripcion != null)
+    {
+        <p class="jk-small text-secondary jk-mb-0">
+            Tu negocio todavia no tiene una suscripcion asignada.
+            @(suscripcion.SuspendidoManual ? "Ademas, la cuenta esta suspendida manualmente." : "")
+        </p>
+    }
+</div>
 
 <!-- ===== DATOS DEL NEGOCIO ===== -->
 <div class="jk-card jk-mt-24">
