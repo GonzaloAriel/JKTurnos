@@ -234,6 +234,10 @@
     <Compile Include="Migrations\202608262247114_AddAvatarUrlToConfiguracion.Designer.cs">
       <DependentUpon>202608262247114_AddAvatarUrlToConfiguracion.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608271348191_AddIdempotencyKeyToPagoSuscripcion.cs" />
+    <Compile Include="Migrations\202608271348191_AddIdempotencyKeyToPagoSuscripcion.Designer.cs">
+      <DependentUpon>202608271348191_AddIdempotencyKeyToPagoSuscripcion.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
@@ -532,6 +536,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608262247114_AddAvatarUrlToConfiguracion.resx">
       <DependentUpon>202608262247114_AddAvatarUrlToConfiguracion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608271348191_AddIdempotencyKeyToPagoSuscripcion.resx">
+      <DependentUpon>202608271348191_AddIdempotencyKeyToPagoSuscripcion.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

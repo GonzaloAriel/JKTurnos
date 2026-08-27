@@ -27,5 +27,11 @@ namespace JKTurnos.Models.Entities
 
         // AdminGlobal que registra el pago (auditoria autocontenida).
         public int UsuarioId { get; set; }
+
+        // C4: clave de idempotencia (GUID por formulario). Impide duplicar un pago por
+        // doble submit / reenvio del form: el servicio verifica antes de crear. No hay
+        // indice unico (rechazaria historicos con NULL duplicados en este SQL Server);
+        // nullable para registros historicos sin clave.
+        public string IdempotencyKey { get; set; }
     }
 }

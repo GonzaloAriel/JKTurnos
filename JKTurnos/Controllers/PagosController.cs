@@ -9,7 +9,7 @@ using JKTurnos.Services;
 namespace JKTurnos.Controllers
 {
     // Modulo Pagos: listado + filtros, registro, edicion y anulacion (baja logica con motivo).
-    [Authorize]
+    [Authorize(Roles = Roles.Admin + "," + Roles.User)]
     public class PagosController : BaseController
     {
         private readonly PagoService _pagoService;

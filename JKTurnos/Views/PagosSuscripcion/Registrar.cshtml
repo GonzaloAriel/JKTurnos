@@ -29,9 +29,10 @@
         </div>
         <div class="col-md-6">
             <div class="jk-form-group">
-                <label class="jk-label" for="@Html.IdFor(m => m.Fecha)">Fecha</label>
-                @Html.TextBoxFor(m => m.Fecha, "{0:yyyy-MM-dd}", new { @class = "jk-input", type = "date", required = "required" })
-                @Html.ValidationMessageFor(m => m.Fecha, "", new { @class = "jk-field-error" })
+                <label class="jk-label">Fecha</label>
+                <input type="text" class="jk-input" value="@DateTime.Today.ToString("dd/MM/yyyy")" disabled="disabled" />
+                @Html.HiddenFor(m => m.Fecha)
+                @Html.HiddenFor(m => m.IdempotencyKey)
             </div>
         </div>
     </div>

@@ -12,9 +12,9 @@
         <div class="jk-form-group jk-filter-field">
             <label class="jk-label" for="estado">Estado</label>
             <select id="estado" name="estado" class="jk-select">
-                <option value="">Todos</option>
                 <option value="activos" @(ViewBag.Estado == "activos" ? "selected" : "")>Activos</option>
                 <option value="desactivados" @(ViewBag.Estado == "desactivados" ? "selected" : "")>Desactivados</option>
+                <option value="">Todos</option>
             </select>
         </div>
         <button type="submit" class="jk-btn jk-btn-primary">
@@ -107,6 +107,7 @@
                                                 { "EditUrl", Url.Action("Edit", new { id = item.TenantId }) },
                                                 { "DeleteUrl", Url.Action("Desactivar", new { id = item.TenantId }) },
                                                 { "DeleteLabel", "Desactivar" },
+                                                { "DeleteIcon", "pause-circle" },
                                                 { "ItemName", item.Nombre },
                                                 { "Compact", true }
                                             })

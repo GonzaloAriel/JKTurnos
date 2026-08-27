@@ -81,7 +81,10 @@ namespace JKTurnos.Controllers
             {
                 TenantId = tenantId ?? 0,
                 Fecha = DateTime.Today,
-                Monto = 0m
+                Monto = 0m,
+                // C4: la clave de idempotencia se genera UNA vez por formulario y viaja
+                // oculta para que el mismo form reenviado no duplique el pago.
+                IdempotencyKey = Guid.NewGuid().ToString("N")
             };
 
             ViewBag.Tenants = new SelectList(_tenantService.GetAll(), "Id", "Nombre", tenantId);
@@ -104,7 +107,11 @@ namespace JKTurnos.Controllers
 
             try
             {
-                _service.Registrar(model.TenantId, model.PlanCodigo, model.Monto, model.Fecha, model.Observacion, UserId);
+                // C4: sella la fecha a hoy (ignora el campo Fecha del form) y reutiliza
+                // la clave de idempotencia que viaja oculta desde el GET, para no
+                // duplicar el pago ante un reenvio (doble submit / retry).
+                var fechaSellada = DateTime.Today;
+                _service.Registrar(model.TenantId, model.PlanCodigo, model.Monto, fechaSellada, model.Observacion, UserId, model.IdempotencyKey);
                 TempData["Success"] = "Pago registrado correctamente.";
                 return RedirectToAction("Index");
             }

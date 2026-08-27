@@ -7,7 +7,7 @@ using JKTurnos.Services;
 
 namespace JKTurnos.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.Admin + "," + Roles.User)]
     public class ServiciosController : BaseController
     {
         private readonly ServicioService _service;

@@ -45,8 +45,13 @@ namespace JKTurnos.Services
         }
 
         /// <summary>
-        /// D-037 / AG-0 punto 5 / AG-4: registra un pago confirmado y actualiza la
+        /// D-037 / AG-0 punto 5 / AG-4 / C4: registra un pago confirmado y actualiza la
         /// suscripcion del tenant en UNA transaccion (pago + vencimiento, todo o nada).
+        /// C4 - idempotencia: si ya existe un PagoSuscripcion con la misma IdempotencyKey
+        /// (reenvio del mismo submit), devuelve ese pago sin duplicar ni re-aplicar el
+        /// recalculo de vencimiento (el submit original ya lo hizo). No hay indice unico
+        /// (rechazaria historicos con NULL duplicados en este SQL Server); la verificacion
+        /// transaccional por clave es la fuente de idempotencia.
         /// Recalculo de vigencia (PlanesSuscripcion.CalcularNuevoVencimiento):
         /// - Si Vencimiento >= fecha del pago (vigente): extiende desde el vencimiento
         ///   vigente para que el tenant no pierda dias (renovacion anticipada).
@@ -54,9 +59,9 @@ namespace JKTurnos.Services
         /// FechaInicioPeriodo = fecha del pago; PlanCodigo del tenant = plan de este
         /// pago (el ultimo pago manda). No toca SuspendidoManual ni IsActive.
         /// UsuarioId = AdminGlobal que registra (claim del usuario autenticado).
-        /// Devuelve el pago creado.
+        /// Devuelve el pago creado (o el pre-existente si la clave se repite).
         /// </summary>
-        public PagoSuscripcion Registrar(int tenantId, string planCodigo, decimal monto, DateTime fecha, string observacion, int usuarioId)
+        public PagoSuscripcion Registrar(int tenantId, string planCodigo, decimal monto, DateTime fecha, string observacion, int usuarioId, string idempotencyKey)
         {
             if (!PlanesSuscripcion.Todos.Any(p => p.Codigo == planCodigo))
                 throw new InvalidOperationException("Plan de suscripcion desconocido: " + planCodigo);
@@ -73,6 +78,19 @@ namespace JKTurnos.Services
                 var pagoRepo = new GlobalRepository<PagoSuscripcion>(context);
                 var tenantRepo = new GlobalRepository<Tenant>(context);
 
+                // C4: idempotencia. Si el mismo submit (misma clave) ya genero un pago,
+                // devolvemos ese pago sin duplicar ni re-aplicar el recalculo.
+                if (!string.IsNullOrEmpty(idempotencyKey))
+                {
+                    var existente = pagoRepo.GetAll()
+                                            .FirstOrDefault(x => x.IdempotencyKey == idempotencyKey);
+                    if (existente != null)
+                    {
+                        transaccion.Commit();
+                        return existente;
+                    }
+                }
+
                 var tenant = tenantRepo.GetById(tenantId);
 
                 if (tenant == null)
@@ -85,7 +103,8 @@ namespace JKTurnos.Services
                     Monto = monto,
                     Fecha = fecha,
                     Observacion = string.IsNullOrWhiteSpace(observacion) ? null : observacion.Trim(),
-                    UsuarioId = usuarioId
+                    UsuarioId = usuarioId,
+                    IdempotencyKey = string.IsNullOrWhiteSpace(idempotencyKey) ? null : idempotencyKey.Trim()
                 };
 
                 pagoRepo.Add(pago);
@@ -95,6 +114,25 @@ namespace JKTurnos.Services
                 tenant.FechaVencimiento = PlanesSuscripcion.CalcularNuevoVencimiento(tenant.FechaVencimiento, fecha, planCodigo);
 
                 tenantRepo.Update(tenant);
+
+                // C6: notificar al tenant en su feed in-app (NotificacionSistema, por
+                // tenant). Se inserta con TenantId explicito (el AdminGlobal corre con
+                // TenantId=0; BaseRepository.Add lo forzaria a 0 y el tenant no lo veria).
+                // Dentro del MISMO contexto/transaccion: pago + suscripcion + notificacion,
+                // todo o nada. Sin navegacion (EntidadTipo=null): el feed del tenant no
+                // tiene pagina operativa para suscripciones.
+                var notifRepo = new GlobalRepository<NotificacionSistema>(context);
+                notifRepo.Add(new NotificacionSistema
+                {
+                    TenantId = tenantId,
+                    Tipo = NotificacionSistemaService.TipoPagoRegistrado,
+                    Titulo = "Pago de suscripcion",
+                    Mensaje = "Pago registrado por $" + monto.ToString("0.##") + " (plan " + planCodigo + ").",
+                    EntidadTipo = null,
+                    EntidadId = null,
+                    Fecha = DateTime.Now,
+                    Leida = false
+                });
 
                 transaccion.Commit();
 

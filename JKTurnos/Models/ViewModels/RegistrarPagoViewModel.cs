@@ -22,11 +22,14 @@ namespace JKTurnos.Models.ViewModels
         public decimal Monto { get; set; }
 
         [Display(Name = "Fecha")]
-        [Required(ErrorMessage = "La fecha es obligatoria.")]
         public DateTime Fecha { get; set; }
 
         [Display(Name = "Observacion")]
         [MaxLength(500, ErrorMessage = "La observacion no puede superar 500 caracteres.")]
         public string Observacion { get; set; }
+
+        // C4: clave de idempotencia por formulario. Se genera en GET y viaja oculta
+        // (hidden field) para que el mismo form reenviado no duplique el pago.
+        public string IdempotencyKey { get; set; }
     }
 }

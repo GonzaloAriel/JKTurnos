@@ -46,6 +46,13 @@ namespace JKTurnos.Data
                 .Property(x => x.Observacion)
                 .HasMaxLength(500);
 
+            // C4: clave de idempotencia (sin indice unico: la idempotencia se hace por
+            // verificacion transaccional en el servicio; un indice unico rechazaria
+            // registros historicos con NULL duplicados en este SQL Server).
+            modelBuilder.Entity<PagoSuscripcion>()
+                .Property(x => x.IdempotencyKey)
+                .HasMaxLength(36);
+
             modelBuilder.Entity<AvatarPlataforma>()
                 .Property(x => x.Nombre)
                 .HasMaxLength(100);

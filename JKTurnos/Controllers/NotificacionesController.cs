@@ -1,4 +1,5 @@
 using System.Web.Mvc;
+using JKTurnos.Models.Entities;
 using JKTurnos.Services;
 
 namespace JKTurnos.Controllers
@@ -6,7 +7,7 @@ namespace JKTurnos.Controllers
     // Notificaciones del sistema (in-app): feed de actividad del tenant.
     // El feed se lee desde BaseController (ViewBag.TopbarNotificaciones);
     // aqui solo viven las acciones de usuario.
-    [Authorize]
+    [Authorize(Roles = Roles.Admin + "," + Roles.User)]
     public class NotificacionesController : BaseController
     {
         private readonly NotificacionSistemaService _service;

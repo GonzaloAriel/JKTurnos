@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using JKTurnos.Models.Entities;
 using JKTurnos.Models.ViewModels;
 using JKTurnos.Services;
 using Microsoft.Owin.Security;
@@ -37,6 +38,9 @@ namespace JKTurnos.Controllers
                 ModelState.AddModelError("", "Credenciales incorrectas o cuenta desactivada. Contacte al administrador.");
                 return View(model);
             }
+
+            if (User.IsInRole(Roles.AdminGlobal))
+                return RedirectToAction("Index", "AdminGlobalDashboard");
 
             return RedirectToAction("Index", "Home");
         }

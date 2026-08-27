@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Web.Mvc;
+using JKTurnos.Models.Entities;
 using JKTurnos.Services;
 
 namespace JKTurnos.Controllers
 {
+    [Authorize(Roles = Roles.Admin + "," + Roles.User)]
     public class HomeController : BaseController
     {
         private readonly HomeService _homeService;

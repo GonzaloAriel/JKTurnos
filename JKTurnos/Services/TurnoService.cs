@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
 using JKTurnos.Data;
+using JKTurnos.Infrastructure;
 using JKTurnos.Models.Entities;
 
 namespace JKTurnos.Services
@@ -156,6 +157,8 @@ namespace JKTurnos.Services
                 throw new InvalidOperationException(
                     "No hay estados de turno configurados. Contacte al administrador.");
 
+            ValidarReferenciasTenant(turno);
+
             _repo.Add(turno);
 
             new NotificacionSistemaService().RegistrarTurnoCreado(turno.Id);
@@ -181,6 +184,8 @@ namespace JKTurnos.Services
             if (!ValidarDisponibilidad(turno.RecursoId, turno.FechaHoraInicio, turno.FechaHoraFin, turno.Id))
                 throw new InvalidOperationException(
                     "El recurso no esta disponible en el horario seleccionado.");
+
+            ValidarReferenciasTenant(turno);
 
             var cambios = CompararTurnos(existente, turno);
 
@@ -266,6 +271,38 @@ namespace JKTurnos.Services
                 AuditService.E_Turno,
                 detalle,
                 id);
+        }
+
+        /// <summary>
+        /// C1 (seguridad): valida que Cliente/Servicio/Recurso/EstadoTurno referenciados
+        /// por el turno pertenezcan al tenant del usuario. Evita la inyeccion de FK
+        /// referencial cross-tenant (turno apuntando a entidades de OTRO tenant), que
+        /// antes filtraba datos ajenos via Include(...). Se consulta por TenantId
+        /// (sin exigir IsActive) para no romper la edicion de turnos cuyas referencias
+        /// fueron dadas de baja (soft delete).
+        /// </summary>
+        private void ValidarReferenciasTenant(Turno turno)
+        {
+            using (var context = new JKContext())
+            {
+                var tenantId = new TenantProvider().GetTenantId();
+
+                if (turno.RecursoId <= 0 ||
+                    !context.Recursos.Any(r => r.Id == turno.RecursoId && r.TenantId == tenantId))
+                    throw new InvalidOperationException("El recurso seleccionado no es valido.");
+
+                if (turno.ClienteId <= 0 ||
+                    !context.Clientes.Any(c => c.Id == turno.ClienteId && c.TenantId == tenantId))
+                    throw new InvalidOperationException("El cliente seleccionado no es valido.");
+
+                if (turno.ServicioId.HasValue &&
+                    !context.Servicios.Any(s => s.Id == turno.ServicioId.Value && s.TenantId == tenantId))
+                    throw new InvalidOperationException("El servicio seleccionado no es valido.");
+
+                if (turno.EstadoTurnoId <= 0 ||
+                    !context.EstadosTurno.Any(e => e.Id == turno.EstadoTurnoId && e.TenantId == tenantId))
+                    throw new InvalidOperationException("El estado de turno seleccionado no es valido.");
+            }
         }
 
         private string NombreCliente(int clienteId)

@@ -34,6 +34,7 @@
     string deleteUrl = ViewBag.DeleteUrl ?? "#";
     string editLabel = ViewBag.EditLabel ?? "Editar";
     string deleteLabel = ViewBag.DeleteLabel ?? "Eliminar";
+    string deleteIcon = ViewBag.DeleteIcon ?? "trash";
     string itemName = ViewBag.ItemName ?? "";
     bool compact = ViewBag.Compact ?? false;
 }
@@ -44,7 +45,7 @@
     @if (!compact) { <text>@editLabel</text> }
 </a>
 <a class="jk-btn jk-btn-sm jk-btn-danger" href="@deleteUrl"
-   @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="Eliminar @itemName"</text> }>
-    <i class="bi bi-trash"></i>
+   @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="@deleteLabel @itemName"</text> }>
+    <i class="bi bi-@deleteIcon"></i>
     @if (!compact) { <text>@deleteLabel</text> }
 </a>

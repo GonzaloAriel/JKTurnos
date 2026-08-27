@@ -9,7 +9,7 @@ using JKTurnos.Data;
 
 namespace JKTurnos.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Roles.Admin + "," + Roles.User)]
     public class TurnosController : BaseController
     {
         private readonly TurnoService _turnoService;

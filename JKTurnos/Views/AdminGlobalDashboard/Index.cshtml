@@ -1,5 +1,12 @@
 @model JKTurnos.Models.ViewModels.AdminGlobalDashboardViewModel
 
+@{
+    ViewBag.Title = "Dashboard Global";
+    ViewBag.Subtitle = "Gestion centralizada de la plataforma";
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
 <div class="jk-card jk-mb-24">
     <div class="jk-grid">
         @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
@@ -34,8 +41,3 @@
     @Html.Partial("_AlertasTenants", Model.TenantsEnRiesgo)
     @Html.Partial("_UltimosPagos", Model.UltimosPagos)
 </div>
-
-@{
-    ViewBag.Title = "Dashboard Global";
-    ViewBag.Subtitle = "Gestión centralizada de la plataforma";
-}

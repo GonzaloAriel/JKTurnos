@@ -18,6 +18,10 @@ namespace JKTurnos.Controllers
         // GET: Tenants (AG-7: panel de operacion del Admin Global)
         public ActionResult Index(string busqueda = null, string estado = null)
         {
+            // C3: por defecto solo se muestran activos; opcional ver desactivados.
+            if (string.IsNullOrWhiteSpace(estado))
+                estado = "activos";
+
             ViewBag.Busqueda = busqueda;
             ViewBag.Estado = estado;
 
@@ -99,7 +103,15 @@ namespace JKTurnos.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DesactivarConfirmado(int id)
         {
-            _service.Delete(id);
+            try
+            {
+                _service.Delete(id);
+                TempData["Success"] = "El tenant fue desactivado.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
 
             return RedirectToAction("Index");
         }
@@ -120,7 +132,15 @@ namespace JKTurnos.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ReactivarConfirmado(int id)
         {
-            _service.Reactivar(id);
+            try
+            {
+                _service.Reactivar(id);
+                TempData["Success"] = "El tenant fue reactivado.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
 
             return RedirectToAction("Index");
         }

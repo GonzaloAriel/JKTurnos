@@ -43,6 +43,9 @@ namespace JKTurnos.Services
 
         /// <summary>
         /// Busca un tenant incluyendo los dados de baja (IsActive = false).
+        /// Excepcion justificada a D-022: GlobalRepository filtra por IsActive, por lo
+        /// que para operar sobre registros inactivos (ver/reactivar bajas) se consulta
+        /// el contexto directamente. Solo toca entidades de plataforma, sin TenantId.
         /// </summary>
         public Tenant GetByIdInactive(int id)
         {
@@ -292,10 +295,12 @@ namespace JKTurnos.Services
 
         /// <summary>
         /// Reactiva un tenant dado de baja (IsActive = false -> true).
+        /// En transaccion (simetria con Delete): tenant + users, todo o nada.
         /// </summary>
         public void Reactivar(int id)
         {
             using (var context = new JKContext())
+            using (var transaction = context.Database.BeginTransaction())
             {
                 var tenant = context.Tenants.FirstOrDefault(t => t.Id == id);
 
@@ -314,41 +319,15 @@ namespace JKTurnos.Services
                 }
 
                 context.SaveChanges();
+                transaction.Commit();
             }
         }
 
         /// <summary>
-        /// D-038 / AG-2: suspension SOLO manual e informativa. Toca unicamente
-        /// SuspendidoManual; NUNCA modifica IsActive, fechas de suscripcion ni pagos.
-        /// El corte real de uso se hace desactivando usuarios desde UsuariosController.
+        /// D-038 / AG-2: suspension SOLO manual e informativa. Se elimino el toggle
+        /// del UI (D-039); el campo SuspendidoManual persiste en el modelo solo para
+        /// el estado derivado de la card/dashboard, sin metodos de escritura activos.
         /// </summary>
-        public void Desactivar(int id)
-        {
-            SetSuspendidoManual(id, true);
-        }
-
-        /// <summary>
-        /// D-038 / AG-2: quita la suspension manual. NO modifica fechas ni pagos;
-        /// para extender vigencia se registra un pago (AG-4).
-        /// </summary>
-        public void Activar(int id)
-        {
-            SetSuspendidoManual(id, false);
-        }
-
-        private void SetSuspendidoManual(int id, bool suspendido)
-        {
-            var tenant = _tenantRepo.GetById(id);
-
-            if (tenant == null)
-                return;
-
-            if (tenant.SuspendidoManual == suspendido)
-                return;
-
-            tenant.SuspendidoManual = suspendido;
-            _tenantRepo.Update(tenant);
-        }
 
         private void SeedBaseData(Tenant tenant, string adminEmail)
         {
