@@ -34,7 +34,7 @@ namespace JKTurnos.Controllers
 
             if (!success)
             {
-                ModelState.AddModelError("", "Usuario o contraseña incorrectos");
+                ModelState.AddModelError("", "Credenciales incorrectas o cuenta desactivada. Contacte al administrador.");
                 return View(model);
             }
 

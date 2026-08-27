@@ -20,6 +20,8 @@ namespace JKTurnos.Models.ViewModels
 
         public bool SuspendidoManual { get; set; }
 
+        public bool IsActive { get; set; }
+
         public string PlanCodigo { get; set; }
 
         public string PlanNombre { get; set; }

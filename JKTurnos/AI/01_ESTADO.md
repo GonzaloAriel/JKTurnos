@@ -19,8 +19,92 @@ PENDIENTE - No evaluado.
 - Modulo Configuracion de Negocio (D-025, 2026-08-18, aprobado por TEAM LEAD): `ConfiguracionService` + `ConfiguracionController` (solo rol Admin) con Datos del negocio (edicion de ConfiguracionTenant con ayuda para logo gratis por URL) y CRUD de Estados de Turno (nombre + color, baja logica). Vistas `Views/Configuracion/{Index,DatosNegocio,EstadoCrear,EstadoEditar,EstadoEliminar}.cshtml`. Sidebar item "Negocio" y accion rapida "Configurar" del Command Center apuntan al modulo.
 - Logo del negocio por URL (D-026, 2026-08-18, aprobado por TEAM LEAD): `BaseController.OnActionExecuting` expone `ViewBag.ConfiguracionLogo/Nombre` (un query por request); el sidebar muestra el logo (100px, fallback al icono) y la bienvenida del Command Center lo muestra arriba del saludo (120px, sin recuadro, centrado en movil). Se removio el nombre comercial de la bienvenida (redundante).
 - Deploy con auto-migracion (D-027, 2026-08-18, aprobado por TEAM LEAD): cadena de migraciones reescrita en una unica `Inicial` (modelo actual completo, incluye ServicioId nullable, sin FK Users.TenantId, Turno->Recurso sin cascade via OnModelCreating). `Global.asax.cs` usa `MigrateDatabaseToLatestVersion` (la app actualiza sola la BD al arrancar: migraciones pendientes + Seed). BD local regenerada desde cero y verificada (admin/global/tenant/config/estados correctos). El hosting se vacia UNA vez (borrar tablas) y luego cada deploy = Add-Migration + publicar.
-- Modulo Notificaciones al Cliente (D-033): CONSOLIDADO (2026-08-19, aprobado por TEAM LEAD). Fase 1 CONSOLIDADA: entidad `NotificacionService` (genera el mensaje desde la plantilla con placeholders {nombre}/{servicio}/{fecha}/{hora} y el link `wa.me` con el telefono del cliente normalizado), boton "Recordar por WhatsApp" en `_TurnoDetailDrawer` (abre WhatsApp en otra pestana con el mensaje prellenado; se oculta si el cliente no tiene telefono), plantilla editable por rol Admin en Configuracion (campo `ConfiguracionTenant.WhatsAppTemplate`, form DatosNegocio + card Notificaciones en Index), migracion `AddNotificacionesWhatsApp` aplicada a la BD local. Fase 2 email SMTP CONSOLIDADA (implementada 2026-08-19; aprobado por TEAM LEAD, 2026-08-25): `NotificacionService.EnviarEmail(turnoId)` con asunto/cuerpo desde plantillas editables (EmailAsunto/EmailTemplate), credenciales SMTP en `ConfiguracionTenant` (Servidor, Puerto, Usuario, Password, EmailDesde) + switch `SmtpHabilitado`, accion `Turnos/EnviarRecordatorioEmail` (POST ajax) y boton "Enviar recordatorio por email" en el Drawer (solo si el cliente tiene email; handler global en `jk-layout.js` para Agenda/Pagos/Dashboard); la password no se re-renderiza en el form y en blanco conserva la actual; migracion `AddNotificacionesEmail` aplicada y verificada en la BD local. Seccion propia en Configuracion (2026-08-19): la seccion Notificaciones NO tiene item en el sidebar (decisión del TEAM LEAD: en el grupo Configuracion solo queda "Negocio"); se accede desde la card "Configuracion de notificaciones" del `Configuracion/Index` (link "Ver seccion" y lapices). La vista `Notificaciones.cshtml` tiene las cards "Recordatorio por WhatsApp" y "Recordatorio por email (SMTP)" con boton Editar. Las ediciones estan SEPARADAS: `NotificacionesWhatsApp.cshtml` (solo plantilla WhatsApp) y `NotificacionesEmail.cshtml` (solo SMTP), con acciones y metodos de servicio propios (`UpdateNotificacionWhatsApp`/`UpdateNotificacionEmail`). `Configuracion/Index` suma la card "Configuracion de notificaciones" con las dos filas (WhatsApp y email) y sus lapices propios + link "Ver seccion". `DatosNegocio` quedo solo con datos del negocio; `ConfiguracionService` tiene `UpdateDatosNegocio` (cada forma solo toca sus campos; la password en blanco conserva la actual). Fase 3 centro in-app + recordatorios programados a futuro.
+- Modulo Notificaciones al Cliente (D-033): CONSOLIDADO (2026-08-19, aprobado por TEAM LEAD). Fase 1 CONSOLIDADA: entidad `NotificacionService` (genera el mensaje desde la plantilla con placeholders {nombre}/{servicio}/{fecha}/{hora} y el link `wa.me` con el telefono del cliente normalizado), boton "Recordar por WhatsApp" en `_TurnoDetailDrawer` (abre WhatsApp en otra pestana con el mensaje prellenado; se oculta si el cliente no tiene telefono), plantilla editable por rol Admin en Configuracion (campo `ConfiguracionTenant.WhatsAppTemplate`, form DatosNegocio + card Notificaciones en Index), migracion `AddNotificacionesWhatsApp` aplicada a la BD local. Fase 2 email SMTP CONSOLIDADA (implementada 2026-08-19; aprobado por TEAM LEAD, 2026-08-25): `NotificacionService.EnviarEmail(turnoId)` con asunto/cuerpo desde plantillas editables (EmailAsunto/EmailTemplate), credenciales SMTP en `ConfiguracionTenant` (Servidor, Puerto, Usuario, Password, EmailDesde) + switch `SmtpHabilitado`, accion `Turnos/EnviarRecordatorioEmail` (POST ajax) y boton "Enviar recordatorio por email" en el Drawer (solo si el cliente tiene email; handler global en `jk-layout.js` para Agenda/Pagos/Dashboard); la password no se re-renderiza en el form y en blanco conserva la actual; migracion `AddNotificacionesEmail` aplicada y verificada en la BD local. Seccion propia en Configuracion (2026-08-19): la seccion Notificaciones NO tiene item en el sidebar (decisión del TEAM LEAD: en el grupo Configuracion solo queda "Negocio"); se accede desde la card "Configuracion de notificaciones" del `Configuracion/Index` (link "Ver seccion" y lapices). La vista `Notificaciones.cshtml` tiene las cards "Recordatorio por WhatsApp" y "Recordatorio por email (SMTP)" con boton Editar. Las ediciones estan SEPARADAS: `NotificacionesWhatsApp.cshtml` (solo plantilla WhatsApp) y `NotificacionesEmail.cshtml` (solo SMTP), con acciones y metodos de servicio propios (`UpdateNotificacionWhatsApp`/`UpdateNotificacionEmail`). `ConfiguracionService.UpdateNotificacionWhatsApp` y `UpdateNotificacionEmail` son independentes y actualizan SOLO sus campos. Migracion `AddNotificacionesEmail` aplicada. MSBuild Debug 0 errores.
 - Dashboard / Command Center v2 (D-034): CONSOLIDADO (2026-08-19, aprobado por TEAM LEAD), SECCION APARTE (el TEAM LEAD decidio que no se toca el Command Center). Fase 1 CONSOLIDADA: `DashboardController` + `Views/Dashboard/Index.cshtml` + `DashboardService` + `DashboardViewModel` + `Content/Pages/jk-dashboard-section.css`; sidebar item "Dashboard" en grupo Principal. Muestra KPIs del mes (turnos, ingresos por pagos, ocupacion de hoy, clientes), graficas de ocupacion semanal e ingresos del mes por dia (CSS puro), proximos turnos y turnos sin confirmar (click abre el drawer de detalle en la MISMA seccion Dashboard via `jk-dashboard.js`, sin navegar a la Agenda; incluye registrar pago en el drawer), ranking de servicios, cobrado por recurso y saldo pendiente. Fase 2 CONSOLIDADA (2026-08-19, aprobado por TEAM LEAD): KPI de ingresos con variacion % vs mes anterior, card "Evolucion de ingresos (12 meses)" (barras verticales), card "Ingresos por recurso (mes)" con barras horizontales con %, card "Pagos del mes por tipo" (desglose Senia/PagoParcial/PagoTotal con montos y cantidades). Fase 3 exportacion a futuro.
 - Evolucion visual (D-035): CONSOLIDADO (2026-08-25, aprobado por TEAM LEAD tras smoke test por posta). Archivo fuente unico de la identidad: `Content/DesignSystem/jk-tokens.css`. Postas verificadas: (1) paleta calida crema/marfil/beige + sage accent `#5F7A5D` cambiando SOLO valores de tokens existentes (sin taxonomia nueva); (1.B) aliases legacy unificados a la nueva paleta (`--jk-primary/-hover/-bg-app/-text-main/-text-muted` declarados en jk-tokens.css) + botones primario/danger/success core migrados a tokens (WhatsApp intacto como marca externa); (2) tipografia: titulos en Nunito via nuevo token `--jk-font-display` (@import en jk-tokens.css), cuerpo sigue Inter; (3) radios amables 8/14/18/22px (solo tokens); (4) sombras calidas tinte marron `rgba(74,64,56,...)` + anillos de foco migrados del azul viejo a `color-mix(var(--jk-accent))`; (5) componentes tanda 1 (badges e iconos de notificacion con texto oscurecido via color-mix, AA cumplido; `:active` de botones) y tanda 2 (KPI trends y toasts AA; cards ya heredaban todo, sin cambios); (6) espaciado dirigido: separacion minima entre notificaciones consecutivas (campana y Actividad reciente) via `.jk-notif-item + .jk-notif-item`. Deuda registrada (NO corregir sin decision): hardcodes de `Content/Pages/`, fallbacks `#2563eb`/`#aeaeb2` de Recurso/Estado en Views (son datos, no UI), `_ColorSelector.cshtml` paleta Apple, backdrops negros, CSS muerto (`jk-ds.css`, `jk-sidebar.css`, `jk-topbar.css`), SVG select arrow gris.
 - Evolucion visual segunda ola (D-036 + ajustes aprobados): CONSOLIDADO (2026-08-25, aprobado por TEAM LEAD tras verificacion visual por posta). Incluye: (1) PALETA VINTAGE DE RECURSOS en `_ColorSelector.cshtml` manteniendo nombres: Azul `#7295B5`, Verde `#9CAF88`, Rojo `#C97B6D`, Naranja `#E8A87C`, Amarillo `#E6C868`, Violeta `#A594C5`, Rosa `#D9A5B3`, Turquesa `#6FB3B8`, Gris `#A89F91`, Marron `#B08968`, Indigo `#8784B8`, Cian `#92C7AF`; default y fallbacks de Recurso en Views cambiados de `#2563eb` a `#7295B5` (los recursos ya creados conservan su color guardado hasta editarse). (2) DRAWER: redondeo solo lado izquierdo (`--jk-radius-lg 0 0 var(--jk-radius-lg)`), backdrops calidos `rgba(74,64,56,.40)` drawer y `.45` modal, header con hairline `--jk-border-light`, close circular, seccion economica como mini-card `.jk-drawer-section-economica`. (3) COMMAND CENTER alineado: residuos frios de `Content/jk-dashboard.css` migrados a tokens (`#f0f5ff`->accent-light, `#ecfdf5`->success-light, `#fffbeb`->warning-light, `#d1d5db`->border, blancos+radius hardcodeados->surface/tokens en quick-actions, mi-dia y suggestion cards), KPIs con Nunito (`.kpi-value`), fecha en el saludo como eyebrow (`.contextual-date`), separadores punteados entre secciones. (4) SUPERFICIES Y NAV EN MENTA PALIDA: `--jk-surface #F1FAFA`, `--jk-sidebar-bg #D7F0EF` (fondo de pagina sigue crema). (5) LOGIN RENOVADO: gradiente marron->sage reemplazado por menta->crema con blobs pastel vivos, logo en chip flotante, firma tricolor bajo el titulo, features en chips circulares de color. (6) LAVADO PASTEL GLOBAL: `background-image` con halos fijos al viewport en `.jk-app-shell` y `.jk-login`; `.welcome-section` transparente (sin blobs locales que dupliquen). Deuda menor registrada: los Estados de Turno base siembran colores Bootstrap (D-024), ajenos a la paleta vintage.
-- Plan AG - Suscripciones, Pagos de Plataforma y Admin Global (D-037/D-038; plan AI/SESION_20260826_PLAN_SUSCRIPCIONES.md): EN PROGRESO. AG-0 CONGELADA (2026-08-26). AG-1 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): `Tenant` + PlanCodigo/FechaInicioPeriodo/FechaVencimiento/SuspendidoManual; migracion aditiva `202608261138281_AddSuscripciones` aplicada y verificada en BD local (4 AddColumn, backfill SIN PLAN); `PlanesSuscripcion.cs` con catalogo estatico, constantes AG-0 (aviso 7/gracia 5) y calculador `CalcularNuevoVencimiento` probado con harness (20 casos OK). AG-2 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): `TenantService.Desactivar/Activar` (solo SuspendidoManual, idempotentes) + endpoints POST en `TenantsController`; harness contra BD real (6 casos OK: flag cambia, nada mas cambia, no-op redundante, no-op inexistente); sin UI (grilla con acciones en AG-7). BD basura `JKTurnosConnection` de LocalDB ELIMINADA. MSBuild Debug 0 errores. Posta siguiente: AG-8 (gestion de pagos de plataforma UI). Posta AG-6 EXCLUIDA del alcance (D-038). AG-3 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): entidad `PagoSuscripcion` autocontenida sin FKs (via GlobalRepository D-022) + DbSet `PagosSuscripciones` + MaxLength(500); migracion aditiva `202608261240430_AddPagosSuscripciones` aplicada a BD local (tabla `dbo.PagoSuscripcions`); harness 14 casos OK; MSBuild Debug 0 errores. AG-4 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): `Registrar(...)` TRANSACCIONAL (una transaccion para pago + suscripcion via nuevo ctor interno de `GlobalRepository` con contexto compartido): renovacion anticipada extiende desde vencimiento vigente; vencido/sin plan parte de la fecha del pago; FechaInicioPeriodo=fecha del pago y PlanCodigo=ultimo pago; no toca SuspendidoManual/IsActive. Verificado: caso feliz 11 OK, rollback atomico OK (CHECK temporal inyectado), vencido 3 OK; BD restaurada a estado original. AG-5 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): card "Suscripcion" solo lectura al inicio de `Configuracion/Index` (badge del DS por estado, CSS cero nuevo); `TenantService.GetSuscripcionTenant(tenantId)` + `SuscripcionTenantViewModel` nuevo; derivacion de estado pura en `PlanesSuscripcion.CalcularEstado(...)` (constantes Estado*, limites AG-0: aviso 7/gracia 5, dia calendario); `ConfiguracionController.Index` carga ViewBag.Suscripcion con TenantId del claim. Verificado: harness 19 casos OK (limites exactos + VM real ACTIVO/EN GRACIA/SIN PLAN), aspnet_compiler exit 0 (vistas compilan), MSBuild 0 errores. AG-7 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): `Views/Tenants/Index` = panel operativo Admin Global (contadores con _KpiCard + grilla estado/plan/vencimiento/tiempo + Activar/Desactivar con confirm, movil en cards); `PanelTenantsViewModel` + `GetSuscripciones/GetPanelTenants` (sin N+1); VM gana TenantId/Nombre/Subdominio; componente `_BadgeEstadoSuscripcion.cshtml` compartido (Configuracion ya lo usa). Boton "Registrar pago" por fila diferido a AG-8. Verificado: harness 12 OK (precedencia SUSPENDIDO>VENCIDO incluida), aspnet_compiler 0, MSBuild 0 errores. AG-8 IMPLEMENTADA (2026-08-26, pendiente confirmacion TEAM LEAD): `PagosSuscripcionController` reescrito — Index con filtros (tenantId, fechaDesde, fechaHasta) y listado enriquecido via `PagoSuscripcionItemViewModel` (resuelve TenantNombre/PlanNombre en-service, sin N+1); Registrar con model binding via `RegistrarPagoViewModel` (flujos: renovacion anticipada + vencido/sin plan, hereda AG-4). Boton "Registrar pago" en `Tenants/Index` (desktop icono + mobile ghost button). Vista dedicada `Configuracion/Suscripcion.cshtml` (card estado suscripcion + historial pagos desktop table + mobile cards, desde `ConfiguracionController.Suscripcion`). `Configuracion/Index` limpiado: suscripcion/pagos pasan a card-link que apunta a `Configuracion/Suscripcion`. Sidebar "Pagos Plataforma" en grupo Sistema (AdminGlobal). MSBuild Debug 0 errores. Proximo: AG-9 (Dashboard Admin Global minimo).
+- Plan AG - Suscripciones, Pagos de Plataforma y Admin Global (D-037/D-038; plan AI/SESION_20260826_PLAN_SUSCRIPCIONES.md): EN PROGRESO. AG-0 CONGELADA. AG-1..AG-5, AG-7 IMPLEMENTADAS (pendiente confirmacion TEAM LEAD). AG-6 EXCLUIDA (D-038). AG-8 IMPLEMENTADA (2026-08-26): PagosSuscripcionController con Index (filtros tenant/rango fechas) y Registrar (model binding via RegistrarPagoViewModel). AG-9 IMPLEMENTADA (2026-08-26): Dashboard Admin Global minimo (shell con contadores de tenants por estado). AG-10 IMPLEMENTADA (2026-08-26): Avatares de Plataforma — entidad AvatarPlataforma (global, BaseModel), CRUD AdminGlobal (AvataresController + 4 vistas), selector en Configuracion/DatosNegocio, avatar priorizado en BaseController (AvatarUrl > LogoUrl > icono), sidebar "Avatares" en grupo Sistema. Sidebar branding: texto "JKTurnos" eliminado, subtitulo muestra NombreComercial, logo centrado, collapsed reduce logo a 38x38. Command Center: "Configura horarios" reemplazado por "Crear recurso". Ciclo vida Tenant: DELETE cascade soft-delete (Users, ConfiguracionTenant, EstadosTurno), Reactivar (restaura Tenant + Users), Desactivar con pantalla de confirmacion, login bloqueado para tenants inactivos, filtros de busqueda y estado en grilla. MSBuild Debug 0 errores. Proximo: confirmacion TEAM LEAD.
+
+## Fuentes de verdad
+
+Docs/ contiene la documentacion funcional y de producto. No se duplica en AI/.
+
+Docs/00_VISION.md - vision y filosofia del producto
+
+Docs/01_AGENTS.md - reglas del proyecto para agentes
+
+Docs/02_ROADMAP.md - roadmap y estado por fase
+
+Docs/03_ARCHITECTURE.md - arquitectura tecnica oficial
+
+Docs/04_BUSINESS_RULES.md - reglas de negocio
+
+Docs/05_DESIGN_SYSTEM.md - design system
+
+Docs/06_MIGRACION_DS.md - contexto de migracion del design system
+
+Docs/07_MIGRACION_DS_FASE3.md - avance de migracion fase 3
+
+Docs/08_SESION_20260722.md - resumen de sesion (EF/migrations, sidebar)
+
+Docs/09_SESION_20260727.md - resumen de sesion (modulo Recursos)
+
+Docs/11_ARQUITECTURA_FUNCIONAL.md - arquitectura funcional de Agenda y Turnos
+
+Docs/12_CORE_DOMAIN_MODEL.md - modelo conceptual del nucleo
+
+Docs/13_DER.md - modelo entidad-relacion oficial
+
+Docs/13_AGENDA_UX.md - manual de UX de la Agenda
+
+Docs/14_TURNO_LIFECYCLE.md - ciclo de vida del turno
+
+Docs/16_DRAWER_TURNO_FUTURO.md - Drawer de Time Block V2/V3 (trabajo futuro)
+
+Docs/JKTurnosDictionary.md - diccionario tecnico del proyecto
+
+Docs/DashboardLayoutSystem.md - sistema visual y reglas de composicion (activa)
+
+Nota: Docs/10_MIGRACION_RECURSOID.sql y Docs/generar_migracion.ps1 son assets de la migracion de RecurseoId (ver P-001/P-002).
+
+## Archivos de esta memoria
+
+Leer en este orden segun la tarea.
+
+01_ESTADO.md - estado real por modulo. Solo el TEAM LEAD confirma CONSOLIDADO.
+
+02_DECISIONES.md - decisiones tecnicas preservadas (IDs D-XXX).
+
+03_PROBLEMAS.md - problemas conocidos (IDs P-XXX) y resueltos.
+
+## Rutas de lectura por tarea
+
+Toda tarea: leer este archivo y 01_ESTADO.md.
+
+Tarea de implementacion: leer ademas 02_DECISIONES.md y las secciones de 03_PROBLEMAS.md que afecten al modulo.
+
+Tarea de arquitectura o tecnologia: leer 02_DECISIONES.md completo.
+
+Tarea de diagnostico o bug: leer 03_PROBLEMAS.md completo y 01_ESTADO.md del modulo.
+
+Tarea de producto o UX: consultar Docs/ (AGENDA_UX, BUSINESS_RULES, DESIGN_SYSTEM, VISION).
+
+## Reglas de la memoria
+
+Solo el TEAM LEAD confirma que una etapa esta terminada, aprobada y funcionando.
+
+Nunca auto-consolidar una etapa.
+
+Una implementacion existente pero no confirmada no es CONSOLIDADO.
+
+Lo que falla se registra en 03_PROBLEMAS.md.
+
+Lo que se decide se registra en 02_DECISIONES.md.
+
+Lo que se confirma se registra en 01_ESTADO.md.
+
+No guardar conversaciones, logs, razonamientos internos ni opiniones temporales.
+
+No duplicar Docs/.
+
+La memoria permite a cualquier modelo continuar el trabajo sin conocer conversaciones anteriores.

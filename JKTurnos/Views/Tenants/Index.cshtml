@@ -1,5 +1,31 @@
 ﻿@model JKTurnos.Models.ViewModels.PanelTenantsViewModel
 
+@helper FilterContent() {
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+        @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
+            new ViewDataDictionary {
+                { "Name", "busqueda" },
+                { "Id", "search-tenants" },
+                { "Value", ViewBag.Busqueda },
+                { "Placeholder", "Buscar por nombre o subdominio..." }
+            })
+        <div class="jk-form-group jk-filter-field">
+            <label class="jk-label" for="estado">Estado</label>
+            <select id="estado" name="estado" class="jk-select">
+                <option value="">Todos</option>
+                <option value="activos" @(ViewBag.Estado == "activos" ? "selected" : "")>Activos</option>
+                <option value="desactivados" @(ViewBag.Estado == "desactivados" ? "selected" : "")>Desactivados</option>
+            </select>
+        </div>
+        <button type="submit" class="jk-btn jk-btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </a>
+    </form>
+}
+
 @helper ListContent() {
     <!-- ===== RESUMEN (AG-7: shell Admin Global) ===== -->
     <div class="jk-card jk-mb-24">
@@ -34,6 +60,11 @@
                     { "Label", "Sin plan" },
                     { "Value", Model.TotalSinPlan.ToString() }
                 })
+            @Html.Partial("~/Views/Shared/Components/_KpiCard.cshtml",
+                new ViewDataDictionary {
+                    { "Label", "Dados de baja" },
+                    { "Value", Model.TotalBaja.ToString() }
+                })
         </div>
     </div>
 
@@ -53,7 +84,7 @@
                 <tbody>
                     @foreach (var item in Model.Tenants)
                     {
-                        <tr>
+                        <tr class="@(!item.IsActive ? "jk-row-inactive" : "")">
                             <td>
                                 <strong>@item.Nombre</strong><br />
                                 <span class="jk-small text-secondary"><i class="bi bi-globe"></i> @item.Subdominio</span>
@@ -66,23 +97,26 @@
                             <td>@item.TiempoRestanteTexto</td>
                             <td>
                                 <span class="jk-flex jk-gap-8">
-                                    <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-icon" title="Registrar pago">
-                                        <i class="bi bi-cash-stack"></i>
-                                    </a>
-                                    @using (Html.BeginForm(item.SuspendidoManual ? "Activar" : "Desactivar", "Tenants", new { id = item.TenantId }, FormMethod.Post, new { onsubmit = "return confirm('¿" + (item.SuspendidoManual ? "Activar" : "Desactivar") + " el tenant " + item.Nombre + "?');" }))
+                                    @if (item.IsActive)
                                     {
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="jk-btn jk-btn-icon" title="@(item.SuspendidoManual ? "Activar" : "Desactivar")">
-                                            <i class="bi bi-@(item.SuspendidoManual ? "play-circle" : "pause-circle")"></i>
-                                        </button>
+                                        <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-icon" title="Registrar pago">
+                                            <i class="bi bi-cash-stack"></i>
+                                        </a>
+                                        @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                            new ViewDataDictionary {
+                                                { "EditUrl", Url.Action("Edit", new { id = item.TenantId }) },
+                                                { "DeleteUrl", Url.Action("Desactivar", new { id = item.TenantId }) },
+                                                { "DeleteLabel", "Desactivar" },
+                                                { "ItemName", item.Nombre },
+                                                { "Compact", true }
+                                            })
                                     }
-                                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
-                                        new ViewDataDictionary {
-                                            { "EditUrl", Url.Action("Edit", new { id = item.TenantId }) },
-                                            { "DeleteUrl", Url.Action("Delete", new { id = item.TenantId }) },
-                                            { "ItemName", item.Nombre },
-                                            { "Compact", true }
-                                        })
+                                    else
+                                    {
+                                        <a href="@Url.Action("Reactivar", new { id = item.TenantId })" class="jk-btn jk-btn-icon jk-btn-success" title="Reactivar">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </a>
+                                    }
                                 </span>
                             </td>
                         </tr>
@@ -95,7 +129,7 @@
     <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
         @foreach (var item in Model.Tenants)
         {
-            <div class="jk-card jk-card-compact">
+            <div class="jk-card jk-card-compact @(!item.IsActive ? "jk-card-inactive" : "")">
                 <div class="jk-flex-between">
                     <strong>@item.Nombre</strong>
                     @Html.Partial("~/Views/Shared/Components/_BadgeEstadoSuscripcion.cshtml", item.Estado)
@@ -107,20 +141,16 @@
                     @item.TiempoRestanteTexto
                 </div>
                 <div class="jk-mt-8 jk-flex jk-gap-8">
-                    <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-cash-stack"></i> Pago</a>
-                    @using (Html.BeginForm(item.SuspendidoManual ? "Activar" : "Desactivar", "Tenants", new { id = item.TenantId }, FormMethod.Post, new { onsubmit = "return confirm('¿" + (item.SuspendidoManual ? "Activar" : "Desactivar") + " el tenant " + item.Nombre + "?');" }))
+                    @if (item.IsActive)
                     {
-                        @Html.AntiForgeryToken()
-                        if (item.SuspendidoManual)
-                        {
-                            <button type="submit" class="jk-btn jk-btn-sm jk-btn-primary"><i class="bi bi-play-circle"></i> Activar</button>
-                        }
-                        else
-                        {
-                            <button type="submit" class="jk-btn jk-btn-sm jk-btn-danger"><i class="bi bi-pause-circle"></i> Desactivar</button>
-                        }
+                        <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-cash-stack"></i> Pago</a>
+                        <a href="@Url.Action("Desactivar", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-danger"><i class="bi bi-pause-circle"></i> Desactivar</a>
+                        <a href="@Url.Action("Edit", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-pencil"></i> Editar</a>
                     }
-                    <a href="@Url.Action("Edit", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-pencil"></i> Editar</a>
+                    else
+                    {
+                        <a href="@Url.Action("Reactivar", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-success"><i class="bi bi-arrow-clockwise"></i> Reactivar</a>
+                    }
                 </div>
             </div>
         }
@@ -143,6 +173,7 @@
     ViewBag.Subtitle = "Administra los negocios de la plataforma";
     ViewBag.PrimaryAction = Url.Action("Create");
     ViewBag.PrimaryActionLabel = "Nuevo Tenant";
+    ViewBag.ToolbarContent = FilterContent();
 
     ViewBag.PageContent = Model.Tenants.Any() ? ListContent() : EmptyContent();
 }

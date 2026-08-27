@@ -16,9 +16,12 @@ namespace JKTurnos.Controllers
         }
 
         // GET: Tenants (AG-7: panel de operacion del Admin Global)
-        public ActionResult Index()
+        public ActionResult Index(string busqueda = null, string estado = null)
         {
-            return View(_service.GetPanelTenants());
+            ViewBag.Busqueda = busqueda;
+            ViewBag.Estado = estado;
+
+            return View(_service.GetPanelTenants(busqueda, estado));
         }
 
         // GET: Tenants/Create
@@ -80,10 +83,10 @@ namespace JKTurnos.Controllers
             return RedirectToAction("Index");
         }
 
-        // GET: Tenants/Delete/5
-        public ActionResult Delete(int id)
+        // GET: Tenants/Desactivar/5
+        public ActionResult Desactivar(int id)
         {
-            var tenant = _service.GetById(id);
+            var tenant = _service.GetByIdInactive(id);
 
             if (tenant == null)
                 return HttpNotFound();
@@ -91,32 +94,33 @@ namespace JKTurnos.Controllers
             return View(tenant);
         }
 
-        // POST: Tenants/DeleteConfirmed/5
+        // POST: Tenants/DesactivarConfirmado/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DesactivarConfirmado(int id)
         {
             _service.Delete(id);
 
             return RedirectToAction("Index");
         }
 
-        // POST: Tenants/Desactivar/5 (D-038: suspension manual e informativa)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Desactivar(int id)
+        // GET: Tenants/Reactivar/5
+        public ActionResult Reactivar(int id)
         {
-            _service.Desactivar(id);
+            var tenant = _service.GetByIdInactive(id);
 
-            return RedirectToAction("Index");
+            if (tenant == null)
+                return HttpNotFound();
+
+            return View(tenant);
         }
 
-        // POST: Tenants/Activar/5 (D-038: quita la suspension; no toca fechas ni pagos)
+        // POST: Tenants/ReactivarConfirmado/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Activar(int id)
+        public ActionResult ReactivarConfirmado(int id)
         {
-            _service.Activar(id);
+            _service.Reactivar(id);
 
             return RedirectToAction("Index");
         }

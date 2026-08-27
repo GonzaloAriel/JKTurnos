@@ -49,6 +49,7 @@ namespace JKTurnos.Models.Entities
         public const string EstadoEnGracia = "EN GRACIA";
         public const string EstadoPorVencer = "POR VENCER";
         public const string EstadoActivo = "ACTIVO";
+        public const string EstadoBaja = "BAJA";
 
         public static readonly PlanSuscripcion[] Todos = new[]
         {

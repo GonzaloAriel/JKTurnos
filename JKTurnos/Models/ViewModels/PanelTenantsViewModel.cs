@@ -21,5 +21,7 @@ namespace JKTurnos.Models.ViewModels
         public int TotalSuspendidos { get; set; }
 
         public int TotalSinPlan { get; set; }
+
+        public int TotalBaja { get; set; }
     }
 }

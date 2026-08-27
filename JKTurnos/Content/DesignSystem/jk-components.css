@@ -1132,6 +1132,14 @@
     background: var(--jk-bg);
 }
 
+.jk-table tbody tr.jk-row-inactive td {
+    opacity: 0.6;
+}
+
+.jk-card.jk-card-inactive {
+    opacity: 0.6;
+}
+
 /* ================================================================
    SEARCH BAR
    ================================================================ */

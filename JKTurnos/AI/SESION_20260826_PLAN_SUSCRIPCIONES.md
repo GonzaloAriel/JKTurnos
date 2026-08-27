@@ -1,10 +1,10 @@
 # SESION 2026-08-26: PLAN AG - SUSCRIPCIONES, PAGOS DE PLATAFORMA Y ADMIN GLOBAL
 
-ESTADO: PLAN EN PROGRESO (AG-0..AG-5, AG-7, AG-8 implementadas; AG-6 EXCLUIDA; AG-9/AG-10 pendientes).
+ESTADO: PLAN EN PROGRESO (AG-0..AG-5, AG-7, AG-8, AG-9, AG-10 implementadas; AG-6 EXCLUIDA; pendiente confirmacion TEAM LEAD).
 
-Decisiones marco: D-037 (estructura y alcance) / D-038 (sin suspension automatica; AG-6 EXCLUIDA).
+Decisiones marco: D-037 (estructura y alcance) / D-038 (sin suspension automatica; AG-6 EXCLUIDA) / D-039 (ciclo vida Tenant: Desactivar/Reactivar).
 
-Proximo paso: POSTA AG-9 (Dashboard Admin Global minimo) o confirmacion del TEAM LEAD sobre AG-1..AG-8.
+Proximo paso: Confirmacion del TEAM LEAD sobre AG-1..AG-10.
 
 AG-0 CONGELADA (2026-08-26): ver seccion "AG-0 ESPECIFICACION FUNCIONAL" al final de este archivo.
 
@@ -54,8 +54,8 @@ El Tenant ve su propia suscripcion en una card persistente (Configuracion/Negoci
 | AG-6 | EXCLUIDA por TEAM LEAD (bloqueo automatico). Ver D-038 | - | EXCLUIDA |
 | AG-7 | Shell Admin Global + grilla Tenants (reusa existente) | Medio | IMPLEMENTADA (2026-08-26, pendiente confirmacion) |
 | AG-8 | Gestion de pagos UI (expone el flujo AG-4) | Alto | IMPLEMENTADA (2026-08-26, pendiente confirmacion) |
-| AG-9 | Dashboard Admin Global minimo | Bajo | PENDIENTE |
-| AG-10 | Prueba integral + matriz de seguridad | Alto | PENDIENTE |
+| AG-9 | Dashboard Admin Global minimo | Bajo | IMPLEMENTADA |
+| AG-10 | Avatares de Plataforma + ciclo vida Tenant | Alto | IMPLEMENTADA |
 
 Nota: el estado derivado para MOSTRAR (regla 7) se implementa dentro de la posta donde aparece primero (AG-5 card / AG-7 grilla / AG-9 dashboard), no como posta aparte.
 
@@ -105,13 +105,15 @@ Seccion AdminGlobal (sidebar grupo Sistema): resumen minimo + tabla Tenants (est
 
 Formulario de registro de pago (tenant, plan, importe, fecha, referencia) que ejecuta el flujo AG-4; listado de pagos de plataforma con filtros basicos.
 
-### AG-9 - Dashboard Admin Global minimo
+### AG-9 - Dashboard Admin Global minimo (IMPLEMENTADA 2026-08-26)
 
-Contadores (activos, en gracia, vencidos, suspendidos manuales), "vencen esta semana" y ultimos pagos. CSS del DS (tokens --jk-*); graficas NO requeridas.
+Contadores de tenants por estado (Activos, Por vencer, En gracia, Vencidos, Suspendidos, Sin plan, Baja) + tabla de tenants con nombre, estado, plan, vencimiento y tiempo restante. `DashboardGlobalController` (solo AdminGlobal) + `DashboardGlobalService` + `DashboardGlobalViewModel`. Sidebar "Panel Admin" en grupo Sistema. CSS del DS (tokens --jk-*).
 
-### AG-10 - Prueba integral + seguridad
+### AG-10 - Avatares de Plataforma + ciclo vida Tenant (IMPLEMENTADA 2026-08-26)
 
-Caso feliz completo, renovacion anticipada, activacion manual, backfill "Sin plan". Matriz de seguridad: un tenant no ve rutas AdminGlobal ni muta su suscripcion; AdminGlobal sigue sin ver datos de negocio (D-022).
+**Avatares de Plataforma:** entidad `AvatarPlataforma` (global, BaseModel), CRUD AdminGlobal (`AvataresController` + 4 vistas Index/Crear/Editar/Eliminar), selector de avatares activos en `Configuracion/DatosNegocio`, avatar priorizado en `BaseController` (AvatarUrl > LogoUrl > icono fallback), sidebar "Avatares" en grupo Sistema. Migraciones `AddAvataresPlataforma` + `AddAvatarUrlToConfiguracion`.
+
+**Ciclo vida Tenant (D-039):** Desactivar = cascade soft-delete en transaccion (Users, ConfiguracionTenant, EstadosTurno) + pantalla de confirmacion. Reactivar = restaura Tenant + Users. Login bloqueado para tenants inactivos (`AuthService` verifica `Tenant.IsActive`). Filtros de busqueda (nombre/subdominio) y dropdown de estado (Todos/Activos/Desactivados) en grilla. Badge "BAJA" en gris. Se eliminaron: boton de pausa/suspension, vistas `Activar.cshtml`/`Delete.cshtml`.
 
 ## Reporte de cierre (obligatorio por posta)
 

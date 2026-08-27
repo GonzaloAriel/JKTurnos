@@ -1,0 +1,28 @@
+@model JKTurnos.Models.Entities.Tenant
+
+@{
+    ViewBag.Title = "Reactivar Tenant";
+    ViewBag.Subtitle = "Restaurar el negocio en la plataforma";
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="jk-card jk-mt-24">
+    <p>¿Desea reactivar el tenant <strong>@Model.Nombre</strong> (<span>@Model.Subdominio</span>)?</p>
+    <p class="jk-small text-secondary">Se restaurara el acceso de los usuarios de este negocio.</p>
+
+    @using (Html.BeginForm("ReactivarConfirmado", "Tenants", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.Id)
+
+        <div class="jk-flex jk-gap-12 jk-mt-16">
+            <button type="submit" class="jk-btn jk-btn-success">
+                <i class="bi bi-arrow-clockwise"></i> Si, reactivar
+            </button>
+            <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+                Cancelar
+            </a>
+        </div>
+    }
+</div>

@@ -42,6 +42,17 @@ namespace JKTurnos.Services
         }
 
         /// <summary>
+        /// Busca un tenant incluyendo los dados de baja (IsActive = false).
+        /// </summary>
+        public Tenant GetByIdInactive(int id)
+        {
+            using (var context = new JKContext())
+            {
+                return context.Tenants.FirstOrDefault(t => t.Id == id);
+            }
+        }
+
+        /// <summary>
         /// AG-5: suscripcion del tenant calculada para mostrar (card de Configuracion).
         /// Solo lectura: aplica la derivacion de estado congelada en AG-0 (D-038:
         /// nunca persiste ni bloquea acceso).
@@ -63,25 +74,47 @@ namespace JKTurnos.Services
 
         /// <summary>
         /// AG-7: suscripciones de TODOS los tenants para la grilla del Admin Global.
-        /// Un solo query (sin N+1): cada VM se construye desde la entidad ya cargada.
+        /// Incluye tenants dados de baja (IsActive = false) para que el AdminGlobal
+        /// pueda verlos, reactivarlos o gestionarlos.
         /// </summary>
         public List<SuscripcionTenantViewModel> GetSuscripciones()
         {
             var hoy = DateTime.Today;
 
-            return _tenantRepo.GetAll()
+            using (var context = new JKContext())
+            {
+                return context.Tenants
                               .OrderBy(t => t.Nombre)
                               .ToList()
                               .Select(t => BuildSuscripcionVm(t, hoy))
                               .ToList();
+            }
         }
 
         /// <summary>
         /// AG-7: panel completo (grilla + contadores por estado) del Admin Global.
+        /// Filtros: busqueda (nombre/subdominio) y estado (activo/desactivado).
         /// </summary>
-        public PanelTenantsViewModel GetPanelTenants()
+        public PanelTenantsViewModel GetPanelTenants(string busqueda = null, string estado = null)
         {
             var tenants = GetSuscripciones();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                busqueda = busqueda.Trim().ToLower();
+                tenants = tenants.Where(x =>
+                    (x.Nombre != null && x.Nombre.ToLower().Contains(busqueda)) ||
+                    (x.Subdominio != null && x.Subdominio.ToLower().Contains(busqueda))
+                ).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(estado))
+            {
+                if (estado == "activos")
+                    tenants = tenants.Where(x => x.IsActive).ToList();
+                else if (estado == "desactivados")
+                    tenants = tenants.Where(x => !x.IsActive).ToList();
+            }
 
             return new PanelTenantsViewModel
             {
@@ -91,7 +124,8 @@ namespace JKTurnos.Services
                 TotalEnGracia = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoEnGracia),
                 TotalVencidos = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoVencido),
                 TotalSuspendidos = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoSuspendidoManual),
-                TotalSinPlan = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoSinPlan)
+                TotalSinPlan = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoSinPlan),
+                TotalBaja = tenants.Count(x => x.Estado == PlanesSuscripcion.EstadoBaja)
             };
         }
 
@@ -110,9 +144,18 @@ namespace JKTurnos.Services
             vm.Nombre = tenant.Nombre;
             vm.Subdominio = tenant.Subdominio;
             vm.SuspendidoManual = tenant.SuspendidoManual;
+            vm.IsActive = tenant.IsActive;
             vm.PlanCodigo = tenant.PlanCodigo;
             vm.FechaInicioPeriodo = tenant.FechaInicioPeriodo;
             vm.FechaVencimiento = tenant.FechaVencimiento;
+
+            if (!tenant.IsActive)
+            {
+                vm.Estado = PlanesSuscripcion.EstadoBaja;
+                vm.TiempoRestanteTexto = "Tenant dado de baja";
+                return vm;
+            }
+
             vm.Estado = PlanesSuscripcion.CalcularEstado(tenant.SuspendidoManual, tenant.PlanCodigo, tenant.FechaVencimiento, hoy);
 
             PlanSuscripcion plan = null;
@@ -208,7 +251,70 @@ namespace JKTurnos.Services
 
         public void Delete(int id)
         {
-            _tenantRepo.Delete(id);
+            using (var context = new JKContext())
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                var tenant = context.Tenants.FirstOrDefault(t => t.Id == id);
+
+                if (tenant == null)
+                    return;
+
+                var now = DateTime.Now;
+
+                var users = context.Users.Where(u => u.TenantId == id).ToList();
+                foreach (var u in users)
+                {
+                    u.IsActive = false;
+                    u.UpdatedAt = now;
+                }
+
+                var config = context.ConfiguracionesTenant.Where(c => c.TenantId == id).ToList();
+                foreach (var c in config)
+                {
+                    c.IsActive = false;
+                    c.UpdatedAt = now;
+                }
+
+                var estados = context.EstadosTurno.Where(e => e.TenantId == id).ToList();
+                foreach (var e in estados)
+                {
+                    e.IsActive = false;
+                    e.UpdatedAt = now;
+                }
+
+                tenant.IsActive = false;
+                tenant.UpdatedAt = now;
+
+                context.SaveChanges();
+                transaction.Commit();
+            }
+        }
+
+        /// <summary>
+        /// Reactiva un tenant dado de baja (IsActive = false -> true).
+        /// </summary>
+        public void Reactivar(int id)
+        {
+            using (var context = new JKContext())
+            {
+                var tenant = context.Tenants.FirstOrDefault(t => t.Id == id);
+
+                if (tenant == null || tenant.IsActive)
+                    return;
+
+                var now = DateTime.Now;
+                tenant.IsActive = true;
+                tenant.UpdatedAt = now;
+
+                var users = context.Users.Where(u => u.TenantId == id).ToList();
+                foreach (var u in users)
+                {
+                    u.IsActive = true;
+                    u.UpdatedAt = now;
+                }
+
+                context.SaveChanges();
+            }
         }
 
         /// <summary>

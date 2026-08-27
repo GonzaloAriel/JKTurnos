@@ -54,6 +54,7 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-036 | Capa decorativa de marca sistematizada: firma tricolor (`.jk-signature` + `--jk-gradient-tricolor`), chips circulares de icono por accion/feature, brand del sidebar en chip y blobs pastel en bienvenida/login. Se tokenizan los colores de identidad que ya tienen consumidor real: coral, butter, teal (+ lights). Ajuste posterior aprobado por TEAM LEAD: superficies y nav con tinte menta palida (`--jk-surface #F1FAFA`, `--jk-sidebar-bg #D7F0EF`) | 2026-08-25 | VIGENTE |
 | D-037 | Plan AG Suscripciones/Pagos de Plataforma/AdminGlobal aprobado: modelo plano sin entidad Subscription v1 (campos sobre Tenant), catalogo estatico de planes en codigo, pago de plataforma = confirmado (sin pendientes), sin notificaciones nuevas ni SignalR (card persistente + dashboard), postas AG-0..AG-10. Plan: AI/SESION_20260826_PLAN_SUSCRIPCIONES.md | 2026-08-26 | VIGENTE |
 | D-038 | Sin suspension/bloqueo automatico por vencimiento (posta AG-6 EXCLUIDA): estado derivado de fechas SOLO para mostrar; la unica suspension efectiva es manual. Riesgo aceptado por TEAM LEAD | 2026-08-26 | VIGENTE |
+| D-039 | Ciclo de vida del Tenant: solo 2 estados (Activo / Baja). Desactivar = cascade soft-delete (Tenant + Users + ConfiguracionTenant + EstadosTurno) + bloqueo de login. Reactivar = restaura Tenant + Users. Sin pausa/suspension manual (SuspendidoManual eliminado del UI). Pantalla de confirmacion para cada accion. Filtros de busqueda y estado en grilla AdminGlobal | 2026-08-26 | VIGENTE |
 
 ## Detalle
 
@@ -560,6 +561,20 @@ Motivo: .NET Framework 4.7 MVC 5 no ofrece hosted services confiables en el host
 Consecuencias: RIESGO ACEPTADO por TEAM LEAD: un tenant vencido sigue plenamente operativo hasta desactivacion manual; el Dashboard Admin Global debe volver visible el vencimiento (contadores/alertas). Si en el futuro se desea enforcement, se agrega como posta independiente (gate en BaseController.OnActionExecuting) sin cambiar el modelo.
 
 Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-039
+
+Fecha: 2026-08-26
+
+Decision: El Tenant tiene solo 2 estados en el UI: Activo y Baja. El ciclo de vida se gestiona con 3 acciones: Desactivar (cascade soft-delete), Reactivar (restaura Tenant + Users) y登録 (crear). El login bloquea usuarios de tenants inactivos (AuthService verifica Tenant.IsActive). La grilla del AdminGlobal muestra todos los tenants (activos y dados de baja) con filtros de busqueda (nombre/subdominio) y dropdown de estado (Todos/Activos/Desactivados). Cada accion destructiva tiene pantalla de confirmacion dedicada (patron Delete.cshtml). SuspendidoManual se mantiene en el modelo pero NO tiene UI (botones de pausa eliminados).
+
+Motivo: simplificar el ciclo de vida del tenant a lo esencial (activo/inactivo) sin crear estados intermedios confusos. La pausa manual no bloqueaba acceso y generaba friccion.
+
+Consecuencias: `TenantService.Delete()` cascade soft-delete en transaccion (Users, ConfiguracionTenant, EstadosTurno). `TenantService.Reactivar()` restaura Tenant + Users. `AuthService.Login()` verifica `Tenant.IsActive` antes de autenticar. `PlanesSuscripcion.EstadoBaja` nuevo badge gris. `SuscripcionTenantViewModel.IsActive` nuevo campo. Vista `Tenants/Desactivar.cshtml` y `Tenants/Reactivar.cshtml` (pantallas de confirmacion). Vista `Tenants/Index.cshtml` con `FilterContent()` (search + dropdown estado). Acciones `Desactivar` (GET+POST) y `Reactivar` (GET+POST) en `TenantsController`. Se eliminaron: `Tenants/Activar.cshtml`, `Tenants/Delete.cshtml`, acciones `Activar/ActivarConfirmado/Delete/DeleteConfirmed`.
+
+Reemplaza a: D-023 parcialmente (la parte de Desactivar/Activar como endpoints POST sin UI).
 
 Estado: VIGENTE
 

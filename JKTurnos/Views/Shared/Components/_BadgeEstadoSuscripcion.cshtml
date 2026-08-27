@@ -8,6 +8,7 @@
 
 @{
     var clase = "jk-badge jk-badge-neutral";
+    var extraStyle = "";
 
     if (Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoActivo)
     {
@@ -23,6 +24,11 @@
     {
         clase = "jk-badge jk-badge-danger";
     }
+    else if (Model == JKTurnos.Models.Entities.PlanesSuscripcion.EstadoBaja)
+    {
+        clase = "jk-badge";
+        extraStyle = "background:#6c757d; color:#fff;";
+    }
 }
 
-<span class="@clase">@Model</span>
+<span class="@clase" @(!string.IsNullOrEmpty(extraStyle) ? Html.Raw("style=\"" + extraStyle + "\"") : Html.Raw(""))>@Model</span>

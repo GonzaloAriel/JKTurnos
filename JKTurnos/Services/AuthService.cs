@@ -35,6 +35,17 @@ namespace JKTurnos.Services
                 return false;
             }
 
+            if (user.TenantId != 0)
+            {
+                var tenant = _context.Tenants.FirstOrDefault(t => t.Id == user.TenantId);
+
+                if (tenant == null || !tenant.IsActive)
+                {
+                    new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
+                    return false;
+                }
+            }
+
             new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, true);
 
             SignIn(user);
