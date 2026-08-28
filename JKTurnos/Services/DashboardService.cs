@@ -37,7 +37,7 @@ namespace JKTurnos.Services
 
             var turnosMes = _turnoService.GetTurnosEnRango(inicioMes, finMes);
             var activosMes = turnosMes
-                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado")
+                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
                 .ToList();
 
             var pagosMes = _pagoService.GetPagosEnRango(inicioMes, finMes);
@@ -138,7 +138,7 @@ namespace JKTurnos.Services
         private int CalcularOcupacionHoy(DateTime hoyDate)
         {
             var activos = _turnoService.GetTurnosDelDia(hoyDate)
-                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado")
+                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
                 .ToList();
 
             var minutosOcupados = activos.Sum(t => (t.FechaHoraFin - t.FechaHoraInicio).TotalMinutes);
@@ -188,7 +188,7 @@ namespace JKTurnos.Services
             var ahora = DateTime.Now;
 
             return _turnoService.GetTurnosEnRango(DateTime.Today, DateTime.Today.AddDays(14))
-                .Where(t => t.FechaHoraFin > ahora && t.EstadoTurno != null && t.EstadoTurno.Nombre == "Pendiente")
+                .Where(t => t.FechaHoraFin > ahora && t.EstadoTurno != null && t.EstadoTurno.Codigo == EstadosTurnoBase.Pendiente)
                 .OrderBy(t => t.FechaHoraInicio)
                 .Take(6)
                 .Select(MapTurnoItem)
@@ -235,6 +235,9 @@ namespace JKTurnos.Services
 
         private static DashboardTurnoItem MapTurnoItem(Models.Entities.Turno t)
         {
+            var situacionClave = SituacionTemporal.Calcular(t);
+            var situacion = situacionClave != null ? SituacionTemporal.De(situacionClave) : null;
+
             return new DashboardTurnoItem
             {
                 Id = t.Id,
@@ -242,7 +245,11 @@ namespace JKTurnos.Services
                 ServicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado",
                 RecursoNombre = t.Recurso != null ? t.Recurso.Nombre : "Sin recurso",
                 EstadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "",
-                EstadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : "#aeaeb2",
+                EstadoIcono = t.EstadoTurno != null ? t.EstadoTurno.Icono : "bi-circle-fill",
+                SituacionClave = situacionClave,
+                SituacionLabel = situacion != null ? situacion.Label : null,
+                SituacionColor = situacion != null ? situacion.Color : null,
+                SituacionIcono = situacion != null ? situacion.Icono : null,
                 FechaHoraInicio = t.FechaHoraInicio,
                 FechaHoraFin = t.FechaHoraFin
             };

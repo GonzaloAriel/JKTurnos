@@ -329,22 +329,23 @@ namespace JKTurnos.Services
         /// el estado derivado de la card/dashboard, sin metodos de escritura activos.
         /// </summary>
 
+        /// <summary>
+        /// Semilla de estados genericos para cualquier negocio (D-024/D-040).
+        /// Siembra exactamente los 4 estados del catalogo fijo, con su Codigo
+        /// estable, iconos geometricos (no colores) para distinguir del color
+        /// del recurso en la Agenda.
+        /// </summary>
         private void SeedBaseData(Tenant tenant, string adminEmail)
         {
-            var estados = new[]
-            {
-                new { Nombre = "Pendiente",  Color = "#ffc107" },
-                new { Nombre = "Confirmado", Color = "#0d6efd" },
-                new { Nombre = "Atendido",   Color = "#198754" }
-            };
-
-            foreach (var e in estados)
+            foreach (var e in EstadosTurnoBase.Todos)
             {
                 _estadoRepo.Add(new EstadoTurno
                 {
                     TenantId = tenant.Id,
                     Nombre = e.Nombre,
+                    Codigo = e.Codigo,
                     Color = e.Color,
+                    Icono = e.Icono,
                     CreatedAt = DateTime.Now,
                     IsActive = true
                 });

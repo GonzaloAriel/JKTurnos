@@ -235,17 +235,21 @@ Crear un nuevo bloque de tiempo asignando cliente, servicio y recurso.
 
 **Atender ahora**
 
-Iniciar el turno actual. Marca el estado como "En curso".
+Iniciar el turno actual. Marca el estado como "En curso" (Pendiente -> En curso).
 
-**Reagendar**
+**Finalizar**
 
-Mover un turno existente a otro horario.
+Cierra la atencion: En curso -> Finalizado.
 
-Arrastrar y soltar en la Agenda.
+**Mover horario / Reagendar**
+
+Reposicionar un turno a otro horario (por disponibilidad). En el modelo actual
+(D-040) NO es un cambio de estado: no existe el estado Reagendado. A futuro se
+resuelve como reposicionamiento del Time Block preservando el estado vigente.
 
 **Cancelar**
 
-Cambiar el estado del turno a Cancelado.
+Cambiar el estado del turno a Cancelado (Pendiente/En curso -> Cancelado).
 
 Solicitar motivo opcional.
 
@@ -338,16 +342,36 @@ Existen dos grupos distintos de estados.
 
 Nunca deben mezclarse.
 
-## 11.1 Estados operativos
+> Actualizado 2026-08-28 (D-040): los estados operativos son un catalogo FIJO
+> del sistema (4 estados) resuelto por `Codigo`, nunca por `Nombre`. La matriz
+> de transiciones es UNICA en `TurnoEstadoMotor`. Se eliminan Confirmado y
+> Reagendado.
+
+## 11.1 Estados operativos (catalogo fijo, D-040)
 
 Representan por donde pasa el turno en su ciclo de vida.
 
 - Pendiente
-- Confirmado
 - En curso
 - Finalizado
 - Cancelado
-- Reagendado
+
+Transiciones permitidas (matriz canonica):
+
+| Desde      | Hasta       |
+|------------|-------------|
+| Pendiente  | En curso    |
+| Pendiente  | Cancelado   |
+| En curso   | Finalizado  |
+| En curso   | Cancelado   |
+
+`Finalizado` y `Cancelado` son terminales.
+
+### Situacion temporal (calculada, NO es estado)
+
+Ademas del estado persistido, la Agenda/Home/Dashboard/Drawer informan la
+situacion temporal (`SituacionTemporal`: `demorado`, `tiempo-excedido`,
+`a-tiempo`) sobre el reloj. Es calculada e informativa; nunca muta el estado.
 
 ## 11.2 Estados economicos
 

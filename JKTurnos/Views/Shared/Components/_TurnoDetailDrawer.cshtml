@@ -15,13 +15,19 @@
 
 @model JKTurnos.Models.ViewModels.TurnoDetailViewModel
 
+@using JKTurnos.Models.Entities
+
 @Html.AntiForgeryToken()
 
 <div class="jk-drawer-section">
     <div class="jk-flex jk-flex-between">
         <h4 class="jk-drawer-subtitle">@Model.ClienteNombre</h4>
-        <span class="jk-badge" style="--jk-status-color: @(Model.EstadoColor ?? "#aeaeb2");">
-            <i class="bi bi-circle-fill" style="color: @(Model.EstadoColor ?? "#aeaeb2");"></i> @Model.EstadoNombre
+        <span class="jk-badge">
+            <i class="bi @(Model.EstadoIcono ?? "bi-circle-fill")"></i> @Model.EstadoNombre
+            @if (Model.SituacionClave != null && SituacionTemporal.EsAlarma(Model.SituacionClave))
+            {
+                <i class="bi @Model.SituacionIcono" title="@Model.SituacionLabel" style="color: @Model.SituacionColor; margin-left: 6px;"></i>
+            }
         </span>
     </div>
 

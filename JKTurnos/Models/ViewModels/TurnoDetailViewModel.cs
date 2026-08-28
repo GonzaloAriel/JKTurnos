@@ -24,6 +24,12 @@ namespace JKTurnos.Models.ViewModels
         public int EstadoTurnoId { get; set; }
         public string EstadoNombre { get; set; }
         public string EstadoColor { get; set; }
+        public string EstadoIcono { get; set; }
+
+        public string SituacionClave { get; set; }
+        public string SituacionLabel { get; set; }
+        public string SituacionColor { get; set; }
+        public string SituacionIcono { get; set; }
 
         public DateTime FechaHoraInicio { get; set; }
         public DateTime FechaHoraFin { get; set; }

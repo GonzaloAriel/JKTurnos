@@ -347,6 +347,20 @@ El estado se representa mediante elementos sutiles:
 
 El indicador de estado nunca debe competir con el color del recurso.
 
+## Indicador de situacion temporal (D-040 / P8)
+
+Ademas del estado persistido, la Agenda/Home/Dashboard/Drawer informan la
+**situacion temporal** calculada (`SituacionTemporal`: `demorado`,
+`tiempo-excedido`, `a-tiempo`) junto al indicador de estado, como un icono de
+alarma de color:
+
+- `demorado` (naranja): el turno no se inicio y su hora ya paso
+- `tiempo-excedido` (rojo): el turno En curso supero su horario de fin
+- `a-tiempo`: sin indicador de alarma
+
+Es informativo (el reloj informa, el operador decide): nunca modifica el
+estado persistido del turno.
+
 ## Contraste
 
 El texto sobre la banda de color debe tener contraste suficiente.
@@ -454,11 +468,16 @@ La Agenda debe respetar:
 ## Desde el Drawer
 
 - Editar datos del turno
-- Cambiar estado (Confirmar, Iniciar, Finalizar, Cancelar)
-- Reagendar (cambiar fecha/hora)
+- Cambiar estado (Iniciar, Finalizar, Cancelar)
 - Ver historial
-- Registrar senia
+- Registrar senia / pago
 - Agregar observaciones
+
+> Actualizado 2026-08-28 (D-040): las acciones de estado son las de la matriz
+> canonica (`TurnoEstadoMotor`): Iniciar (Pendiente -> En curso), Finalizar
+> (En curso -> Finalizado), Cancelar (Pendiente/En curso -> Cancelado). No
+> existe Confirmar (el turno nace "Pendiente"); Reagendar dejo de ser un
+> cambio de estado (no existe el estado Reagendado).
 
 ## Acciones masivas (futuro)
 

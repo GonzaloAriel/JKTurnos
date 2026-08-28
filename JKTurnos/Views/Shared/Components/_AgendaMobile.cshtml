@@ -108,7 +108,9 @@ else
                             var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Sin cliente";
                             var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado";
                             var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
-                            var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
+                            var estadoIcono = t.EstadoTurno != null ? t.EstadoTurno.Icono : "bi-circle-fill";
+                            var situacionClave = SituacionTemporal.Calcular(t);
+                            var situacionAlarma = situacionClave != null && SituacionTemporal.EsAlarma(situacionClave) ? SituacionTemporal.De(situacionClave) : null;
 
                             <div class="jk-agenda-time-block"
                                  role="button"
@@ -124,7 +126,11 @@ else
                                 </div>
                                 <div class="jk-agenda-time-block-body">
                                     <div class="jk-agenda-time-block-title">
-                                        <span class="jk-agenda-time-block-status" title="@estadoNombre" style="--jk-status-color: @(estadoColor ?? "#aeaeb2")"><i class="bi bi-circle-fill"></i></span>
+                                        <span class="jk-agenda-time-block-status" title="@estadoNombre"><i class="bi @estadoIcono"></i></span>
+                                        @if (situacionAlarma != null)
+                                        {
+                                            <span class="jk-agenda-time-block-status" title="@situacionAlarma.Label" style="color: @situacionAlarma.Color"><i class="bi @situacionAlarma.Icono"></i></span>
+                                        }
                                         <span class="jk-agenda-time-block-client">@clienteNombre</span>
                                     </div>
                                     <span class="jk-agenda-time-block-service">@servicioNombre</span>

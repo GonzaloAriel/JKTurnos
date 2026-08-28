@@ -14,8 +14,6 @@ namespace JKTurnos.Models.ViewModels
 
         public IEnumerable<Turno> Turnos { get; set; }
 
-        public IEnumerable<EstadoTurno> Estados { get; set; }
-
         public int? OpenRecursoId { get; set; }
     }
 }

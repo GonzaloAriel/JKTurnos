@@ -21,7 +21,7 @@ namespace JKTurnos.Controllers
         public ActionResult Index()
         {
             ViewBag.Configuracion = _service.GetConfiguracion();
-            return View(_service.GetEstados());
+            return View();
         }
 
         // GET: Configuracion/Suscripcion
@@ -127,86 +127,6 @@ namespace JKTurnos.Controllers
             }
 
             return RedirectToAction("Notificaciones");
-        }
-
-        // GET: Configuracion/EstadoCrear
-        public ActionResult EstadoCrear()
-        {
-            return View(new EstadoTurno { Color = "#6c757d" });
-        }
-
-        // POST: Configuracion/EstadoCrear
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult EstadoCrear(EstadoTurno model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            try
-            {
-                _service.CrearEstado(model.Nombre, model.Color);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-                return View(model);
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: Configuracion/EstadoEditar/5
-        public ActionResult EstadoEditar(int id)
-        {
-            var estado = _service.GetEstado(id);
-
-            if (estado == null)
-                return HttpNotFound();
-
-            return View(estado);
-        }
-
-        // POST: Configuracion/EstadoEditar/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult EstadoEditar(EstadoTurno model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            try
-            {
-                _service.ActualizarEstado(model.Id, model.Nombre, model.Color);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-                return View(model);
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: Configuracion/EstadoEliminar/5
-        public ActionResult EstadoEliminar(int id)
-        {
-            var estado = _service.GetEstado(id);
-
-            if (estado == null)
-                return HttpNotFound();
-
-            return View(estado);
-        }
-
-        // POST: Configuracion/EstadoEliminar/5
-        [HttpPost]
-        [ActionName("EstadoEliminar")]
-        [ValidateAntiForgeryToken]
-        public ActionResult EstadoEliminarConfirmed(int id)
-        {
-            _service.EliminarEstado(id);
-            return RedirectToAction("Index");
         }
     }
 }

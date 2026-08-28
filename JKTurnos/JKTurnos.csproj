@@ -238,11 +238,16 @@
     <Compile Include="Migrations\202608271348191_AddIdempotencyKeyToPagoSuscripcion.Designer.cs">
       <DependentUpon>202608271348191_AddIdempotencyKeyToPagoSuscripcion.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608281509241_AddCatalogoEstados.cs" />
+    <Compile Include="Migrations\202608281509241_AddCatalogoEstados.Designer.cs">
+      <DependentUpon>202608281509241_AddCatalogoEstados.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\EstadoTurno.cs" />
+    <Compile Include="Models\Entities\EstadosTurnoBase.cs" />
     <Compile Include="Models\Entities\Pago.cs" />
     <Compile Include="Models\Entities\AvatarPlataforma.cs" />
     <Compile Include="Models\Entities\PagoSuscripcion.cs" />
@@ -256,6 +261,7 @@
     <Compile Include="Models\Entities\Auditoria.cs" />
     <Compile Include="Models\Entities\NotificacionSistema.cs" />
     <Compile Include="Models\Entities\Servicio.cs" />
+    <Compile Include="Models\Entities\SituacionTemporal.cs" />
     <Compile Include="Models\Entities\Tenant.cs" />
     <Compile Include="Models\Entities\Turno.cs" />
     <Compile Include="Models\Entities\User.cs" />
@@ -295,6 +301,7 @@
     <Compile Include="Services\ConfiguracionService.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\RecordatorioService.cs" />
+    <Compile Include="Services\TurnoEstadoMotor.cs" />
     <Compile Include="Services\TurnoService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
@@ -337,6 +344,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Migrations\Scripts\20260828_AddIconoEstadoTurno.sql" />
     <Content Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -417,9 +425,6 @@
     <Content Include="Views\Shared\Components\_FormLayout.cshtml" />
     <Content Include="Views\Shared\Components\_FormActions.cshtml" />
     <Content Include="Views\Configuracion\DatosNegocio.cshtml" />
-    <Content Include="Views\Configuracion\EstadoCrear.cshtml" />
-    <Content Include="Views\Configuracion\EstadoEditar.cshtml" />
-    <Content Include="Views\Configuracion\EstadoEliminar.cshtml" />
     <Content Include="Views\Configuracion\Index.cshtml" />
     <Content Include="Views\Configuracion\Notificaciones.cshtml" />
     <Content Include="Views\Configuracion\NotificacionesWhatsApp.cshtml" />
@@ -539,6 +544,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608271348191_AddIdempotencyKeyToPagoSuscripcion.resx">
       <DependentUpon>202608271348191_AddIdempotencyKeyToPagoSuscripcion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608281509241_AddCatalogoEstados.resx">
+      <DependentUpon>202608281509241_AddCatalogoEstados.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

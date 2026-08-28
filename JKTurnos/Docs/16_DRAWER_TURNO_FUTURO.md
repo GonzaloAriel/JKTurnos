@@ -6,6 +6,16 @@ A una vista de: 2026-08-12, TEAM LEAD aprobo la V1 (Drawer de detalle de Time Bl
 
 Referencias: Docs/13_AGENDA_UX.md (secciones 5 y 14), Docs/14_TURNO_LIFECYCLE.md (mapa de transiciones, auditoria, matriz de permisos), D-005 (estados operativos y economicos independientes).
 
+> **NOTA (2026-08-28, D-040):** el catalogo de estados operativos es ahora FIJO
+> (4 estados: Pendiente, En curso, Finalizado, Cancelado) resuelto por `Codigo`,
+> y la matriz de transiciones es UNICA en `TurnoEstadoMotor` (Iniciar/
+> Finalizar/Cancelar). Esto invalida partes de V2 abajo que mencionan acciones
+> **Confirmar** y **Reagendar** y el estado **Reagendado** (ya no existen). La
+> V1 del Drawer YA implementa (P8) la situacion temporal (`SituacionTemporal`)
+> como indicador de alarma junto al estado. Este archivo es un registro a
+> futuro; al retomar V2/V3, alinear las acciones con la matriz canonica de
+> D-040 y reescribir estas secciones.
+
 ---
 
 ## V2 - Acciones de estado y edicion desde el Drawer

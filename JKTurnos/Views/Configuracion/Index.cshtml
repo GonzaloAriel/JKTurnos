@@ -1,6 +1,4 @@
-﻿@model List<JKTurnos.Models.Entities.EstadoTurno>
-
-@using JKTurnos.Models.Entities
+﻿@using JKTurnos.Models.Entities
 
 @{
     ViewBag.Title = "Configuracion";
@@ -117,42 +115,5 @@
     else
     {
         <p class="jk-small text-secondary jk-mb-0">Carga los datos del negocio para configurar los recordatorios.</p>
-    }
-</div>
-
-<!-- ===== ESTADOS DE TURNO ===== -->
-<div class="jk-card jk-mt-24">
-    <div class="jk-card-header">
-        <h3 class="jk-card-title">Estados de turno</h3>
-        <a href="@Url.Action("EstadoCrear")" class="jk-btn jk-btn-sm jk-btn-primary">
-            <i class="bi bi-plus-lg"></i> Nuevo Estado
-        </a>
-    </div>
-
-    @if (Model.Any())
-    {
-        <div>
-            @foreach (var estado in Model)
-            {
-                <div class="jk-flex-between jk-list-row">
-                    <span class="jk-flex jk-gap-8">
-                        <span class="jk-color-dot" style="background-color:@estado.Color"></span>
-                        @estado.Nombre
-                    </span>
-                    <span class="jk-flex jk-gap-8">
-                        <a href="@Url.Action("EstadoEditar", new { id = estado.Id })" class="jk-btn jk-btn-icon" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <a href="@Url.Action("EstadoEliminar", new { id = estado.Id })" class="jk-btn jk-btn-icon" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </span>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <p class="jk-small text-secondary jk-mb-0">No tenes estados de turno. Agrega el primero con "Nuevo Estado".</p>
     }
 </div>

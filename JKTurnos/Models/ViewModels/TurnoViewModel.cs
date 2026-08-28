@@ -23,6 +23,19 @@ namespace JKTurnos.Models.ViewModels
         [Display(Name = "Estado")]
         public int EstadoTurnoId { get; set; }
 
+        // Datos de display del estado actual (Edit): el estado ya NO se elige por
+        // dropdown (D-040: catalogo fijo). Solo se muestra y se acciona desde botones
+        // contextuales (P5).
+        public string EstadoNombre { get; set; }
+        public string EstadoColor { get; set; }
+        public string EstadoIcono { get; set; }
+        public string EstadoCodigo { get; set; }
+
+        // Acciones contextuales habilitadas segun el estado actual (P5).
+        public bool PuedeIniciar { get; set; }
+        public bool PuedeFinalizar { get; set; }
+        public bool PuedeCancelar { get; set; }
+
         [Required(ErrorMessage = "La fecha y hora de inicio son obligatorias.")]
         [Display(Name = "Inicio")]
         [DataType(DataType.DateTime)]
@@ -41,14 +54,12 @@ namespace JKTurnos.Models.ViewModels
         public IEnumerable<SelectListItem> Clientes { get; set; }
         public IEnumerable<SelectListItem> Servicios { get; set; }
         public IEnumerable<SelectListItem> Recursos { get; set; }
-        public IEnumerable<SelectListItem> EstadosTurno { get; set; }
 
         public TurnoViewModel()
         {
             Clientes = new List<SelectListItem>();
             Servicios = new List<SelectListItem>();
             Recursos = new List<SelectListItem>();
-            EstadosTurno = new List<SelectListItem>();
             FechaHoraInicio = DateTime.Now;
         }
     }

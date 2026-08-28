@@ -39,8 +39,8 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-021 | KPI "Ingresos" del Command Center = PROYECCION del dia (suma de Servicio.Precio de los turnos del dia excluyendo "Cancelado"); no usa pagos reales (modelo economico V3 a futuro, D-005). Ocupacion = minutos ocupados / 690 (08:00-19:30) | 2026-08-14 | VIGENTE |
 | D-022 | Acceso global de plataforma: GlobalRepository filtra solo IsActive (sin TenantId); Add NO asigna TenantId. Uso exclusivo de servicios de plataforma; AdminGlobal (TenantId=0) no ve datos de negocio via BaseRepository | 2026-08-18 | VIGENTE |
 | D-023 | Roles como constantes (Roles.cs) + [Authorize(Roles=...)]; sin tabla de permisos. AdminGlobal = TenantId 0 (sin tenant), sin FK Users.TenantId->Tenants | 2026-08-18 | VIGENTE |
-| D-024 | Un tenant nuevo nace operativo: TenantService.Create siembra Estados de Turno base (Pendiente/Confirmado/Atendido) + ConfiguracionTenant. TurnoService.Crear con guard si no hay estados | 2026-08-18 | VIGENTE |
-| D-025 | Modulo Configuracion de Negocio (solo rol Admin): datos del negocio (ConfiguracionTenant) + CRUD de Estados de Turno del tenant con selector de color. Reglas en ConfiguracionService | 2026-08-18 | VIGENTE |
+| D-024 | Un tenant nuevo nace operativo: TenantService.Create siembra los Estados de Turno base del catalogo FIJO (D-040: Pendiente/En curso/Finalizado/Cancelado con Codigo) + ConfiguracionTenant. TurnoService.Crear con guard si no hay estados | 2026-08-18 | VIGENTE (modificado por D-040) |
+| D-025 | Modulo Configuracion de Negocio (solo rol Admin): datos del negocio (ConfiguracionTenant) + CRUD de Estados de Turno del tenant con selector de color. La parte de CRUD de estados quedo SUPERADA (D-040, eliminada en P4) | 2026-08-18 | SUPERADA (parcial, por D-040) |
 | D-026 | Logo del negocio por URL: se muestra en el sidebar (marca) y en la bienvenida del Command Center con fallback al icono/omitido si no hay URL. BaseController.OnActionExecuting expone ViewBag.ConfiguracionLogo/Nombre (un query por request) | 2026-08-18 | VIGENTE |
 | D-027 | Cadena de migraciones aplastada en una unica migracion Inicial (modelo actual completo) + auto-migracion al arranque: Global.asax.cs usa MigrateDatabaseToLatestVersion. La BD del hosting se actualiza sola en cada deploy (Add-Migration + publicar). RecursoId en Turno sin cascade (configurado en JKContext.OnModelCreating) | 2026-08-18 | VIGENTE |
 | D-028 | Modulo Estado Economico (V3): entidad Pago con el estado economico CALCULADO desde los pagos (no persistido en Turno). Sin tope de monto: el precio del servicio es solo referencia. Pago.UsuarioId autocontenido (TurnoHistorial a V2). Admin y Operador registran pagos | 2026-08-19 | VIGENTE |
@@ -55,6 +55,7 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-037 | Plan AG Suscripciones/Pagos de Plataforma/AdminGlobal aprobado: modelo plano sin entidad Subscription v1 (campos sobre Tenant), catalogo estatico de planes en codigo, pago de plataforma = confirmado (sin pendientes), sin notificaciones nuevas ni SignalR (card persistente + dashboard), postas AG-0..AG-10. Plan: AI/SESION_20260826_PLAN_SUSCRIPCIONES.md | 2026-08-26 | VIGENTE |
 | D-038 | Sin suspension/bloqueo automatico por vencimiento (posta AG-6 EXCLUIDA): estado derivado de fechas SOLO para mostrar; la unica suspension efectiva es manual. Riesgo aceptado por TEAM LEAD | 2026-08-26 | VIGENTE |
 | D-039 | Ciclo de vida del Tenant: solo 2 estados (Activo / Baja). Desactivar = cascade soft-delete (Tenant + Users + ConfiguracionTenant + EstadosTurno) + bloqueo de login. Reactivar = restaura Tenant + Users. Sin pausa/suspension manual (SuspendidoManual eliminado del UI). Pantalla de confirmacion para cada accion. Filtros de busqueda y estado en grilla AdminGlobal | 2026-08-26 | VIGENTE |
+| D-040 | Estados del Turno = catalogo operativo FIJO del sistema (Pendiente, En curso, Finalizado, Cancelado), NO configurables por tenant. El usuario no elige el estado al crear; el sistema asigna Pendiente. EstadoTurnoId sigue NOT NULL. Lo extra (No asistio, Confirmado, etc.) se modela a futuro como eventos/motivos/atributos, no inflando EstadoTurno. Situacion temporal (reloj) = calculada y separada del estado; el reloj NUNCA muta el estado. Plan: AI/SESION_20260828_PLAN_ESTADOS.md | 2026-08-28 | VIGENTE |
 
 ## Detalle
 
@@ -382,31 +383,44 @@ Estado: VIGENTE
 
 ### D-024
 
-Fecha: 2026-08-18
+Fecha: 2026-08-18 (actualizado 2026-08-28 por D-040)
 
-Decision: Al crear un tenant, `TenantService.Create` siembra automaticamente los Estados de Turno base (Pendiente #ffc107, Confirmado #0d6efd, Atendido #198754) y la `ConfiguracionTenant` del negocio. `TurnoService.Crear` tiene guard defensivo: si no existe un estado "Pendiente" lanza un error claro en vez del FK.
+Decision: Al crear un tenant, `TenantService.Create` siembra automaticamente los Estados de Turno base y la `ConfiguracionTenant` del negocio. `TurnoService.Crear` tiene guard defensivo: si no existe un estado "Pendiente" lanza un error claro en vez del FK.
+
+> Actualizado por D-040 (2026-08-28): el catalogo de estados es FIJO del
+> sistema con 4 estados y `Codigo` estable — Pendiente/`PENDIENTE`,
+> En curso/`EN_CURSO`, Finalizado/`FINALIZADO`, Cancelado/`CANCELADO` — mas
+> `Icono` de display. Se siembra por tenant como catalogo fijo (la semantica es
+> global, resuelta por `Codigo`, nunca por `Nombre`). Migracion
+> `202608281509241_AddCatalogoEstados` (P3).
 
 Motivo: sin estados base un tenant nuevo no puede crear turnos (el form postea `EstadoTurnoId=0` y choca con `FK_Turnoes_EstadoTurnoes`); los estados no tienen CRUD propio y solo el seed demo los creaba para "local".
 
-Consecuencias: el alta de tenant via CRUD queda operable al instante. Clientes/Servicios/Recursos de un tenant nuevo nacen en blanco (se crean aparte).
+Consecuencias: el alta de tenant via CRUD queda operable al instante. Clientes/Servicios/Recursos de un tenant nuevo nacen en blanco (se crean aparte). La documentacion que citaba Pendiente/Confirmado/Atendido quedo corregida (P9).
 
 Reemplaza a: ninguna
 
-Estado: VIGENTE
+Estado: VIGENTE (modificado por D-040)
 
 ### D-025
 
-Fecha: 2026-08-18
+Fecha: 2026-08-18 (SUPERADA por D-040 el 2026-08-28)
 
-Decision: Modulo Configuracion de Negocio accesible solo para rol Admin (tenant). Dos secciones: (1) Datos del negocio = formulario unico sobre `ConfiguracionTenant` (NombreComercial, Telefono, Email, Direccion, LogoUrl) con caja de ayuda para subir el logo gratis (postimages.org / imgbb.com) y pegar la URL directa; (2) Estados de Turno = CRUD del tenant con nombre + color (picker nativo), baja logica (los turnos que ya usan el estado no se pierden). Reglas en `ConfiguracionService`: nombre obligatorio, color con default #6c757d, mutacion de la entidad trackeada (evita el bug de attach de EF). Entrada desde el sidebar (grupo Configuracion, item Negocio) y la accion rapida "Configurar" del Command Center.
+Decision (SUPERADA): Modulo Configuracion de Negocio accesible solo para rol Admin (tenant). Dos secciones: (1) Datos del negocio = formulario unico sobre `ConfiguracionTenant` (NombreComercial, Telefono, Email, Direccion, LogoUrl) con caja de ayuda para subir el logo gratis (postimages.org / imgbb.com) y pegar la URL directa; (2) Estados de Turno = CRUD del tenant con nombre + color (picker nativo), baja logica (los turnos que ya usan el estado no se pierden).
+
+> SUPERADA (2026-08-28, D-040): la seccion "Estados de Turno" deja de ser un
+> CRUD configurable por tenant. El catalogo es FIJO del sistema (4 estados) y
+> el CRUD fue ELIMINADO en P4 (acciones de ConfiguracionController + vistas +
+> card de Configuracion/Index). Solo queda vigente la seccion (1) Datos del
+> negocio.
 
 Motivo: los estados de turno no tenian CRUD propio (solo el seed los creaba) y la ConfiguracionTenant existia sin pantalla de edicion.
 
-Consecuencias: los estados nuevos aparecen automaticamente en los formularios de turno (mismo repo de tenant). El modulo se mantiene progresivo: no obliga a cargar datos.
+Consecuencias: los estados nuevos aparecian automaticamente en los formularios de turno (mismo repo de tenant). El modulo se mantenia progresivo: no obliga a cargar datos. (Ya no aplica: no existen estados configurables.)
 
 Reemplaza a: ninguna
 
-Estado: VIGENTE
+Estado: SUPERADA (por D-040)
 
 ### D-026
 
@@ -575,6 +589,22 @@ Motivo: simplificar el ciclo de vida del tenant a lo esencial (activo/inactivo) 
 Consecuencias: `TenantService.Delete()` cascade soft-delete en transaccion (Users, ConfiguracionTenant, EstadosTurno). `TenantService.Reactivar()` restaura Tenant + Users. `AuthService.Login()` verifica `Tenant.IsActive` antes de autenticar. `PlanesSuscripcion.EstadoBaja` nuevo badge gris. `SuscripcionTenantViewModel.IsActive` nuevo campo. Vista `Tenants/Desactivar.cshtml` y `Tenants/Reactivar.cshtml` (pantallas de confirmacion). Vista `Tenants/Index.cshtml` con `FilterContent()` (search + dropdown estado). Acciones `Desactivar` (GET+POST) y `Reactivar` (GET+POST) en `TenantsController`. Se eliminaron: `Tenants/Activar.cshtml`, `Tenants/Delete.cshtml`, acciones `Activar/ActivarConfirmado/Delete/DeleteConfirmed`.
 
 Reemplaza a: D-023 parcialmente (la parte de Desactivar/Activar como endpoints POST sin UI).
+
+Estado: VIGENTE
+
+### D-040
+
+Fecha: 2026-08-28
+
+Decision: Los estados de Turno son un catalogo operativo FIJO del sistema (Pendiente, En curso, Finalizado, Cancelado), administrados por el sistema y NO configurables por tenant. El usuario NO elige el estado al crear un turno: el sistema crea siempre el turno como Pendiente. `EstadoTurnoId` sigue siendo NOT NULL en BD (lo asigna el sistema, no el usuario). No se agregan estados (ni No asistio, Confirmado, Esperando, Reprogramado, etc.): la informacion extra, si se necesita, se modela a futuro como EVENTOS, MOTIVOS o ATRIBUTOS del turno, no inflando EstadoTurno.
+
+Regla fundamental: ESTADO vs SITUACION TEMPORAL son conceptos separados. Estado = realidad operativa confirmada por el usuario (se persiste). Situacion temporal = interpretacion del reloj (se CALCULA, no se persiste, nunca es un estado). El reloj NUNCA muta el estado (nunca Pendiente->En curso automatico por hora, ni En curso->Finalizado por hora): el reloj informa; el operador decide. La semantica depende de identificadores/catalogo controlado por el sistema, no de strings magicos por nombre.
+
+Motivo: la auditoria (AI/SESION_20260828_PLAN_ESTADOS.md) mostro que el CRUD configurable ya estaba roto en la practica (estados todos soft-deleteados, dropdown vacio) y que la logica ya dependia por nombre de los estados; mantener la falsa configurabilidad agrega complejidad sin valor y unifica metricas de estado a nivel tenant (D-034) sin interpretar multiples estados custom.
+
+Consecuencias: el CRUD de estados (D-025) se elimina progresivamente por postas (P4); la creacion de turno sin dropdown asigna Pendiente (P5); se centralizan las transiciones en un motor (P6); la situacion temporal se agrega como calculada (P7); las superficies (Agenda/Dashboard/Home) se adaptan quitando dependencias por nombre (P8). D-024 se corrige (la documentacion decia Pendiente/Confirmado/Atendido; el codigo ya siembra los 4 estados). AdminGlobal no ve datos de negocio del tenant (D-022): las metricas de estados son del dashboard tenant.
+
+Reemplaza a: D-025 en lo referente al CRUD de estados configurable.
 
 Estado: VIGENTE
 

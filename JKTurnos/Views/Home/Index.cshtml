@@ -1,5 +1,6 @@
 ﻿@model JKTurnos.Models.ViewModels.HomeViewModel
 @using RolesConst = JKTurnos.Models.Entities.Roles;
+@using JKTurnos.Models.Entities
 
 @{
     ViewBag.Title = "Command Center";
@@ -110,10 +111,16 @@
                                     {
                                         var clienteNombre = t.Cliente != null ? t.Cliente.Nombre : "Cliente";
                                         var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
-                                        var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : "#aeaeb2";
+                                        var estadoIcono = t.EstadoTurno != null ? t.EstadoTurno.Icono : "bi-circle-fill";
+                                        var situacionClave = SituacionTemporal.Calcular(t);
+                                        var situacionAlarma = situacionClave != null && SituacionTemporal.EsAlarma(situacionClave) ? SituacionTemporal.De(situacionClave) : null;
 
-                                        <a href="@Url.Action("Agenda", "Turnos")" class="mi-dia-chip" title="@estadoNombre" style="--jk-status-color: @estadoColor;">
-                                            <span class="mi-dia-chip-status"><i class="bi bi-circle-fill"></i></span>
+                                        <a href="@Url.Action("Agenda", "Turnos")" class="mi-dia-chip" title="@estadoNombre">
+                                            <span class="mi-dia-chip-status"><i class="bi @estadoIcono"></i></span>
+                                            @if (situacionAlarma != null)
+                                            {
+                                                <span class="mi-dia-chip-status" title="@situacionAlarma.Label" style="color: @situacionAlarma.Color"><i class="bi @situacionAlarma.Icono"></i></span>
+                                            }
                                             <span class="mi-dia-chip-time">@t.FechaHoraInicio.ToString("HH:mm")</span>
                                             <span class="mi-dia-chip-client">@clienteNombre</span>
                                         </a>

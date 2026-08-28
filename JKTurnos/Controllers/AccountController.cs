@@ -29,17 +29,17 @@ namespace JKTurnos.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var success = _authService.Login(
+            var user = _authService.Login(
                 model.Email,
                 model.Password);
 
-            if (!success)
+            if (user == null)
             {
                 ModelState.AddModelError("", "Credenciales incorrectas o cuenta desactivada. Contacte al administrador.");
                 return View(model);
             }
 
-            if (User.IsInRole(Roles.AdminGlobal))
+            if (user.Role == Roles.AdminGlobal)
                 return RedirectToAction("Index", "AdminGlobalDashboard");
 
             return RedirectToAction("Index", "Home");

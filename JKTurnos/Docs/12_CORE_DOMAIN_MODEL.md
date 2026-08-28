@@ -168,18 +168,27 @@ El modelo nunca depende de un rubro especifico.
 
 Representa la situacion actual de un turno dentro de su ciclo de vida.
 
-Pertenece a un Tenant.
+> Actualizado 2026-08-28 (D-040): los estados operativos son un catalogo FIJO
+> del sistema (no configurables por tenant). La semantica se resuelve por
+> `Codigo` estable (constantes en `EstadosTurnoBase`), nunca por `Nombre`.
+> La matriz de transiciones es UNICA y vive en `TurnoEstadoMotor`.
 
 Existen dos grupos de estados, funcionalmente independientes:
 
-### Estados operativos
+### Estados operativos (catalogo fijo, D-040)
 
-- Pendiente
-- Confirmado
-- En curso
-- Finalizado
-- Cancelado
-- Reagendado
+- Pendiente (`PENDIENTE`)
+- En curso (`EN_CURSO`)
+- Finalizado (`FINALIZADO`)
+- Cancelado (`CANCELADO`)
+
+(Se eliminan Confirmado y Reagendado de la version anterior.)
+
+### Situacion temporal (calculada, NO es estado)
+
+Ademas del estado persistido, `SituacionTemporal` informa sobre el reloj
+(`demorado`, `tiempo-excedido`, `a-tiempo`). Es calculada e informativa:
+nunca muta el estado persistido.
 
 ### Estados economicos
 

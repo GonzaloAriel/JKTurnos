@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using JKTurnos.Models.Entities;
 using JKTurnos.Models.ViewModels;
 
 namespace JKTurnos.Services
@@ -25,7 +26,7 @@ namespace JKTurnos.Services
             var turnosDelDia = _turnoService.GetTurnosDelDia(fecha);
 
             var activos = turnosDelDia
-                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado")
+                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
                 .ToList();
 
             var minutosOcupados = activos

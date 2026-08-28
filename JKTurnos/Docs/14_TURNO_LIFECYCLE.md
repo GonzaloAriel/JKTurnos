@@ -2,9 +2,9 @@
 
 ## Ciclo de Vida del Turno de JKTurnos
 
-Version: 1.0
+Version: 2.0
 
-Fecha: 29/7/2026
+Fecha: 28/8/2026
 
 Estado: Aprobado
 
@@ -18,8 +18,6 @@ Este documento responde una sola pregunta:
 
 Documenta cada estado, cada transicion, cada regla y cada consecuencia.
 
-No habla de implementacion.
-
 No habla de base de datos.
 
 Habla del comportamiento del negocio.
@@ -27,13 +25,20 @@ Habla del comportamiento del negocio.
 Sirve como guia para la construccion del TurnoService y de toda la logica
 asociada al ciclo de vida del turno.
 
+> Actualizado 2026-08-28 (D-040): el catalogo de estados operativos es ahora
+> un conjunto FIJO del sistema (4 estados: Pendiente, En curso, Finalizado,
+> Cancelado). Se eliminan los estados Confirmado y Reagendado y las acciones
+> Confirmar/Reagendar que describia la version 1. La semantica se resuelve por
+> `Codigo` estable, nunca por `Nombre`. La matriz canonica vive en
+> `Services/TurnoEstadoMotor.cs` (regla unica).
+
 ---
 
 # 1. Filosofia del ciclo de vida
 
 Un turno nace, vive y muere.
 
-Durante su vida puede cambiar de estado, de horario o de recurso.
+Durante su vida puede cambiar de estado.
 
 Cada cambio tiene:
 
@@ -53,18 +58,35 @@ El sistema debe comportarse de forma logica y consistente.
 
 # 2. Estados del Turno
 
-## 2.1 Estados operativos
+## 2.1 Estados operativos (catalogo FIJO del sistema, D-040)
 
-| Estado      | Significado                                          |
-|-------------|------------------------------------------------------|
-| Pendiente   | El turno fue creado pero aun no fue confirmado       |
-| Confirmado  | El turno fue confirmado por el cliente o el operador |
-| En curso    | El servicio esta siendo brindado en este momento     |
-| Finalizado  | El servicio fue completado                           |
-| Cancelado   | El turno fue cancelado antes de finalizar            |
-| Reagendado  | El turno fue movido a otra fecha u horario           |
+| Codigo      | Estado      | Significado                                 |
+|-------------|-------------|---------------------------------------------|
+| PENDIENTE   | Pendiente   | El turno fue creado y esta por atender      |
+| EN_CURSO    | En curso    | El servicio esta siendo brindado en este momento |
+| FINALIZADO  | Finalizado  | El servicio fue completado                  |
+| CANCELADO   | Cancelado   | El turno fue cancelado antes de finalizar   |
 
-## 2.2 Estados economicos
+Los estados NO son configurables por tenant: son un catalogo fijo del sistema
+(dado por D-040). La semantica se resuelve por `Codigo` (constantes en
+`EstadosTurnoBase`); el `Nombre` es solo de display.
+
+## 2.2 Situacion temporal (calculada, NO es un estado)
+
+Ademas del estado persistido, el sistema informa una **situacion temporal**
+calculada sobre la base del reloj (P7, `SituacionTemporal`). No es un estado:
+el reloj informa pero NUNCA muta el estado persistido.
+
+| Clave           | Significado                                            |
+|-----------------|--------------------------------------------------------|
+| demorado        | El turno no fue iniciado y su hora ya paso             |
+| tiempo-excedido | El turno esta En curso y supero su horario de fin      |
+| a-tiempo        | Dentro de horario (sin alerta)                         |
+
+Las claves `demorado` y `tiempo-excedido` son de **alarma** y se pintan en las
+superficies (Agenda, Home, Dashboard, Drawer) como indicador de color.
+
+## 2.3 Estados economicos
 
 | Estado         | Significado                                        |
 |----------------|----------------------------------------------------|
@@ -82,63 +104,53 @@ Ambos grupos coexisten pero no se mezclan.
 
 ---
 
-# 3. Mapa completo de transiciones
+# 3. Matriz de transiciones operativas (canonica)
 
-## 3.1 Transiciones operativas
+La matriz canonica es UNICA y vive en `Services/TurnoEstadoMotor.cs`
+(`EsTransicionPermitida`). Toda transicion se valida contra ella.
 
 ```
-                        NACE EL TURNO
-
-                    Disponible (franja horaria)
-                             |
-                        [Reservar]
-                             |
-                         Pendiente
-                        /    |    \
-                       /     |     \
-                 [Confirmar] |  [Cancelar]
-                     /       |        \
-                    /        |         \
-              Confirmado  Reagendado  Cancelado
-                  |    \       |
-                  |     \      |
-           [Iniciar]  [Cancelar] [Confirmar]
-                  |        \        |
-                  |         \       |
-              En curso   Cancelado  Confirmado
-                  |
-           [Finalizar]
-                  |
-              Finalizado
+                NACE EL TURNO
+                      |
+                 [Reservar / Crear]
+                      |
+                  Pendiente
+                 /        \
+          [Iniciar]     [Cancelar]
+             /               \
+            v                 v
+       En curso  ---------->  Cancelado [FINAL]
+         |
+    [Finalizar]
+         |
+         v
+    Finalizado [FINAL]
 ```
 
-### Transiciones explicitas
+### Transiciones permitidas
 
-| Desde        | Accion        | Hasta        | Valido |
-|--------------|---------------|--------------|--------|
-| Disponible   | Reservar      | Pendiente    | Siempre |
-| Pendiente    | Confirmar     | Confirmado   | Siempre |
-| Pendiente    | Cancelar      | Cancelado    | Siempre |
-| Pendiente    | Reagendar     | Reagendado   | Siempre |
-| Confirmado   | Iniciar       | En curso     | Cuando sea la fecha/hora |
-| Confirmado   | Cancelar      | Cancelado    | Siempre |
-| Confirmado   | Reagendar     | Reagendado   | Siempre |
-| En curso     | Finalizar     | Finalizado   | Siempre |
-| En curso     | Cancelar      | Cancelado    | Solo por administrador |
-| Reagendado   | Confirmar     | Confirmado   | Siempre |
-| Reagendado   | Cancelar      | Cancelado    | Siempre |
-| Reagendado   | Reagendar     | Reagendado   | Siempre (nuevo cambio) |
+| Desde      | Accion    | Hasta      | Nota                          |
+|------------|-----------|------------|-------------------------------|
+| Pendiente  | Iniciar   | En curso   | Solo desde Pendiente          |
+| Pendiente  | Cancelar  | Cancelado  | -                             |
+| En curso   | Finalizar | Finalizado | Solo desde En curso           |
+| En curso   | Cancelar  | Cancelado  | -                             |
 
 ### Transiciones bloqueadas
 
-| Desde       | Accion      | Motivo                                   |
-|-------------|-------------|------------------------------------------|
-| Cancelado   | Cualquiera  | Un turno cancelado no puede reactivarse  |
-| Finalizado  | Cualquiera  | Un turno finalizado no puede modificarse |
-| En curso    | Reagendar   | No se reagenda un turno en curso         |
-| En curso    | Confirmar   | Ya esta mas alla de confirmado           |
+| Desde      | Hasta       | Motivo                                        |
+|------------|-------------|-----------------------------------------------|
+| Pendiente  | Finalizado  | Debe pasar por En curso primero               |
+| En curso   | Pendiente   | No hay retroceso                              |
+| Finalizado | Cualquiera  | Terminal: no se modifica                      |
+| Cancelado  | Cualquiera  | Terminal: no se reactiva                      |
 
-## 3.2 Transiciones economicas
+Nota: en la implementacion actual del motor, `Cancelar` acepta origen
+Pendiente o En curso (guardia de estado origen). `Finalizar` solo desde
+En curso. `Iniciar` solo desde Pendiente. No existen acciones Confirmar ni
+Reagendar (eliminadas en D-040).
+
+## 3.1 Transiciones economicas
 
 ```
                    Sin senia
@@ -217,50 +229,15 @@ Finalizado           - Atender igualmente
 - Solo requiere nombre y telefono
 - Si no hay disponibilidad, la decision final es del usuario
 
-## 4.2 Reagendamiento
+> Nota: walk-in no esta implementado en el alcance actual (D-040). Se documenta
+> como regla de negocio a futuro.
 
-Cuando un turno cambia de fecha u horario.
-
-### Flujo
-
-```
-Turno existente (Pendiente o Confirmado)
-         |
-   [Reagendar]
-         |
-   v
-   Seleccionar nueva fecha/hora
-         |
-   v
-   ¿El nuevo horario esta disponible?
-    /                  \
-   Si                  No
-   |                    |
-   v                    v
-Estado: Reagendado  Informar conflicto
-   |                    |
-   v                    v
-   [Confirmar]     Sugerir horario alternativo
-   |
-   v
-   Confirmado
-```
-
-### Reglas
-
-- El turno original conserva su historial
-- El nuevo horario no debe superponerse con otro turno del mismo recurso
-- Al reagendar, el turno pasa a "Reagendado"
-- Requiere confirmacion posterior (automatica o manual segun configuracion)
-- Se debe registrar el motivo del reagendamiento
-- El historial debe conservar el horario anterior y el nuevo
-
-## 4.3 Cancelacion
+## 4.2 Cancelacion
 
 ### Flujo
 
 ```
-Turno existente (Pendiente, Confirmado o En curso*)
+Turno existente (Pendiente o En curso*)
          |
    [Cancelar]
          |
@@ -279,7 +256,7 @@ Turno existente (Pendiente, Confirmado o En curso*)
                     Cancelado
 ```
 
-* Solo administrador puede cancelar un turno "En curso"
+* Solo administrador puede cancelar un turno "En curso" (matriz de permisos)
 * Si hay senia, debe registrarse si se reembolsa o se retiene
 
 ### Reglas
@@ -297,12 +274,18 @@ Turno existente (Pendiente, Confirmado o En curso*)
   - Retener senia
 - El estado economico no cambia automaticamente al cancelar
 - Queda registrado si hay saldo pendiente
+- Un turno Finalizado no puede cancelarse (matriz canonica)
 
 ---
 
 # 5. Acciones del ciclo de vida
 
-## 5.1 Reservar
+Las acciones operativas expuestas por la UI son las del estado persistido:
+**Iniciar**, **Finalizar** y **Cancelar** (endpoints ajax
+`IniciarAtencion`/`FinalizarAtencion`/`CancelarAtencion`). La situacion
+temporal es informativa y se muestra, no se opera.
+
+## 5.1 Reservar / Crear
 
 ### Quien
 - Usuario autenticado
@@ -321,50 +304,31 @@ Crea un nuevo turno en estado Pendiente.
 ### Consecuencias
 - El bloque de tiempo queda reservado
 - El recurso no puede recibir otro turno en ese horario
-- (Futuro) Se envia notificacion de confirmacion pendiente
 
 ### Validaciones
 - La fecha no puede ser pasada (excepto walk-in)
 - La hora debe estar dentro del horario laboral del recurso
 - No debe existir otro turno en el mismo horario para el mismo recurso
 
-## 5.2 Confirmar
-
-### Quien
-- Usuario autenticado
-- (Futuro) Cliente via enlace de confirmacion
-
-### Que hace
-Cambia el estado de Pendiente a Confirmado.
-
-### Requisitos
-- El turno debe estar en estado Pendiente o Reagendado
-
-### Consecuencias
-- El turno queda firme en la Agenda
-- (Futuro) Se programa recordatorio
-
-## 5.3 Iniciar
+## 5.2 Iniciar
 
 ### Quien
 - Usuario autenticado
 
 ### Que hace
-Cambia el estado de Confirmado a En curso.
+Cambia el estado de Pendiente a En curso.
 
 ### Requisitos
-- El turno debe estar en estado Confirmado
-- Debe ser la fecha del turno o posterior
+- El turno debe estar en estado Pendiente
 
 ### Consecuencias
 - El bloque de tiempo se marca como "ocupado ahora"
-- (Futuro) Se notifica al cliente que el servicio comenzo
 
 ### Validaciones
-- No se puede iniciar un turno antes de su fecha/hora
+- No se puede iniciar un turno que no este Pendiente
 - No se puede iniciar un turno de otro recurso sin permisos
 
-## 5.4 Finalizar
+## 5.3 Finalizar
 
 ### Quien
 - Usuario autenticado
@@ -378,9 +342,8 @@ Cambia el estado de En curso a Finalizado.
 ### Consecuencias
 - El servicio se marca como completado
 - El recurso queda disponible para el proximo turno
-- (Futuro) Se genera registro para caja
 
-## 5.5 Cancelar
+## 5.4 Cancelar
 
 ### Quien
 - Usuario autenticado
@@ -390,7 +353,7 @@ Cambia el estado de En curso a Finalizado.
 Cambia el estado a Cancelado.
 
 ### Requisitos
-- El turno no debe estar Finalizado
+- El turno debe estar Pendiente o En curso (no Finalizado)
 - Debe registrarse un motivo
 - Si el turno esta En curso, solo administrador puede cancelar
 
@@ -398,29 +361,8 @@ Cambia el estado a Cancelado.
 - El bloque de tiempo queda disponible nuevamente
 - Se registra el motivo de cancelacion
 - Si habia senia, se define si se reembolsa o retiene
-- (Futuro) Se notifica al cliente
 
-## 5.6 Reagendar
-
-### Quien
-- Usuario autenticado
-- (Futuro) Cliente via enlace de reagendamiento
-
-### Que hace
-Cambia la fecha y/u hora del turno.
-
-### Requisitos
-- El turno no debe estar En curso ni Finalizado ni Cancelado
-- El nuevo horario debe estar disponible
-- Debe registrarse el motivo del cambio
-
-### Consecuencias
-- El horario original queda disponible
-- El nuevo horario queda reservado
-- El estado pasa a Reagendado
-- El historial registra el cambio
-
-## 5.7 Pagar senia
+## 5.5 Pagar senia
 
 ### Quien
 - Usuario autenticado
@@ -434,9 +376,8 @@ Registra una senia.
 
 ### Consecuencias
 - El estado economico cambia a Senia pagada
-- (Futuro) Se registra en caja
 
-## 5.8 Registrar pago
+## 5.6 Registrar pago
 
 ### Quien
 - Usuario autenticado
@@ -450,7 +391,6 @@ Registra un pago parcial o completo.
 
 ### Consecuencias
 - El estado economico se actualiza
-- (Futuro) Se registra en caja
 
 ---
 
@@ -463,8 +403,10 @@ Registra un pago parcial o completo.
 - Un turno cancelado no puede reactivarse
 - Un turno finalizado no puede modificarse
 - Solo un administrador puede cancelar un turno en curso
-- El reagendamiento preserva el historial completo del turno original
 - Cada cambio de estado debe registrar fecha, hora y responsable
+- El catalogo de estados es FIJO (D-040) y se resuelve por Codigo, nunca por Nombre
+- No existe Confirmar: un turno nace "Pendiente" y se atendera directamente
+- No existe Reagendar como cambio de estado (se agenda eliminando/creando)
 
 ## 6.2 Reglas economicas
 
@@ -479,7 +421,6 @@ Registra un pago parcial o completo.
 - Un recurso no puede tener dos turnos en el mismo horario
 - El sistema no debe permitir crear un turno en horario bloqueado
 - El sistema no debe permitir crear un turno en el pasado
-- (Futuro) El sistema debe respetar el horario laboral del recurso
 
 ---
 
@@ -493,7 +434,7 @@ Cada accion sobre un turno debe generar un registro de auditoria.
 |------------------|------------------------------------------------|
 | Fecha y hora     | Momento exacto de la accion                    |
 | Responsable      | Usuario que realizo la accion                  |
-| Accion           | Tipo de accion (crear, confirmar, cancelar...) |
+| Accion           | Tipo de accion (crear, iniciar, cancelar...)   |
 | Estado anterior  | Estado del turno antes de la accion            |
 | Estado posterior | Estado del turno despues de la accion          |
 | Detalle          | Informacion adicional segun la accion          |
@@ -501,9 +442,8 @@ Cada accion sobre un turno debe generar un registro de auditoria.
 ## Eventos que generan auditoria
 
 - Creacion del turno
-- Cada cambio de estado operativo
+- Cada cambio de estado operativo (via TurnoEstadoMotor)
 - Cada cambio de estado economico
-- Cada reagendamiento (con horario anterior y nuevo)
 - Cada cancelacion (con motivo)
 - Cada pago registrado (con monto)
 
@@ -518,14 +458,11 @@ disparar notificaciones.
 
 | Accion           | Notificacion                         | Destinatario     |
 |------------------|--------------------------------------|------------------|
-| Reservar         | Turno creado (pendiente de confirmar)| Cliente          |
-| Confirmar        | Turno confirmado                     | Cliente          |
+| Crear/Reservar   | Turno por atender                    | Cliente          |
 | Recordatorio     | Recordatorio de turno proximo        | Cliente          |
-| Reagendar        | Turno reagendado (nuevo horario)     | Cliente          |
 | Cancelar         | Turno cancelado                      | Cliente          |
 | Iniciar          | Servicio en curso                    | Cliente          |
 | Finalizar        | Servicio completado                  | Cliente          |
-| Recordatorio     | Recordatorio (X horas antes)        | Cliente          |
 
 Los canales de notificacion seran definidos cuando el modulo se implemente.
 
@@ -535,24 +472,21 @@ Los canales de notificacion seran definidos cuando el modulo se implemente.
 
 | Accion           | Admin | Operador | (Futuro) Cliente |
 |------------------|-------|----------|------------------|
-| Reservar         | Si    | Si       | Si               |
-| Confirmar        | Si    | Si       | Si               |
+| Crear/Reservar   | Si    | Si       | Si               |
 | Iniciar          | Si    | Si       | No               |
 | Finalizar        | Si    | Si       | No               |
 | Cancelar         | Si    | Si (*)   | Si (**)          |
-| Reagendar        | Si    | Si       | Si (**)          |
 | Pagar senia      | Si    | Si       | No               |
 | Registrar pago   | Si    | Si       | No               |
 
 (*) Operador no puede cancelar turnos En curso
-(**) Cliente solo puede cancelar/reagendar dentro de la ventana definida por
-     el negocio
+(**) Cliente solo puede cancelar dentro de la ventana definida por el negocio
 
 ---
 
 # 10. Reglas de validacion por accion
 
-## Reservar
+## Reservar / Crear
 
 ```
 - Fecha no puede ser pasada
@@ -563,17 +497,11 @@ Los canales de notificacion seran definidos cuando el modulo se implemente.
 - No debe existir conflicto de horario con el mismo recurso
 ```
 
-## Confirmar
-
-```
-- Turno debe estar en estado Pendiente o Reagendado
-```
-
 ## Iniciar
 
 ```
-- Turno debe estar en estado Confirmado
-- Fecha debe ser hoy o posterior
+- Turno debe estar en estado Pendiente
+- Fecha del turno controlada por la situacion temporal (informativa)
 ```
 
 ## Finalizar
@@ -585,19 +513,10 @@ Los canales de notificacion seran definidos cuando el modulo se implemente.
 ## Cancelar
 
 ```
-- Turno no debe estar Finalizado
+- Turno debe estar Pendiente o En curso (no Finalizado)
 - Motivo obligatorio
 - Si esta En curso, solo Admin
 - Si hay senia, preguntar reembolso/retencion
-```
-
-## Reagendar
-
-```
-- Turno no debe estar En curso, Finalizado ni Cancelado
-- Nueva fecha/hora debe ser valida
-- Nuevo horario debe estar disponible
-- Motivo obligatorio
 ```
 
 ---
@@ -635,22 +554,16 @@ Si tenia senia retenida, el registro contable se mantiene.
                               NACE
                                 |
                             Pendiente
-                           /    |    \
-                          /     |     \
-                    Confirmo  Reagendo  Cancelan
-                    /          |           \
-                   /           |            \
-              Confirmado  Reagendado     Cancelado
-              /    |           |          [FINAL]
-             /     |           |
-        Inicio  Reagendo   Confirman
-          |        |           |
-          v        v           v
-      En curso  Reagendado  Confirmado
-          |        |
-          v        v
-     Finalizado  (ciclo)
-       [FINAL]
+                           /        \
+                    [Iniciar]     [Cancelar]
+                      /              \
+                     v                v
+                 En curso        Cancelado [FINAL]
+                   |
+             [Finalizar]
+                   |
+                   v
+             Finalizado [FINAL]
 
 
                   ESTADOS ECONOMICOS
@@ -683,8 +596,10 @@ Si tenia senia retenida, el registro contable se mantiene.
 - Un walk-in nace en En curso
 - Un turno cancelado no se reactiva
 - Un turno finalizado no se modifica
+- El catalogo de estados es FIJO (D-040) y se resuelve por Codigo
+- No existen Confirmar ni Reagendar (eliminados en D-040)
+- La situacion temporal es calculada e informativa, nunca muta el estado
 - Toda cancelacion requiere motivo
-- Todo reagendamiento registra el horario anterior y el nuevo
 - Los estados economicos no bloquean los operativos
 - La senia solo puede registrarse una vez
 - Cada accion genera auditoria

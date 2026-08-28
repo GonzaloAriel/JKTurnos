@@ -13,7 +13,7 @@ namespace JKTurnos.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = false;
         }
 
@@ -89,38 +89,57 @@ namespace JKTurnos.Migrations
                 });
             }
 
-            // 4. ESTADOS DE TURNO
+            // 4. ESTADOS DE TURNO (D-040: catalogo fijo de 4, con Codigo estable)
             if (!context.EstadosTurno.Any(x => x.TenantId == tenant.Id))
             {
-                context.EstadosTurno.Add(
-                    new EstadoTurno
-                    {
-                        TenantId = tenant.Id,
-                        Nombre = "Pendiente",
-                        Color = "#ffc107",
-                        CreatedAt = DateTime.Now,
-                        IsActive = true
-                    });
+                foreach (var e in EstadosTurnoBase.Todos)
+                {
+                    context.EstadosTurno.Add(
+                        new EstadoTurno
+                        {
+                            TenantId = tenant.Id,
+                            Nombre = e.Nombre,
+                            Codigo = e.Codigo,
+                            Color = e.Color,
+                            Icono = e.Icono,
+                            CreatedAt = DateTime.Now,
+                            IsActive = true
+                        });
+                }
 
-                context.EstadosTurno.Add(
-                    new EstadoTurno
-                    {
-                        TenantId = tenant.Id,
-                        Nombre = "Confirmado",
-                        Color = "#0d6efd",
-                        CreatedAt = DateTime.Now,
-                        IsActive = true
-                    });
+                context.SaveChanges();
+            }
+            else
+            {
+                // El tenant ya tiene estados (ex.: re-seed sobre BD existente):
+                // garantizar que los estados del catalogo tengan Codigo e Icono,
+                // sin duplicar ni crear estados fuera del catalogo.
+                foreach (var e in EstadosTurnoBase.Todos)
+                {
+                    var existente = context.EstadosTurno
+                        .FirstOrDefault(x => x.TenantId == tenant.Id && x.Codigo == e.Codigo);
 
-                context.EstadosTurno.Add(
-                    new EstadoTurno
+                    if (existente != null)
                     {
-                        TenantId = tenant.Id,
-                        Nombre = "Atendido",
-                        Color = "#198754",
-                        CreatedAt = DateTime.Now,
-                        IsActive = true
-                    });
+                        existente.Icono = e.Icono;
+                    }
+                    else
+                    {
+                        // No existe ese Codigo: se crea (migra el estado por su Nombre
+                        // conocido si esta, sino se agrega nuevo).
+                        context.EstadosTurno.Add(
+                            new EstadoTurno
+                            {
+                                TenantId = tenant.Id,
+                                Nombre = e.Nombre,
+                                Codigo = e.Codigo,
+                                Color = e.Color,
+                                Icono = e.Icono,
+                                CreatedAt = DateTime.Now,
+                                IsActive = true
+                            });
+                    }
+                }
 
                 context.SaveChanges();
             }
@@ -207,9 +226,9 @@ namespace JKTurnos.Migrations
 
             // 8. TURNOS DEMO
             var estadoPendiente = context.EstadosTurno
-                .FirstOrDefault(x => x.Nombre == "Pendiente" && x.TenantId == tenant.Id);
-            var estadoConfirmado = context.EstadosTurno
-                .FirstOrDefault(x => x.Nombre == "Confirmado" && x.TenantId == tenant.Id);
+                .FirstOrDefault(x => x.Codigo == EstadosTurnoBase.Pendiente && x.TenantId == tenant.Id);
+            var estadoEnCurso = context.EstadosTurno
+                .FirstOrDefault(x => x.Codigo == EstadosTurnoBase.EnCurso && x.TenantId == tenant.Id);
             var recurso = context.Recursos.FirstOrDefault(x => x.TenantId == tenant.Id);
             var hoy = DateTime.Today;
 
@@ -228,7 +247,7 @@ namespace JKTurnos.Migrations
                     ServicioNombre = "Color",
                     HoraInicio = hoy.AddHours(11),
                     HoraFin = hoy.AddHours(11).AddMinutes(60),
-                    Estado = estadoConfirmado,
+                    Estado = estadoEnCurso,
                     Obs = ""
                 },
                 new {

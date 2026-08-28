@@ -172,20 +172,30 @@ El modelo debe ser el mismo para cualquier rubro.
 Define las etapas operativas por las que atraviesa un Turno durante su ciclo
 de vida.
 
-### Relaciones
+> Actualizado 2026-08-28 (D-040): el catalogo de estados es FIJO del sistema
+> (no persistido como CRUD configurable por tenant). Se siembra con la entidad
+> `EstadoTurno` (con columna `Codigo` estable) y la semantica se resuelve por
+> `Codigo`, nunca por `Nombre`. La matriz de transiciones es UNICA y vive en
+> `TurnoEstadoMotor`.
 
-Pertenece a un Tenant.
+### Relaciones
 
 Cada Turno posee exactamente un Estado operativo.
 
-### Estados operativos
+### Estados operativos (catalogo fijo, D-040)
 
-- Pendiente
-- Confirmado
-- En curso
-- Finalizado
-- Cancelado
-- Reagendado
+- Pendiente (`PENDIENTE`)
+- En curso (`EN_CURSO`)
+- Finalizado (`FINALIZADO`)
+- Cancelado (`CANCELADO`)
+
+(Se eliminan Confirmado y Reagendado de la version anterior.)
+
+### Situacion temporal (calculada, NO es estado)
+
+`SituacionTemporal` informa el estado del reloj (`demorado`,
+`tiempo-excedido`, `a-tiempo`) sobre el estado persistido. Es calculada e
+informativa; no es una fila de `EstadoTurno` y nunca muta el estado.
 
 ### Aclaracion
 
@@ -386,7 +396,7 @@ Las relaciones entre las entidades del modelo son las siguientes:
 
 **EstadoTurno**
 
-- Un EstadoTurno pertenece a un Tenant
+- Un EstadoTurno se siembra por tenant como catalogo FIJO del sistema (D-040); la semantica es global y se resuelve por `Codigo`, nunca por `Nombre`
 - Un EstadoTurno puede estar presente en muchos Turnos
 - Un Turno posee un unico Estado
 

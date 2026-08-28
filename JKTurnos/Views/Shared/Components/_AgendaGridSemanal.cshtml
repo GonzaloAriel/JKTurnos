@@ -134,7 +134,9 @@
                         var servicioNombre = t.Servicio != null ? t.Servicio.Nombre : "Reservado";
                         var recursoColor = colorRecurso.ContainsKey(t.RecursoId) ? colorRecurso[t.RecursoId] : "#7295B5";
                         var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
-                        var estadoColor = t.EstadoTurno != null ? t.EstadoTurno.Color : null;
+                        var estadoIcono = t.EstadoTurno != null ? t.EstadoTurno.Icono : "bi-circle-fill";
+                        var situacionClave = SituacionTemporal.Calcular(t);
+                        var situacionAlarma = situacionClave != null && SituacionTemporal.EsAlarma(situacionClave) ? SituacionTemporal.De(situacionClave) : null;
 
                         <div class="jk-agenda-week-block"
                              role="button"
@@ -144,7 +146,11 @@
                              style="top: @topPx.ToString("0.##")px; height: @heightPx.ToString("0.##")px; left: @leftPct.ToString("0.##")%; width: @widthPct.ToString("0.##")%; --jk-block-color: @recursoColor;"
                              aria-label="Turno de @clienteNombre, @servicioNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                             <div class="jk-agenda-week-block-band">
-                                <span class="jk-agenda-week-block-status" title="@estadoNombre" style="--jk-status-color: @(estadoColor ?? "#aeaeb2")"><i class="bi bi-circle-fill"></i></span>
+                                <span class="jk-agenda-week-block-status" title="@estadoNombre"><i class="bi @estadoIcono"></i></span>
+                                @if (situacionAlarma != null)
+                                {
+                                    <span class="jk-agenda-week-block-status" title="@situacionAlarma.Label" style="color: @situacionAlarma.Color"><i class="bi @situacionAlarma.Icono"></i></span>
+                                }
                                 <span class="jk-agenda-week-block-hour">@t.FechaHoraInicio.ToString("HH:mm") - @t.FechaHoraFin.ToString("HH:mm")</span>
                                 <button type="button" class="jk-agenda-time-block-pago" data-turno-id="@t.Id" title="Registrar pago" aria-label="Registrar pago de @clienteNombre">
                                     <i class="bi bi-cash-coin"></i>

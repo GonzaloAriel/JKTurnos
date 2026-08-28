@@ -32,12 +32,6 @@
     </div>
 
     <div class="jk-form-group">
-        <label class="jk-label" for="@Html.IdFor(m => m.EstadoTurnoId)">@Html.DisplayNameFor(m => m.EstadoTurnoId)</label>
-        @Html.DropDownListFor(m => m.EstadoTurnoId, Model.EstadosTurno, "Seleccione un estado", new { @class = "jk-input" })
-        @Html.ValidationMessageFor(m => m.EstadoTurnoId, "", new { @class = "jk-field-error" })
-    </div>
-
-    <div class="jk-form-group">
         <label class="jk-label" for="@Html.IdFor(m => m.FechaHoraInicio)">@Html.DisplayNameFor(m => m.FechaHoraInicio)</label>
         <input type="datetime-local" class="jk-input" id="FechaHoraInicio" name="FechaHoraInicio"
                value="@(Model.FechaHoraInicio != DateTime.MinValue ? Model.FechaHoraInicio.ToString("yyyy-MM-ddTHH:mm") : "")" />
@@ -59,6 +53,42 @@
 
     ViewBag.FormContent = FormContent();
 }
+
+<!-- ===== ESTADO + ACCIONES CONTEXTUALES (P5: sin dropdown, catalogo fijo D-040) ===== -->
+<div class="jk-card jk-mb-24">
+    @Html.AntiForgeryToken()
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Estado del turno</h3>
+    </div>
+    <div class="jk-flex jk-gap-8 jk-align-center jk-mb-12">
+        <i class="bi @(string.IsNullOrEmpty(Model.EstadoIcono) ? "bi-circle-fill" : Model.EstadoIcono)" style="color:@Model.EstadoColor"></i>
+        <strong>@Model.EstadoNombre</strong>
+    </div>
+    <div class="jk-flex jk-gap-8">
+        @if (Model.PuedeIniciar)
+        {
+            <button type="button" class="jk-btn jk-btn-primary" data-accion data-url="@Url.Action("IniciarAtencion", "Turnos")" data-turno="@Model.Id">
+                <i class="bi bi-play-fill"></i> Iniciar atencion
+            </button>
+        }
+        @if (Model.PuedeFinalizar)
+        {
+            <button type="button" class="jk-btn jk-btn-primary" data-accion data-url="@Url.Action("FinalizarAtencion", "Turnos")" data-turno="@Model.Id">
+                <i class="bi bi-check-lg"></i> Finalizar
+            </button>
+        }
+        @if (Model.PuedeCancelar)
+        {
+            <button type="button" class="jk-btn jk-btn-danger" data-accion data-url="@Url.Action("CancelarAtencion", "Turnos")" data-turno="@Model.Id">
+                <i class="bi bi-x-lg"></i> Cancelar turno
+            </button>
+        }
+        @if (!Model.PuedeIniciar && !Model.PuedeFinalizar && !Model.PuedeCancelar)
+        {
+            <p class="jk-small text-secondary jk-mb-0">Este turno no tiene acciones pendientes (estado terminal).</p>
+        }
+    </div>
+</div>
 
 @Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
 
@@ -110,6 +140,41 @@
                     loadRecursos(this.value);
                 });
             }
+
+            // Acciones contextuales de cambio de estado (P5), POST ajax + anti-forgery.
+            var estadoToken = document.querySelector('input[name="__RequestVerificationToken"]');
+
+            document.querySelectorAll('[data-accion]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var accionUrl = btn.getAttribute('data-url');
+                    var turnoId = btn.getAttribute('data-turno');
+                    if (!estadoToken) return;
+
+                    var body = '__RequestVerificationToken=' + encodeURIComponent(estadoToken.value) +
+                               '&turnoId=' + encodeURIComponent(turnoId);
+
+                    btn.disabled = true;
+
+                    fetch(accionUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                        body: body
+                    })
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        btn.disabled = false;
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            showToast(data.message || 'No se pudo realizar la accion', 'error');
+                        }
+                    })
+                    .catch(function () {
+                        btn.disabled = false;
+                        showToast('Error de conexion al realizar la accion', 'error');
+                    });
+                });
+            });
         })();
     </script>
 }

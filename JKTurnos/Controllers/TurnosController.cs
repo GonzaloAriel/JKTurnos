@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using JKTurnos.Models.Entities;
 using JKTurnos.Models.ViewModels;
 using JKTurnos.Services;
-using JKTurnos.Data;
 
 namespace JKTurnos.Controllers
 {
@@ -18,7 +17,6 @@ namespace JKTurnos.Controllers
         private readonly RecursoService _recursoService;
         private readonly RecursoServicioService _recursoServicioService;
         private readonly PagoService _pagoService;
-        private readonly BaseRepository<EstadoTurno> _estadoRepo;
 
         public TurnosController()
         {
@@ -28,7 +26,6 @@ namespace JKTurnos.Controllers
             _recursoService = new RecursoService();
             _recursoServicioService = new RecursoServicioService();
             _pagoService = new PagoService();
-            _estadoRepo = new BaseRepository<EstadoTurno>();
         }
 
         public JsonResult GetRecursosPorServicio(int servicioId)
@@ -68,6 +65,9 @@ namespace JKTurnos.Controllers
             var nombresUsuarios = _pagoService.GetNombresUsuarios(pagos.Select(p => p.UsuarioId));
             var notificacionService = new NotificacionService();
 
+            var situacionClave = SituacionTemporal.Calcular(turno);
+            var situacion = situacionClave != null ? SituacionTemporal.De(situacionClave) : null;
+
             var model = new TurnoDetailViewModel
             {
                 Id = turno.Id,
@@ -82,6 +82,11 @@ namespace JKTurnos.Controllers
                 EstadoTurnoId = turno.EstadoTurnoId,
                 EstadoNombre = turno.EstadoTurno != null ? turno.EstadoTurno.Nombre : "Sin estado",
                 EstadoColor = turno.EstadoTurno != null ? turno.EstadoTurno.Color : null,
+                EstadoIcono = turno.EstadoTurno != null ? turno.EstadoTurno.Icono : "bi-circle-fill",
+                SituacionClave = situacionClave,
+                SituacionLabel = situacion != null ? situacion.Label : null,
+                SituacionColor = situacion != null ? situacion.Color : null,
+                SituacionIcono = situacion != null ? situacion.Icono : null,
                 FechaHoraInicio = turno.FechaHoraInicio,
                 FechaHoraFin = turno.FechaHoraFin,
                 Observaciones = turno.Observaciones,
@@ -160,6 +165,55 @@ namespace JKTurnos.Controllers
             return Json(new { success = true, message = "Recordatorio enviado por email" });
         }
 
+        // P5 (UX de acciones): transicion operatoria Pendiente → En curso.
+        // POST ajax, patron QuickCreate (D-013). El motor completo se centraliza en P6.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult IniciarAtencion(int turnoId)
+        {
+            try
+            {
+                _turnoService.Iniciar(turnoId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // P5 (UX de acciones): transicion operatoria En curso → Finalizado.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult FinalizarAtencion(int turnoId)
+        {
+            try
+            {
+                _turnoService.Finalizar(turnoId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // P5 (UX de acciones): transicion de salida Cancelar (Pendiente/En curso → Cancelado).
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CancelarAtencion(int turnoId)
+        {
+            try
+            {
+                _turnoService.Cancelar(turnoId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         public ActionResult Agenda(DateTime? fecha = null, string vista = null, int? openRecursoId = null, int? openTurnoId = null)
         {
             var hoy = DateTime.Today;
@@ -174,7 +228,6 @@ namespace JKTurnos.Controllers
                 Fecha = fechaSeleccionada,
                 Vista = vistaNormalizada,
                 Recursos = _recursoService.GetAll(),
-                Estados = _estadoRepo.GetAll().ToList(),
                 OpenRecursoId = openRecursoId
             };
 
@@ -328,6 +381,9 @@ namespace JKTurnos.Controllers
             if (turno == null)
                 return HttpNotFound();
 
+            var estado = turno.EstadoTurno;
+            var estadoCodigo = estado != null ? estado.Codigo : null;
+
             var model = new TurnoViewModel
             {
                 Id = turno.Id,
@@ -335,6 +391,14 @@ namespace JKTurnos.Controllers
                 ServicioId = turno.ServicioId,
                 RecursoId = turno.RecursoId,
                 EstadoTurnoId = turno.EstadoTurnoId,
+                EstadoNombre = estado != null ? estado.Nombre : "Sin estado",
+                EstadoColor = estado != null ? estado.Color : null,
+                EstadoIcono = estado != null ? estado.Icono : "bi-circle-fill",
+                EstadoCodigo = estadoCodigo,
+                PuedeIniciar = estadoCodigo == EstadosTurnoBase.Pendiente,
+                PuedeFinalizar = estadoCodigo == EstadosTurnoBase.EnCurso,
+                PuedeCancelar = estadoCodigo == EstadosTurnoBase.Pendiente ||
+                                estadoCodigo == EstadosTurnoBase.EnCurso,
                 FechaHoraInicio = turno.FechaHoraInicio,
                 FechaHoraFin = turno.FechaHoraFin,
                 Observaciones = turno.Observaciones
@@ -362,7 +426,6 @@ namespace JKTurnos.Controllers
             turno.ClienteId = model.ClienteId;
             turno.ServicioId = model.ServicioId;
             turno.RecursoId = model.RecursoId;
-            turno.EstadoTurnoId = model.EstadoTurnoId;
             turno.FechaHoraInicio = model.FechaHoraInicio;
             turno.FechaHoraFin = model.FechaHoraFin;
             turno.Observaciones = model.Observaciones;
@@ -418,12 +481,6 @@ namespace JKTurnos.Controllers
             {
                 Value = r.Id.ToString(),
                 Text = r.Nombre // Asumiendo que tiene propiedad Nombre
-            });
-
-            model.EstadosTurno = _estadoRepo.GetAll().Select(e => new SelectListItem
-            {
-                Value = e.Id.ToString(),
-                Text = e.Nombre
             });
         }
     }

@@ -18,7 +18,14 @@ namespace JKTurnos.Services
             _context = new JKContext();
         }
 
-        public bool Login(string email, string password)
+        /// <summary>
+        /// Autentica un usuario. Retorna el User si el login es valido,
+        /// o null si falla. El controller debe usar el User retornado
+        /// (no User.IsInRole()) porque en OWIN la cookie se escribe en
+        /// la respuesta pero HttpContext.User no se actualiza hasta la
+        /// proxima request.
+        /// </summary>
+        public User Login(string email, string password)
         {
             var user = _context.Users
                 .FirstOrDefault(x => x.Email == email);
@@ -26,13 +33,13 @@ namespace JKTurnos.Services
             if (user == null)
             {
                 new AuditService().RegistrarLogin(0, null, null, null, email, false);
-                return false;
+                return null;
             }
 
             if (!PasswordHasher.Verify(password, user.PasswordHash))
             {
                 new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
-                return false;
+                return null;
             }
 
             if (user.TenantId != 0)
@@ -42,7 +49,7 @@ namespace JKTurnos.Services
                 if (tenant == null || !tenant.IsActive)
                 {
                     new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
-                    return false;
+                    return null;
                 }
             }
 
@@ -50,7 +57,7 @@ namespace JKTurnos.Services
 
             SignIn(user);
 
-            return true;
+            return user;
         }
 
         private void SignIn(User user)

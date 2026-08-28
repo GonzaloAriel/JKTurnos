@@ -14,6 +14,7 @@ namespace JKTurnos.Services
         private readonly BaseRepository<Servicio> _servicioRepo;
         private readonly BaseRepository<EstadoTurno> _estadoRepo;
         private readonly BaseRepository<Cliente> _clienteRepo;
+        private readonly TurnoEstadoMotor _turnoEstadoMotor;
 
         public TurnoService()
         {
@@ -21,6 +22,7 @@ namespace JKTurnos.Services
             _servicioRepo = new BaseRepository<Servicio>();
             _estadoRepo = new BaseRepository<EstadoTurno>();
             _clienteRepo = new BaseRepository<Cliente>();
+            _turnoEstadoMotor = new TurnoEstadoMotor();
         }
 
         public List<Turno> GetAll()
@@ -147,15 +149,19 @@ namespace JKTurnos.Services
             if (turno.EstadoTurnoId == 0)
             {
                 var pendiente = _estadoRepo.GetAll()
-                    .FirstOrDefault(x => x.Nombre == "Pendiente");
+                    .FirstOrDefault(x => x.Codigo == EstadosTurnoBase.Pendiente);
 
                 if (pendiente != null)
+                {
                     turno.EstadoTurnoId = pendiente.Id;
+                }
+                else
+                {
+                    // Fallback: sembrar estados genericos inline para no bloquear
+                    var tenantId = new TenantProvider().GetTenantId();
+                    turno.EstadoTurnoId = SeedEstadosBase(tenantId);
+                }
             }
-
-            if (turno.EstadoTurnoId == 0)
-                throw new InvalidOperationException(
-                    "No hay estados de turno configurados. Contacte al administrador.");
 
             ValidarReferenciasTenant(turno);
 
@@ -202,56 +208,25 @@ namespace JKTurnos.Services
 
         public void CambiarEstado(int turnoId, int estadoTurnoId)
         {
-            var turno = _repo.GetById(turnoId);
-            if (turno == null)
-                throw new ArgumentException("Turno no encontrado.");
-
-            var estadoAnterior = _estadoRepo.GetById(turno.EstadoTurnoId)?.Nombre ?? turno.EstadoTurnoId.ToString();
-            var estadoNuevo = _estadoRepo.GetById(estadoTurnoId)?.Nombre ?? estadoTurnoId.ToString();
-
-            turno.EstadoTurnoId = estadoTurnoId;
-            _repo.Update(turno);
-
-            new NotificacionSistemaService().RegistrarCambioEstado(turnoId, estadoNuevo);
-
-            new AuditService().Registrar(
-                AuditService.A_CambiarEstado,
-                AuditService.E_Turno,
-                "Cambio el estado del turno de " + NombreCliente(turno.ClienteId) + " " +
-                turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm") + " a " + estadoNuevo,
-                turnoId,
-                AuditService.FormatearCambios(
-                    AuditService.Campo("Estado", estadoAnterior, estadoNuevo)));
+            _turnoEstadoMotor.CambiarEstado(turnoId, estadoTurnoId);
         }
 
         public void Cancelar(int turnoId)
         {
-            var turno = _repo.GetById(turnoId);
-            if (turno == null)
-                throw new ArgumentException("Turno no encontrado.");
+            _turnoEstadoMotor.Cancelar(turnoId);
+        }
 
-            var estadoAnterior = _estadoRepo.GetById(turno.EstadoTurnoId)?.Nombre ?? turno.EstadoTurnoId.ToString();
+        // P6: la matriz completa (guardia de origen incluida) quedo centralizada en
+        // TurnoEstadoMotor; estos metodos publicos de TurnoService delegan en el.
+        public void Iniciar(int turnoId)
+        {
+            _turnoEstadoMotor.Iniciar(turnoId);
+        }
 
-            var cancelado = _estadoRepo.GetAll()
-                .FirstOrDefault(x => x.Nombre == "Cancelado");
-
-            if (cancelado == null)
-                throw new InvalidOperationException(
-                    "Estado Cancelado no encontrado. Ejecute la semilla primero.");
-
-            turno.EstadoTurnoId = cancelado.Id;
-            _repo.Update(turno);
-
-            new NotificacionSistemaService().RegistrarCambioEstado(turnoId, "Cancelado");
-
-            new AuditService().Registrar(
-                AuditService.A_CambiarEstado,
-                AuditService.E_Turno,
-                "Cancelo el turno de " + NombreCliente(turno.ClienteId) + " " +
-                turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
-                turnoId,
-                AuditService.FormatearCambios(
-                    AuditService.Campo("Estado", estadoAnterior, "Cancelado")));
+        // P6: ver Iniciar. Delegacion al motor unico de transiciones.
+        public void Finalizar(int turnoId)
+        {
+            _turnoEstadoMotor.Finalizar(turnoId);
         }
 
         public void Delete(int id)
@@ -271,6 +246,46 @@ namespace JKTurnos.Services
                 AuditService.E_Turno,
                 detalle,
                 id);
+        }
+
+        /// <summary>
+        /// Semilla de estados genericos inline como fallback (D-024/D-040).
+        /// Siembra exactamente el catalogo fijo con su Codigo estable.
+        /// Retorna el Id del estado "Pendiente".
+        /// </summary>
+        private int SeedEstadosBase(int tenantId)
+        {
+            var pendienteCatalog = EstadosTurnoBase.Todos
+                .First(e => e.Codigo == EstadosTurnoBase.Pendiente);
+
+            int pendienteId = 0;
+            foreach (var e in EstadosTurnoBase.Todos)
+            {
+                _estadoRepo.Add(new EstadoTurno
+                {
+                    TenantId = tenantId,
+                    Nombre = e.Nombre,
+                    Codigo = e.Codigo,
+                    Color = e.Color,
+                    Icono = e.Icono,
+                    CreatedAt = DateTime.Now,
+                    IsActive = true
+                });
+
+                if (e.Codigo == EstadosTurnoBase.Pendiente)
+                {
+                    using (var context = new JKContext())
+                    {
+                        pendienteId = context.EstadosTurno
+                            .Where(x => x.TenantId == tenantId && x.Codigo == EstadosTurnoBase.Pendiente)
+                            .OrderByDescending(x => x.Id)
+                            .Select(x => x.Id)
+                            .FirstOrDefault();
+                    }
+                }
+            }
+
+            return pendienteId;
         }
 
         /// <summary>

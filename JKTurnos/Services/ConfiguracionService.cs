@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using JKTurnos.Data;
 using JKTurnos.Models.Entities;
@@ -7,19 +6,17 @@ using JKTurnos.Models.Entities;
 namespace JKTurnos.Services
 {
     /// <summary>
-    /// Datos del negocio (ConfiguracionTenant) + CRUD de estados de turno del tenant.
-    /// Reglas en el servicio: los estados se crean por tenant; el nombre es obligatorio;
-    /// el color tiene un default neutral si no se indica.
+    /// Datos del negocio (ConfiguracionTenant): datos del negocio, plantillas de
+    /// notificaciones (WhatsApp/Email) y recordatorios ocultos. Los estados de
+    /// turno ya NO se configuran (D-040: catalogo FIJO del sistema).
     /// </summary>
     public class ConfiguracionService
     {
         private readonly BaseRepository<ConfiguracionTenant> _configRepo;
-        private readonly BaseRepository<EstadoTurno> _estadoRepo;
 
         public ConfiguracionService()
         {
             _configRepo = new BaseRepository<ConfiguracionTenant>();
-            _estadoRepo = new BaseRepository<EstadoTurno>();
         }
 
         public ConfiguracionTenant GetConfiguracion()
@@ -137,80 +134,6 @@ namespace JKTurnos.Services
 
             actual.RecordatoriosOcultos = claves;
             _configRepo.Update(actual);
-        }
-
-        public List<EstadoTurno> GetEstados()
-        {
-            return _estadoRepo.GetAll().OrderBy(x => x.Nombre).ToList();
-        }
-
-        public EstadoTurno GetEstado(int id)
-        {
-            return _estadoRepo.GetById(id);
-        }
-
-        public void CrearEstado(string nombre, string color)
-        {
-            if (string.IsNullOrWhiteSpace(nombre))
-                throw new ArgumentException("El nombre del estado es obligatorio.");
-
-            var estado = new EstadoTurno
-            {
-                Nombre = nombre.Trim(),
-                Color = NormalizarColor(color)
-            };
-
-            _estadoRepo.Add(estado);
-
-            new AuditService().Registrar(
-                AuditService.A_Crear,
-                AuditService.E_EstadoTurno,
-                "Creo el estado de turno " + estado.Nombre,
-                estado.Id);
-        }
-
-        public void ActualizarEstado(int id, string nombre, string color)
-        {
-            var actual = _estadoRepo.GetById(id);
-
-            if (actual == null)
-                throw new InvalidOperationException("Estado no encontrado.");
-
-            if (string.IsNullOrWhiteSpace(nombre))
-                throw new ArgumentException("El nombre del estado es obligatorio.");
-
-            var cambios = AuditService.FormatearCambios(
-                AuditService.Campo("Nombre", actual.Nombre, nombre.Trim()),
-                AuditService.Campo("Color", actual.Color, NormalizarColor(color)));
-
-            actual.Nombre = nombre.Trim();
-            actual.Color = NormalizarColor(color);
-            _estadoRepo.Update(actual);
-
-            new AuditService().Registrar(
-                AuditService.A_Editar,
-                AuditService.E_EstadoTurno,
-                "Edito el estado de turno " + actual.Nombre,
-                id,
-                cambios);
-        }
-
-        public void EliminarEstado(int id)
-        {
-            var actual = _estadoRepo.GetById(id);
-
-            _estadoRepo.Delete(id);
-
-            new AuditService().Registrar(
-                AuditService.A_Eliminar,
-                AuditService.E_EstadoTurno,
-                actual != null ? "Elimino el estado de turno " + actual.Nombre : "Elimino el estado de turno #" + id,
-                id);
-        }
-
-        private static string NormalizarColor(string color)
-        {
-            return string.IsNullOrWhiteSpace(color) ? "#6c757d" : color.Trim();
         }
     }
 }

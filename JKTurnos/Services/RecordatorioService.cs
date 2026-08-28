@@ -39,7 +39,7 @@ namespace JKTurnos.Services
 
             AgregarProximoTurno(recordatorios, turnos, ahora);
             AgregarRecordatoriosDelDia(recordatorios, turnos, hoy);
-            AgregarTurnosSinConfirmar(recordatorios, turnos);
+            AgregarTurnosPorAtender(recordatorios, turnos);
             AgregarSaldoPendiente(recordatorios, hoy);
             AgregarClientesSinContacto(recordatorios, turnos, hoy);
 
@@ -122,7 +122,7 @@ namespace JKTurnos.Services
         {
             var proximo = turnos
                 .Where(t => t.FechaHoraFin > ahora &&
-                            (t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado"))
+                            (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado))
                 .OrderBy(t => t.FechaHoraInicio)
                 .FirstOrDefault();
 
@@ -164,7 +164,7 @@ namespace JKTurnos.Services
             var delDia = turnos
                 .Where(t => t.FechaHoraInicio.Date == hoy &&
                             t.FechaHoraFin > ahora &&
-                            (t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado") &&
+                            (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado) &&
                             t.Cliente != null &&
                             !string.IsNullOrWhiteSpace(t.Cliente.Telefono))
                 .OrderBy(t => t.FechaHoraInicio)
@@ -189,26 +189,26 @@ namespace JKTurnos.Services
             }
         }
 
-        private static void AgregarTurnosSinConfirmar(
+        private static void AgregarTurnosPorAtender(
             List<RecordatorioSistema> recordatorios,
             List<Turno> turnos)
         {
             var hoy = DateTime.Today;
 
-            var sinConfirmar = turnos.Count(t =>
+            var porAtender = turnos.Count(t =>
                 (t.FechaHoraInicio.Date == hoy || t.FechaHoraInicio.Date == hoy.AddDays(1)) &&
                 t.EstadoTurno != null &&
-                t.EstadoTurno.Nombre == "Pendiente");
+                t.EstadoTurno.Codigo == EstadosTurnoBase.Pendiente);
 
-            if (sinConfirmar <= 0)
+            if (porAtender <= 0)
                 return;
 
-            var turnosTxt = sinConfirmar == 1 ? "turno sin confirmar" : "turnos sin confirmar";
+            var turnosTxt = porAtender == 1 ? "turno por atender" : "turnos por atender";
 
             recordatorios.Add(new RecordatorioSistema
             {
-                Titulo = "Turnos sin confirmar",
-                Mensaje = "Tenes " + sinConfirmar + " " + turnosTxt + " para hoy o manana.",
+                Titulo = "Turnos por atender",
+                Mensaje = "Tenes " + porAtender + " " + turnosTxt + " para hoy o manana.",
                 Icono = "bi-hourglass-split",
                 IconoClase = "jk-notif-icon-warning",
                 Clave = "sinConfirmar:" + hoy.AddDays(1).ToString("yyyyMMdd"),
