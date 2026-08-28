@@ -163,7 +163,7 @@ namespace JKTurnos.Services
                 var dia = lunes.AddDays(i);
                 var cantidad = turnosSemana.Count(t =>
                     t.FechaHoraInicio.Date == dia.Date &&
-                    (t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado"));
+                    (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado));
 
                 resultado.Add(new BarraGrafico { Etiqueta = dayNames[i], Valor = cantidad });
             }

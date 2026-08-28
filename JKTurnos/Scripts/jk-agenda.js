@@ -323,6 +323,7 @@
     var quickCreateUrl = agenda.getAttribute('data-quick-create-url');
     var recursosUrl = agenda.getAttribute('data-recursos-url');
     var recursosTodosUrl = agenda.getAttribute('data-recursos-todos-url');
+    var serviciosPorRecursoUrl = agenda.getAttribute('data-servicios-por-recurso-url');
 
     function qcToast(message, type) {
         var container = document.getElementById('jk-toast-agenda');
@@ -341,10 +342,43 @@
             if (el) el.value = value || '';
         }
 
+        // Abre el drawer de Quick Create. Preselecciona Recurso y filtra el
+        // dropdown de Servicios a los vinculados al recurso (bidireccional:
+        // mismo comportamiento que GetRecursosPorServicio). Si hay un unico
+        // servicio vinculado, lo preselecciona. Cuando el usuario cambia de
+        // Recurso, se re-filtra Servicios; cuando cambia de Servicio, se preserva
+        // el Recurso si sigue siendo valido.
         function openQuickCreate(hora, recursoId, fecha) {
             setQcValue('qk-FechaHoraInicio', (fecha || agendaFecha) + 'T' + (hora || '09:00'));
             setQcValue('qk-RecursoId', recursoId);
+            setQcValue('qk-ServicioId', '');
+            // Guardar recurso seleccionado para preservarlo si el usuario cambia de Servicio.
+            if (recursoId) {
+                qcRecurso.setAttribute('data-prev-value', recursoId);
+            }
             clearQcErrors();
+
+            // Filtrar servicios disponibles segun el recurso de la celda.
+            var servicioDdl = document.getElementById('qk-ServicioId');
+            if (recursoId && serviciosPorRecursoUrl && servicioDdl) {
+                servicioDdl.innerHTML = '<option value="">Cargando...</option>';
+                fetch(serviciosPorRecursoUrl + '?recursoId=' + encodeURIComponent(recursoId))
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        servicioDdl.innerHTML = '<option value="">Seleccione un servicio (opcional)</option>';
+                        data.forEach(function (s) {
+                            var option = document.createElement('option');
+                            option.value = s.Id;
+                            option.textContent = s.Nombre;
+                            servicioDdl.appendChild(option);
+                        });
+                        // Si hay un unico servicio vinculado, preseleccionarlo.
+                        if (data && data.length === 1) {
+                            servicioDdl.value = data[0].Id;
+                        }
+                    });
+            }
+
             qcDrawer.classList.add('open');
             qcBackdrop.classList.add('open');
             qcDrawer.setAttribute('aria-hidden', 'false');
@@ -358,6 +392,8 @@
             qcBackdrop.classList.remove('open');
             qcDrawer.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('jk-drawer-open');
+            // Limpiar recurso preseleccionado residual para evitar arrastre entre aperturas.
+            qcRecurso.removeAttribute('data-prev-value');
         }
 
         function clearQcErrors() {
@@ -429,6 +465,7 @@
         // Cambio de servicio -> recarga los recursos habilitados (misma logica
         // que el alta completa, replicada para el formulario del drawer).
         var qcServicio = document.getElementById('qk-ServicioId');
+        var qcRecurso = document.getElementById('qk-RecursoId');
         if (qcServicio && recursosUrl) {
             qcServicio.addEventListener('change', function () {
                 var recursoDdl = document.getElementById('qk-RecursoId');
@@ -444,12 +481,54 @@
                     .then(function (res) { return res.json(); })
                     .then(function (data) {
                         recursoDdl.innerHTML = '<option value="">Seleccione un recurso</option>';
+                        var recursoActual = recursoDdl.getAttribute('data-prev-value');
+                        var encontrado = false;
                         data.forEach(function (r) {
                             var option = document.createElement('option');
                             option.value = r.Id;
                             option.textContent = r.Nombre;
                             recursoDdl.appendChild(option);
+                            if (recursoActual && r.Id.toString() === recursoActual) {
+                                recursoDdl.value = r.Id;
+                                encontrado = true;
+                            }
                         });
+                        recursoDdl.removeAttribute('data-prev-value');
+                        if (recursoActual && !encontrado) {
+                            recursoDdl.value = '';
+                        }
+                    });
+            });
+        }
+
+        // Cambio de recurso -> filtrar servicios disponibles (mismo comportamiento
+        // que en openQuickCreate: GetServiciosPorRecurso). Si hay un unico servicio
+        // vinculado, lo preselecciona.
+        if (qcRecurso && serviciosPorRecursoUrl) {
+            qcRecurso.addEventListener('change', function () {
+                var servicioDdl = document.getElementById('qk-ServicioId');
+                if (!servicioDdl) return;
+
+                if (!this.value) {
+                    // Si no hay recurso, mostrar todos los servicios.
+                    servicioDdl.innerHTML = '<option value="">Seleccione un servicio (opcional)</option>';
+                    return;
+                }
+
+                servicioDdl.innerHTML = '<option value="">Cargando...</option>';
+                fetch(serviciosPorRecursoUrl + '?recursoId=' + encodeURIComponent(this.value))
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        servicioDdl.innerHTML = '<option value="">Seleccione un servicio (opcional)</option>';
+                        data.forEach(function (s) {
+                            var option = document.createElement('option');
+                            option.value = s.Id;
+                            option.textContent = s.Nombre;
+                            servicioDdl.appendChild(option);
+                        });
+                        if (data && data.length === 1) {
+                            servicioDdl.value = data[0].Id;
+                        }
                     });
             });
         }

@@ -226,7 +226,7 @@ namespace JKTurnos.Services
             var finMes = inicioMes.AddMonths(1);
 
             var activosMes = _turnoService.GetTurnosEnRango(inicioMes, finMes)
-                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado")
+                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
                 .ToList();
 
             var acumuladoPorTurno = _pagoService.GetPagosEnRango(inicioMes, finMes)
@@ -273,7 +273,7 @@ namespace JKTurnos.Services
         {
             var sinContacto = turnos.Count(t =>
                 t.FechaHoraInicio.Date == hoy &&
-                (t.EstadoTurno == null || t.EstadoTurno.Nombre != "Cancelado") &&
+                (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado) &&
                 t.Cliente != null &&
                 string.IsNullOrWhiteSpace(t.Cliente.Telefono) &&
                 string.IsNullOrWhiteSpace(t.Cliente.Email));
