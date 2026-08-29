@@ -55,7 +55,8 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-037 | Plan AG Suscripciones/Pagos de Plataforma/AdminGlobal aprobado: modelo plano sin entidad Subscription v1 (campos sobre Tenant), catalogo estatico de planes en codigo, pago de plataforma = confirmado (sin pendientes), sin notificaciones nuevas ni SignalR (card persistente + dashboard), postas AG-0..AG-10. Plan: AI/SESION_20260826_PLAN_SUSCRIPCIONES.md | 2026-08-26 | VIGENTE |
 | D-038 | Sin suspension/bloqueo automatico por vencimiento (posta AG-6 EXCLUIDA): estado derivado de fechas SOLO para mostrar; la unica suspension efectiva es manual. Riesgo aceptado por TEAM LEAD | 2026-08-26 | VIGENTE |
 | D-039 | Ciclo de vida del Tenant: solo 2 estados (Activo / Baja). Desactivar = cascade soft-delete (Tenant + Users + ConfiguracionTenant + EstadosTurno) + bloqueo de login. Reactivar = restaura Tenant + Users. Sin pausa/suspension manual (SuspendidoManual eliminado del UI). Pantalla de confirmacion para cada accion. Filtros de busqueda y estado en grilla AdminGlobal | 2026-08-26 | VIGENTE |
-| D-040 | Estados del Turno = catalogo operativo FIJO del sistema (Pendiente, En curso, Finalizado, Cancelado), NO configurables por tenant. El usuario no elige el estado al crear; el sistema asigna Pendiente. EstadoTurnoId sigue NOT NULL. Lo extra (No asistio, Confirmado, etc.) se modela a futuro como eventos/motivos/atributos, no inflando EstadoTurno. Situacion temporal (reloj) = calculada y separada del estado; el reloj NUNCA muta el estado. Plan: AI/SESION_20260828_PLAN_ESTADOS.md | 2026-08-28 | VIGENTE |
+|| D-040 | Estados del Turno = catalogo operativo FIJO del sistema (Pendiente, En curso, Finalizado, Cancelado), NO configurables por tenant. El usuario no elige el estado al crear; el sistema asigna Pendiente. EstadoTurnoId sigue NOT NULL. Lo extra (No asistio, Confirmado, etc.) se modela a futuro como eventos/motivos/atributos, no inflando EstadoTurno. Situacion temporal (reloj) = calculada y separada del estado; el reloj NUNCA muta el estado. Plan: AI/SESION_20260828_PLAN_ESTADOS.md | 2026-08-28 | VIGENTE |
+|| D-041 | Drawer Quick Create de Agenda (D-017, implementado 2026-08-28): al abrir desde una celda, el Recurso se preselecciona Y el dropdown de Servicios se filtra a los vinculados (GetServiciosPorRecurso). Si recurso tiene 1 servicio vinculado, se preselecciona automaticamente. Cambio de Recurso re-filtra Servicios; cambio de Servicio preserva el Recurso si sigue siendo valido. Reduce de 3 selecciones a 1-2. Coherente con D-013, D-014, D-040 y la vinculacion N:M bidireccional. | 2026-08-28 | VIGENTE |
 
 ## Detalle
 
@@ -605,6 +606,20 @@ Motivo: la auditoria (AI/SESION_20260828_PLAN_ESTADOS.md) mostro que el CRUD con
 Consecuencias: el CRUD de estados (D-025) se elimina progresivamente por postas (P4); la creacion de turno sin dropdown asigna Pendiente (P5); se centralizan las transiciones en un motor (P6); la situacion temporal se agrega como calculada (P7); las superficies (Agenda/Dashboard/Home) se adaptan quitando dependencias por nombre (P8). D-024 se corrige (la documentacion decia Pendiente/Confirmado/Atendido; el codigo ya siembra los 4 estados). AdminGlobal no ve datos de negocio del tenant (D-022): las metricas de estados son del dashboard tenant.
 
 Reemplaza a: D-025 en lo referente al CRUD de estados configurable.
+
+Estado: VIGENTE
+
+### D-041
+
+Fecha: 2026-08-28
+
+Decision: El Drawer de Quick Create de la Agenda (D-017, implementado originalmente en 2026-08-13) se mejora con preseleccion bidireccional Recurso-Servicio. Al abrir desde una celda de recurso, el Recurso se preselecciona Y el dropdown de Servicios se filtra a los vinculados via `GetServiciosPorRecurso` (endpoint existente en TurnosController). Si el recurso tiene exactamente 1 servicio vinculado, se preselecciona automaticamente. El cambio de Recurso re-filtra Servicios; el cambio de Servicio preserva el Recurso si sigue siendo valido (via `data-prev-value`). Reduce las selecciones de 3 (Cliente + Servicio + Recurso) a 1-2 (Cliente + opcional Servicio si el recurso tiene multiples vinculos).
+
+Motivo: coherente con D-013 (QuickCreate), D-014 (Servicio opcional), D-040 (catalogo fijo) y la vinculacion N:M bidireccional (D-013). Mejora la UX del flujo mas comun (crear turno desde la Agenda) eliminando pasos innecesarios.
+
+Consecuencias: `jk-agenda.js` `openQuickCreate` ahora filtra Servicios por recurso y preselecciona si hay 1. Nuevo handler `qcRecurso.addEventListener('change')` para re-filtrar Servicios. Handler modificado `qcServicio.addEventListener('change')` preserva Recurso si sigue valido. `closeQuickCreate` limpia `data-prev-value`. `Agenda.cshtml` agrega `data-servicios-por-recurso-url` apuntando a `GetServiciosPorRecurso`. Sin cambios en el modelo de datos ni en el servidor (reuso de endpoint existente).
+
+Reemplaza a: ninguna (mejora de D-017 existente)
 
 Estado: VIGENTE
 

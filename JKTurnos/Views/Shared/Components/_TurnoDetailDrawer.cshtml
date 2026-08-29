@@ -141,10 +141,6 @@
                     {
                         <div class="jk-small text-secondary">@pago.Observacion</div>
                     }
-                    @if (!string.IsNullOrWhiteSpace(pago.UsuarioNombre))
-                    {
-                        <div class="jk-small text-secondary">por @pago.UsuarioNombre</div>
-                    }
                 </li>
             }
         </ul>
@@ -153,7 +149,6 @@
     @if (Model.PuedeEditarPagos)
     {
         <div class="jk-flex jk-gap-8 jk-mt-8">
-            <button type="button" class="jk-btn jk-btn-primary jk-btn-sm" data-pago-accion="Senia" data-turno-id="@Model.Id">Registrar senia</button>
             <button type="button" class="jk-btn jk-btn-secondary jk-btn-sm" data-pago-accion="Pago" data-turno-id="@Model.Id">Registrar pago</button>
         </div>
 

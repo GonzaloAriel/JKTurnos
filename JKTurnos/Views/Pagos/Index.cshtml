@@ -128,7 +128,7 @@
 
 @helper RegisterContent() {
     <section class="jk-card jk-card-compact jk-pago-register"
-         data-buscar-turnos-url="@Url.Action("BuscarTurnos")">
+             data-buscar-turnos-url="@Url.Action("BuscarTurnos")">
         <div class="jk-card-header">
             <h2 class="jk-card-title">Registrar pago</h2>
         </div>
@@ -166,6 +166,7 @@
                 </div>
             </div>
         </form>
+        <br />
     </section>
 }
 
@@ -200,24 +201,24 @@
 }
 
 @helper FilterContent() {
-    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
+    <form method="get" action="@Url.Action("Index")" class="jk-filter-bar jk-mt-24 jk-mb-16">
         @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
-            new ViewDataDictionary {
+                 new ViewDataDictionary {
                 { "Name", "busqueda" },
                 { "Id", "search-pagos" },
                 { "Value", ViewBag.Busqueda },
                 { "Placeholder", "Buscar por cliente o recurso..." }
-            })
+                         })
 
         @Html.Partial("~/Views/Shared/Components/_DateFilter.cshtml",
-            new ViewDataDictionary {
+                 new ViewDataDictionary {
                 { "InicioName", "fechaDesde" },
                 { "FinName", "fechaHasta" },
                 { "InicioValue", ViewBag.FechaDesde },
                 { "FinValue", ViewBag.FechaHasta },
                 { "InicioLabel", "Desde" },
                 { "FinLabel", "Hasta" }
-            })
+                         })
 
         <button type="submit" class="jk-btn jk-btn-primary">
             <i class="bi bi-search"></i> Buscar
@@ -226,6 +227,7 @@
         <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
             <i class="bi bi-arrow-counterclockwise"></i> Limpiar
         </a>
+        <br />
     </form>
 }
 
@@ -245,11 +247,11 @@
 @{
     ViewBag.Title = "Pagos";
     ViewBag.Subtitle = "Cobros y senias registrados";
-    ViewBag.ToolbarContent = FilterContent();
 
     ViewBag.PageContent = MvcHtmlString.Create(
         ToastContent().ToString()
         + RegisterContent().ToString()
+        + FilterContent().ToString()
         + (Model.Any() ? ListContent().ToString() : EmptyContent().ToString()));
 }
 

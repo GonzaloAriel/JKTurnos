@@ -312,6 +312,14 @@
      * la fecha+hora (+recurso) de la celda prellenados. El envio es ajax
      * (patron QuickCreate D-013); al crear, recarga la agenda de la misma
      * fecha/vista y abre el detalle del turno nuevo.
+     *
+     * Mejora post-D-017 (D-041, 2026-08-28): preseleccion bidireccional
+     * Recurso-Servicio. Al abrir desde una celda, el Recurso se preselecciona Y
+     * el dropdown de Servicios se filtra a los vinculados (GetServiciosPorRecurso).
+     * Si el recurso tiene 1 servicio vinculado, se preselecciona automaticamente.
+     * El cambio de Recurso re-filtra Servicios; el cambio de Servicio preserva
+     * el Recurso si sigue siendo valido (data-prev-value). Reduce de 3 selecciones
+     * a 1-2 (Cliente + opcional Servicio si el recurso tiene varios vinculados).
      */
     var qcDrawer = document.getElementById('drawer-turno-quick');
     var qcBackdrop = document.getElementById('drawer-turno-quick-backdrop');
