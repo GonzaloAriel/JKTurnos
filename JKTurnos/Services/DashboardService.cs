@@ -177,6 +177,7 @@ namespace JKTurnos.Services
 
             return _turnoService.GetTurnosEnRango(DateTime.Today, DateTime.Today.AddDays(14))
                 .Where(t => t.FechaHoraFin > ahora)
+                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
                 .OrderBy(t => t.FechaHoraInicio)
                 .Take(6)
                 .Select(MapTurnoItem)

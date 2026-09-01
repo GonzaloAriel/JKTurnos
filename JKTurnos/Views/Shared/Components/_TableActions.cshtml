@@ -37,15 +37,34 @@
     string deleteIcon = ViewBag.DeleteIcon ?? "trash";
     string itemName = ViewBag.ItemName ?? "";
     bool compact = ViewBag.Compact ?? false;
+    // ShowDelete (default true): permite ocultar el boton Eliminar por rol
+    // (ej. el usuario operador no elimina turnos, solo el Admin del tenant).
+    bool showDelete = (bool)(ViewBag.ShowDelete ?? true);
+    // ViewUrl (opcional): si se define, se muestra un
+    // tercer boton "Ver" (soft-info, ojo) antes de Editar. Se usa en entidades
+    // con ficha de detalle (ej. Clientes -> Details / historial).
+    string viewUrl = ViewBag.ViewUrl;
+    string viewLabel = ViewBag.ViewLabel ?? "Ver";
 }
 
-<a class="jk-btn jk-btn-sm jk-btn-ghost" href="@editUrl"
+@if (string.IsNullOrEmpty(viewUrl) == false)
+{
+    <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@viewUrl"
+       @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="@viewLabel @itemName"</text> }>
+        <i class="bi bi-eye"></i>
+        @if (!compact) { <text>@viewLabel</text> }
+    </a>
+}
+<a class="jk-btn jk-btn-sm jk-btn-soft-primary" href="@editUrl"
    @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="Editar @itemName"</text> }>
     <i class="bi bi-pencil"></i>
     @if (!compact) { <text>@editLabel</text> }
 </a>
-<a class="jk-btn jk-btn-sm jk-btn-danger" href="@deleteUrl"
-   @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="@deleteLabel @itemName"</text> }>
-    <i class="bi bi-@deleteIcon"></i>
-    @if (!compact) { <text>@deleteLabel</text> }
-</a>
+@if (showDelete)
+{
+    <a class="jk-btn jk-btn-sm jk-btn-soft-danger" href="@deleteUrl"
+       @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="@deleteLabel @itemName"</text> }>
+        <i class="bi bi-@deleteIcon"></i>
+        @if (!compact) { <text>@deleteLabel</text> }
+    </a>
+}

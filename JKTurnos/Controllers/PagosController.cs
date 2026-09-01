@@ -19,15 +19,21 @@ namespace JKTurnos.Controllers
             _pagoService = new PagoService();
         }
 
-        public ActionResult Index(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null)
+        public ActionResult Index(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null, int? turnoId = null)
         {
-            var pagos = _pagoService.GetFiltrados(fechaDesde, fechaHasta, busqueda);
+            var pagos = _pagoService.GetFiltrados(fechaDesde, fechaHasta, busqueda, turnoId);
             var nombresUsuarios = _pagoService.GetNombresUsuarios(pagos.Select(p => p.UsuarioId));
 
             ViewBag.FechaDesde = fechaDesde;
             ViewBag.FechaHasta = fechaHasta;
             ViewBag.Busqueda = busqueda;
             ViewBag.NombresUsuarios = nombresUsuarios;
+            ViewBag.TurnoId = turnoId;
+
+            if (turnoId.HasValue)
+            {
+                ViewBag.TurnoEtiqueta = _pagoService.GetTurnoEtiqueta(turnoId.Value);
+            }
 
             return View(pagos);
         }

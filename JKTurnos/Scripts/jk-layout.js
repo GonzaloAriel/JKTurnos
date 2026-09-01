@@ -452,3 +452,124 @@
         });
     }
 })();
+
+/*
+ * M-02: Busqueda global del topbar.
+ * El input vive dentro de un formulario GET. Enter submita el formulario
+ * y navega a /Busqueda/Index?termino=x. El dropdown es un extra opcional
+ * que muestra resultados en tiempo real sin recargar la pagina.
+ */
+(function () {
+    'use strict';
+
+    var wrapper = document.getElementById('jk-search-global');
+    if (!wrapper) return;
+
+    var input = document.getElementById('jk-search-global-input');
+    var resultsEl = document.getElementById('jk-search-global-results');
+    var url = input.getAttribute('data-buscar-global-url');
+    var timer = null;
+    var highlightIndex = -1;
+    var items = [];
+
+    function closeResults() {
+        resultsEl.innerHTML = '';
+        resultsEl.setAttribute('aria-hidden', 'true');
+        highlightIndex = -1;
+        items = [];
+    }
+
+    function render() {
+        if (items.length === 0) {
+            closeResults();
+            return;
+        }
+        resultsEl.innerHTML = items.map(function (it, i) {
+            var icon = it.tipo === 'cliente' ? 'bi-person'
+                : it.tipo === 'turno' ? 'bi-calendar-check'
+                : it.tipo === 'servicio' ? 'bi-scissors'
+                : 'bi-person-gear';
+            var label = it.label || '';
+            var sub = it.sub ? '<span class="jk-autocomplete-sub">' + it.sub + '</span>' : '';
+            return '<a href="' + (it.url || '#') + '" class="jk-autocomplete-item" data-index="' + i + '">'
+                + '<i class="bi ' + icon + '"></i>'
+                + '<span class="jk-autocomplete-label">' + label + '</span>'
+                + sub
+                + '</a>';
+        }).join('');
+        resultsEl.setAttribute('aria-hidden', 'false');
+        highlightIndex = -1;
+    }
+
+    function doSearch() {
+        var term = (input.value || '').trim();
+        if (term.length < 2) {
+            closeResults();
+            return;
+        }
+
+        fetch(url + '?termino=' + encodeURIComponent(term), { credentials: 'same-origin' })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                items = Array.isArray(data) ? data : [];
+                render();
+            })
+            .catch(function () {
+                closeResults();
+            });
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(doSearch, 250);
+    });
+
+    input.addEventListener('keydown', function (e) {
+        var rendered = items.length > 0;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!rendered) return;
+            highlightIndex = (highlightIndex + 1) % items.length;
+            markHighlight();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!rendered) return;
+            highlightIndex = (highlightIndex - 1 + items.length) % items.length;
+            markHighlight();
+        } else if (e.key === 'Enter') {
+            if (rendered && highlightIndex >= 0) {
+                e.preventDefault();
+                var item = items[highlightIndex];
+                if (item && item.url) {
+                    window.location.href = item.url;
+                }
+            }
+            // Si no hay item seleccionado, el formulario se submita solo (GET a /Busqueda/Index)
+        } else if (e.key === 'Escape' || e.keyCode === 27) {
+            closeResults();
+        }
+    });
+
+    function markHighlight() {
+        var nodes = resultsEl.querySelectorAll('.jk-autocomplete-item');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].classList.toggle('is-active', i === highlightIndex);
+        }
+    }
+
+    resultsEl.addEventListener('click', function (e) {
+        var itemEl = e.target.closest ? e.target.closest('.jk-autocomplete-item') : null;
+        if (!itemEl) return;
+        e.preventDefault();
+        var href = itemEl.getAttribute('href');
+        if (href && href !== '#') {
+            window.location.href = href;
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!wrapper.contains(e.target)) {
+            closeResults();
+        }
+    });
+})();

@@ -23,10 +23,17 @@ namespace JKTurnos.Services
 
         public void RegistrarPago(int turnoId, decimal monto, TipoPago tipo, string observacion, int usuarioId)
         {
-            var turno = _turnoRepo.GetById(turnoId);
+            var turno = _turnoRepo.GetAll()
+                .Include(t => t.EstadoTurno)
+                .FirstOrDefault(t => t.Id == turnoId);
 
             if (turno == null)
                 throw new ArgumentException("Turno no encontrado.");
+
+            // D-042: un turno cancelado no admite pagos (defensa en profundidad,
+            // ademas del filtrado en lista/autocomplete).
+            if (turno.EstadoTurno != null && turno.EstadoTurno.Codigo == EstadosTurnoBase.Cancelado)
+                throw new InvalidOperationException("No se pueden registrar pagos en un turno cancelado.");
 
             if (monto <= 0)
                 throw new ArgumentException("El monto debe ser mayor a 0.");
@@ -67,12 +74,24 @@ namespace JKTurnos.Services
 
         // Listado de pagos (modulo Pagos): filtros por rango de fecha del pago
         // (D-029) y busqueda por cliente/recurso.
-        public List<Pago> GetFiltrados(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null)
+        public List<Pago> GetFiltrados(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null, int? turnoId = null)
         {
             var query = _repo.GetAll()
                 .Include(p => p.Turno.Cliente)
                 .Include(p => p.Turno.Servicio)
-                .Include(p => p.Turno.Recurso);
+                .Include(p => p.Turno.Recurso)
+                .Include(p => p.Turno.EstadoTurno);
+
+            // D-042: los pagos de turnos cancelados no se listan ni se buscan,
+            // para no registrar pagos sobre un turno cancelado.
+            query = query.Where(p =>
+                p.Turno.EstadoTurno == null ||
+                p.Turno.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado);
+
+            if (turnoId.HasValue)
+            {
+                query = query.Where(p => p.TurnoId == turnoId.Value);
+            }
 
             if (fechaDesde.HasValue)
             {
@@ -96,6 +115,22 @@ namespace JKTurnos.Services
             }
 
             return query.OrderByDescending(p => p.Fecha).ToList();
+        }
+
+        // Etiqueta legible del turno filtrado, para el titulo del modulo Pagos
+        // cuando se accede desde la grilla de turnos (icono billete).
+        public string GetTurnoEtiqueta(int turnoId)
+        {
+            var turno = _turnoRepo.GetAll()
+                .Include(t => t.Cliente)
+                .Include(t => t.Recurso)
+                .FirstOrDefault(t => t.Id == turnoId);
+
+            if (turno == null)
+                return "Turno #" + turnoId;
+
+            return (turno.Cliente != null ? turno.Cliente.Nombre : "Sin cliente")
+                + " - " + turno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm");
         }
 
         // Baja logica con motivo: el registro queda conservado (D-008).
@@ -162,7 +197,14 @@ namespace JKTurnos.Services
         {
             var query = _turnoRepo.GetAll()
                 .Include(t => t.Cliente)
-                .Include(t => t.Recurso);
+                .Include(t => t.Recurso)
+                .Include(t => t.EstadoTurno);
+
+            // D-042: los turnos cancelados no se pueden buscar para registrar
+            // un pago (un turno cancelado no tiene cobros asociados).
+            query = query.Where(t =>
+                t.EstadoTurno == null ||
+                t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado);
 
             if (!string.IsNullOrWhiteSpace(termino))
             {

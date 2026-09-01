@@ -46,7 +46,7 @@ namespace JKTurnos.Services
                         .FirstOrDefault(x => x.Id == id);
         }
 
-        public List<Turno> GetFiltrados(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        public List<Turno> GetFiltrados(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null, List<string> estados = null)
         {
             var query = _repo.GetAll()
                              .Include(t => t.Cliente)
@@ -65,6 +65,23 @@ namespace JKTurnos.Services
 
             query = query.Where(t => t.FechaHoraInicio >= desde
                                      && t.FechaHoraInicio < hasta);
+
+            // Filtro por estados operativos (D-045): si viene la lista, solo se
+            // muestran los turnos cuyo Codigo este incluido.
+            if (estados != null && estados.Count > 0)
+            {
+                var codigos = estados
+                    .Where(e => !string.IsNullOrWhiteSpace(e))
+                    .Distinct()
+                    .ToList();
+
+                if (codigos.Count > 0)
+                {
+                    query = query.Where(t =>
+                        t.EstadoTurno != null &&
+                        codigos.Contains(t.EstadoTurno.Codigo));
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(busqueda))
             {
@@ -109,6 +126,20 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
+        // M-03: historial completo del cliente (todos sus turnos, mas reciente
+        // primero). Se usa en la ficha de detalle / CRM del cliente.
+        public List<Turno> GetTurnosPorCliente(int clienteId)
+        {
+            return _repo.GetAll()
+                        .Include(t => t.Cliente)
+                        .Include(t => t.Servicio)
+                        .Include(t => t.Recurso)
+                        .Include(t => t.EstadoTurno)
+                        .Where(t => t.ClienteId == clienteId)
+                        .OrderByDescending(t => t.FechaHoraInicio)
+                        .ToList();
+        }
+
         public DateTime CalcularFin(DateTime inicio, int? servicioId)
         {
             if (!servicioId.HasValue)
@@ -123,9 +154,13 @@ namespace JKTurnos.Services
 
         public bool ValidarDisponibilidad(int recursoId, DateTime inicio, DateTime fin, int? turnoExcluirId = null)
         {
+            // D-042: el turno Cancelado libera su slot (queda disponible para otro
+            // turno); no bloquea la disponibilidad. Solo los turnos operativos
+            // (Pendiente/En curso/Finalizado) ocupan el horario.
             var query = _repo.GetAll()
                 .Where(x => x.RecursoId == recursoId)
-                .Where(x => x.FechaHoraInicio < fin && x.FechaHoraFin > inicio);
+                .Where(x => x.FechaHoraInicio < fin && x.FechaHoraFin > inicio)
+                .Where(x => x.EstadoTurno == null || x.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado);
 
             if (turnoExcluirId.HasValue)
                 query = query.Where(x => x.Id != turnoExcluirId.Value);

@@ -1,12 +1,16 @@
 ﻿@*
     JKTurnos - Turno Detail Drawer Content
-    Contenido del Inspector Drawer del Time Block (V1, solo lectura).
+    Contenido del Inspector Drawer del Time Block.
     Este partial se inyecta via fetch en el drawer contenedor montado en
     Agenda.cshtml (jk-agenda.js). No renderiza el drawer completo:
 
         fetch('@Url.Action("GetDetailDrawer", "Turnos")?id=' + id)
             .then(r => r.text())
             .then(html => body.innerHTML = html)
+
+    El drawer es operable: ademas del detalle (solo lectura), incluye acciones
+    contextuales de estado (Iniciar/Finalizar/Cancelar, P5/D-040) que se operan
+    directo sin ir al Edit, y la seccion economica de Pagos (V3/D-028).
 
     EstadoEconomico es un slot reservado para V3 (Docs/16): el espacio de
     Pagos se muestra siempre, con estado economico real o placeholder
@@ -41,6 +45,35 @@
         </p>
     }
 </div>
+
+@if (Model.PuedeIniciar || Model.PuedeFinalizar || Model.PuedeCancelar)
+{
+    <div class="jk-drawer-section">
+        <div class="jk-flex jk-gap-8 jk-flex-wrap">
+            @if (Model.PuedeIniciar)
+            {
+                <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-success" data-accion data-url="@Url.Action("IniciarAtencion", "Turnos")" data-turno="@Model.Id" title="Iniciar atencion" aria-label="Iniciar atencion de @Model.ClienteNombre">
+                    <i class="bi bi-play-fill"></i> Iniciar atencion
+                </button>
+            }
+            @if (Model.PuedeFinalizar)
+            {
+                <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-success" data-accion data-url="@Url.Action("FinalizarAtencion", "Turnos")" data-turno="@Model.Id" title="Finalizar atencion" aria-label="Finalizar atencion de @Model.ClienteNombre">
+                    <i class="bi bi-check-lg"></i> Finalizar
+                </button>
+            }
+            @if (Model.PuedeCancelar)
+            {
+                <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-danger" data-accion data-url="@Url.Action("CancelarAtencion", "Turnos")" data-turno="@Model.Id" title="Cancelar turno" aria-label="Cancelar turno de @Model.ClienteNombre">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                </button>
+            }
+            <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("Edit", "Turnos", new { id = Model.Id })" title="Re agendar" aria-label="Re agendar @Model.ClienteNombre">
+                <i class="bi bi-arrow-clockwise"></i> Re agendar
+            </a>
+        </div>
+    </div>
+}
 
 <div class="jk-drawer-section">
     <div class="jk-flex jk-flex-between">

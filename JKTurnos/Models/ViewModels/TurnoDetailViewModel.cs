@@ -26,6 +26,12 @@ namespace JKTurnos.Models.ViewModels
         public string EstadoColor { get; set; }
         public string EstadoIcono { get; set; }
 
+        // D-040: acciones contextuales de estado habilitadas segun el Codigo actual
+        // (P5): se muestran en el Drawer de detalle para operar sin ir al Edit.
+        public bool PuedeIniciar { get; set; }
+        public bool PuedeFinalizar { get; set; }
+        public bool PuedeCancelar { get; set; }
+
         public string SituacionClave { get; set; }
         public string SituacionLabel { get; set; }
         public string SituacionColor { get; set; }

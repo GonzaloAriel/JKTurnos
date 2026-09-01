@@ -96,6 +96,43 @@
         currentTurnoId = null;
     }
 
+    /*
+     * Acciones contextuales de estado (P5/D-040) desde el Drawer de detalle
+     * (seccion Dashboard reutiliza _TurnoDetailDrawer). fetch POST + anti-forgery
+     * (token dentro del drawer) + reload de la pagina para reflejar el estado.
+     */
+    function aplicarAccionEstado(btn) {
+        var accionUrl = btn.getAttribute('data-url');
+        var turnoId = btn.getAttribute('data-turno');
+        var token = drawerBody.querySelector('input[name="__RequestVerificationToken"]');
+        if (!accionUrl || !turnoId || !token) return;
+
+        var body = '__RequestVerificationToken=' + encodeURIComponent(token.value) +
+                   '&turnoId=' + encodeURIComponent(turnoId);
+
+        btn.disabled = true;
+
+        fetch(accionUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: body
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            btn.disabled = false;
+            if (data.success) {
+                showToast('Estado actualizado', 'success');
+                window.location.reload();
+            } else {
+                showToast(data.message || 'No se pudo realizar la accion', 'error');
+            }
+        })
+        .catch(function () {
+            btn.disabled = false;
+            showToast('Error de conexion al realizar la accion', 'error');
+        });
+    }
+
     document.addEventListener('click', function (e) {
         var verBtn = e.target.closest('[data-ver-turno]');
         if (verBtn) {
@@ -105,6 +142,13 @@
         }
 
         if (!drawer.classList.contains('open')) return;
+
+        var estadoBtn = e.target.closest('[data-accion]');
+        if (estadoBtn) {
+            e.preventDefault();
+            aplicarAccionEstado(estadoBtn);
+            return;
+        }
 
         var accionBtn = e.target.closest('[data-pago-accion]');
         if (accionBtn) {

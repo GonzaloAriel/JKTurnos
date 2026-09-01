@@ -1,0 +1,144 @@
+@model JKTurnos.Models.ViewModels.BusquedaViewModel
+@{
+    ViewBag.Title = "Busqueda";
+    bool hasTerm = !string.IsNullOrEmpty(Model.Termino);
+    bool hasResults = Model.TotalResultados > 0;
+}
+
+<div class="jk-page-header">
+    <div class="jk-page-header-title">
+        <h1>Busqueda</h1>
+        @if (hasTerm)
+        {
+            <span class="jk-page-header-subtitle">@Model.TotalResultados resultados para "@Model.Termino"</span>
+        }
+    </div>
+</div>
+
+@if (!hasTerm)
+{
+    <div class="jk-empty-state">
+        <i class="bi bi-search"></i>
+        <h3>Buscar en todo JKTurnos</h3>
+        <p>Escribi un termino en el buscador del topbar para encontrar clientes, servicios, recursos y turnos.</p>
+    </div>
+}
+else if (!hasResults)
+{
+    <div class="jk-empty-state">
+        <i class="bi bi-emoji-frown"></i>
+        <h3>Sin resultados</h3>
+        <p>No se encontro nada para "@Model.Termino". Con con otros terminos.</p>
+    </div>
+}
+
+@if (hasTerm && hasResults)
+{
+    if (Model.Clientes.Count > 0)
+    {
+        <div class="jk-search-section">
+            <h2 class="jk-search-section-title">
+                <i class="bi bi-person"></i> Clientes (@Model.Clientes.Count)
+            </h2>
+            <div class="jk-search-grid">
+                @foreach (var c in Model.Clientes)
+                {
+                    <a href="@Url.Action("Details", "Clientes", new { id = c.Id })" class="jk-search-card">
+                        <div class="jk-search-card-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="jk-search-card-body">
+                            <div class="jk-search-card-title">@c.Label</div>
+                            @if (!string.IsNullOrEmpty(c.Sub))
+                            {
+                                <div class="jk-search-card-sub">@c.Sub</div>
+                            }
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    if (Model.Servicios.Count > 0)
+    {
+        <div class="jk-search-section">
+            <h2 class="jk-search-section-title">
+                <i class="bi bi-scissors"></i> Servicios (@Model.Servicios.Count)
+            </h2>
+            <div class="jk-search-grid">
+                @foreach (var s in Model.Servicios)
+                {
+                    <a href="@Url.Action("Edit", "Servicios", new { id = s.Id })" class="jk-search-card">
+                        <div class="jk-search-card-icon">
+                            <i class="bi bi-scissors"></i>
+                        </div>
+                        <div class="jk-search-card-body">
+                            <div class="jk-search-card-title">@s.Label</div>
+                            @if (!string.IsNullOrEmpty(s.Sub))
+                            {
+                                <div class="jk-search-card-sub">@s.Sub</div>
+                            }
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    if (Model.Recursos.Count > 0)
+    {
+        <div class="jk-search-section">
+            <h2 class="jk-search-section-title">
+                <i class="bi bi-person-gear"></i> Recursos (@Model.Recursos.Count)
+            </h2>
+            <div class="jk-search-grid">
+                @foreach (var r in Model.Recursos)
+                {
+                    <a href="@Url.Action("Edit", "Recursos", new { id = r.Id })" class="jk-search-card">
+                        <div class="jk-search-card-icon">
+                            <i class="bi bi-person-gear"></i>
+                        </div>
+                        <div class="jk-search-card-body">
+                            <div class="jk-search-card-title">@r.Label</div>
+                            @if (!string.IsNullOrEmpty(r.Sub))
+                            {
+                                <div class="jk-search-card-sub">@r.Sub</div>
+                            }
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    if (Model.Turnos.Count > 0)
+    {
+        <div class="jk-search-section">
+            <h2 class="jk-search-section-title">
+                <i class="bi bi-calendar-check"></i> Turnos (@Model.Turnos.Count)
+            </h2>
+            <div class="jk-search-grid">
+                @foreach (var t in Model.Turnos)
+                {
+                    <a href="@Url.Action("Agenda", "Turnos", new { openTurnoId = t.Id })" class="jk-search-card">
+                        <div class="jk-search-card-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="jk-search-card-body">
+                            <div class="jk-search-card-title">@t.Label</div>
+                            @if (!string.IsNullOrEmpty(t.Sub))
+                            {
+                                <div class="jk-search-card-sub">@t.Sub</div>
+                            }
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+}
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-busqueda.css" rel="stylesheet" />
+}

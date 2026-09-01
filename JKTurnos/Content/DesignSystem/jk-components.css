@@ -101,6 +101,86 @@
     box-shadow: var(--jk-shadow);
 }
 
+/* Variantes suaves (pastel) para acciones de grilla
+   Filosofia (D-035): fondos *-light de la paleta + texto oscuro calido.
+   Coherentes entre todos los modulos para que las acciones resalten limpio. */
+.jk-btn-soft-primary {
+    background: var(--jk-accent-light);
+    color: var(--jk-accent-hover);
+    border-color: transparent;
+}
+
+.jk-btn-soft-primary:hover {
+    background: color-mix(in srgb, var(--jk-accent-light) 78%, var(--jk-accent));
+    color: var(--jk-white);
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
+.jk-btn-soft-success {
+    background: var(--jk-success-light);
+    color: #4C624A;
+    border-color: transparent;
+}
+
+.jk-btn-soft-success:hover {
+    background: color-mix(in srgb, var(--jk-success-light) 72%, var(--jk-success));
+    color: var(--jk-white);
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
+.jk-btn-soft-warning {
+    background: var(--jk-warning-light);
+    color: #8A6A1F;
+    border-color: transparent;
+}
+
+.jk-btn-soft-warning:hover {
+    background: color-mix(in srgb, var(--jk-warning-light) 70%, var(--jk-warning));
+    color: var(--jk-white);
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
+.jk-btn-soft-danger {
+    background: var(--jk-danger-light);
+    color: #8B3A2F;
+    border-color: transparent;
+}
+
+.jk-btn-soft-danger:hover {
+    background: color-mix(in srgb, var(--jk-danger-light) 72%, var(--jk-danger));
+    color: var(--jk-white);
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
+.jk-btn-soft-info {
+    background: var(--jk-teal-light);
+    color: #2F6B70;
+    border-color: transparent;
+}
+
+.jk-btn-soft-info:hover {
+    background: color-mix(in srgb, var(--jk-teal-light) 72%, var(--jk-teal));
+    color: var(--jk-white);
+    transform: translateY(-1px);
+    box-shadow: var(--jk-shadow);
+}
+
+.jk-btn-soft-ghost {
+    background: var(--jk-bg);
+    color: var(--jk-text-secondary);
+    border-color: var(--jk-border-light);
+}
+
+.jk-btn-soft-ghost:hover {
+    background: var(--jk-border-light);
+    color: var(--jk-text-primary);
+    transform: translateY(-1px);
+}
+
 .jk-btn-whatsapp {
     background: #25d366;
     color: var(--jk-white);
@@ -1224,6 +1304,45 @@
     min-width: 150px;
 }
 
+/* Filtro por grupo (ej. estados de turno): label + checkboxes en un recuadro */
+.jk-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-4);
+    padding: var(--jk-space-8) var(--jk-space-12);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    background: var(--jk-surface);
+    flex-shrink: 0;
+}
+
+.jk-filter-group .jk-checkbox-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--jk-space-12);
+}
+
+.jk-filter-group .jk-checkbox-item {
+    font-size: var(--jk-text-sm);
+}
+
+.jk-filter-label {
+    font-size: var(--jk-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--jk-text-muted, #6b7280);
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-4);
+}
+
+@media (max-width: 767.98px) {
+    .jk-filter-group {
+        width: 100%;
+    }
+}
+
 @media (max-width: 767.98px) {
     .jk-filter-bar .jk-search,
     .jk-filter-bar .jk-date-filter,
@@ -1549,5 +1668,106 @@ a.jk-notif-item:hover {
         left: var(--jk-space-16);
         width: auto;
         max-width: none;
+    }
+}
+
+/* ================================================================
+   M-02 Busqueda global del topbar (autocomplete)
+   ================================================================ */
+
+.jk-search-global {
+    display: none;
+    flex: 1 1 260px;
+    max-width: 360px;
+    margin: 0 var(--jk-space-16);
+}
+
+.jk-topbar .jk-search-global {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.jk-search-global form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.jk-search-global input {
+    flex: 1 1 auto;
+    height: 38px;
+}
+
+.jk-autocomplete {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: var(--jk-z-modal);
+    min-width: 280px;
+    max-height: 360px;
+    overflow-y: auto;
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius);
+    box-shadow: var(--jk-shadow-lg);
+    padding: var(--jk-space-8);
+}
+
+.jk-autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-8) var(--jk-space-12);
+    border-radius: var(--jk-radius-sm);
+    color: var(--jk-text-primary);
+    text-decoration: none;
+    font-size: var(--jk-text-base);
+}
+
+.jk-autocomplete-item i {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-accent-light);
+    color: var(--jk-accent);
+    font-size: 0.8125rem;
+}
+
+.jk-autocomplete-item .jk-autocomplete-label {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jk-autocomplete-item .jk-autocomplete-sub {
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: var(--jk-text-xs);
+    color: var(--jk-text-tertiary);
+}
+
+.jk-autocomplete-item:hover,
+.jk-autocomplete-item.is-active {
+    background: var(--jk-accent-light);
+    color: var(--jk-text-primary);
+}
+
+.jk-autocomplete-empty {
+    padding: var(--jk-space-12);
+    text-align: center;
+    color: var(--jk-text-tertiary);
+    font-size: var(--jk-text-sm);
+}
+
+@media (min-width: 768px) {
+    .jk-search-global {
+        display: block;
     }
 }

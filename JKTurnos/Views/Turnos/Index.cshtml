@@ -1,4 +1,5 @@
 ﻿@model List<JKTurnos.Models.Entities.Turno>
+@using JKTurnos.Models.Entities
 
 @helper ListContent() {
     <div class="jk-hide-mobile">
@@ -11,12 +12,17 @@
                         <th>Servicio</th>
                         <th>Recurso</th>
                         <th>Estado</th>
-                        <th></th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
+                        var codigo = item.EstadoTurno != null ? item.EstadoTurno.Codigo : null;
+                        var puedeIniciar = codigo == EstadosTurnoBase.Pendiente;
+                        var puedeFinalizar = codigo == EstadosTurnoBase.EnCurso;
+                        var puedeCancelar = codigo == EstadosTurnoBase.Pendiente || codigo == EstadosTurnoBase.EnCurso;
+
                         <tr>
                             <td>@item.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</td>
@@ -24,13 +30,37 @@
                             <td>@(item.Recurso != null ? item.Recurso.Nombre : "Sin recurso")</td>
                             <td><span class="jk-badge">@(item.EstadoTurno != null ? item.EstadoTurno.Nombre : "Sin estado")</span></td>
                             <td>
-                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
-                                    new ViewDataDictionary {
-                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
-                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
-                                        { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
-                                        { "Compact", false }
-                                    })
+                                <div class="jk-flex jk-gap-8 jk-flex-wrap">
+                                    @if (puedeIniciar)
+                                    {
+                                        <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-success" data-accion data-url="@Url.Action("IniciarAtencion", "Turnos")" data-turno="@item.Id" title="Iniciar atencion" aria-label="Iniciar atencion de @(item.Cliente != null ? item.Cliente.Nombre : "cliente")">
+                                            <i class="bi bi-play-fill"></i>
+                                        </button>
+                                    }
+                                    @if (puedeFinalizar)
+                                    {
+                                        <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-success" data-accion data-url="@Url.Action("FinalizarAtencion", "Turnos")" data-turno="@item.Id" title="Finalizar atencion" aria-label="Finalizar atencion de @(item.Cliente != null ? item.Cliente.Nombre : "cliente")">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    }
+                                    @if (puedeCancelar)
+                                    {
+                                        <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-danger" data-accion data-url="@Url.Action("CancelarAtencion", "Turnos")" data-turno="@item.Id" title="Cancelar turno" aria-label="Cancelar turno de @(item.Cliente != null ? item.Cliente.Nombre : "cliente")">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    }
+                                    <a class="jk-btn jk-btn-sm jk-btn-soft-warning" href="@Url.Action("Index", "Pagos", new { turnoId = item.Id })" title="Ver pagos" aria-label="Ver pagos">
+                                        <i class="bi bi-cash-coin"></i>
+                                    </a>
+                                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                        new ViewDataDictionary {
+                                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                            { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
+                                            { "Compact", false },
+                                            { "ShowDelete", ViewBag.EsAdmin ?? false }
+                                        })
+                                </div>
                             </td>
                         </tr>
                     }
@@ -42,16 +72,27 @@
     <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
         @foreach (var item in Model)
         {
+            var codigo = item.EstadoTurno != null ? item.EstadoTurno.Codigo : null;
+            var puedeIniciar = codigo == EstadosTurnoBase.Pendiente;
+            var puedeFinalizar = codigo == EstadosTurnoBase.EnCurso;
+            var puedeCancelar = codigo == EstadosTurnoBase.Pendiente || codigo == EstadosTurnoBase.EnCurso;
+
             <div class="jk-card jk-card-compact">
                 <div class="jk-flex-between">
                     <strong>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</strong>
-                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
-                        new ViewDataDictionary {
-                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
-                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
-                            { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
-                            { "Compact", true }
-                        })
+                    <div class="jk-flex jk-gap-4">
+                        <a class="jk-btn jk-btn-sm jk-btn-soft-warning" href="@Url.Action("Index", "Pagos", new { turnoId = item.Id })" title="Ver pagos" aria-label="Ver pagos">
+                            <i class="bi bi-cash-coin"></i>
+                        </a>
+                        @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                            new ViewDataDictionary {
+                                { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
+                                { "Compact", true },
+                                { "ShowDelete", ViewBag.EsAdmin ?? false }
+                            })
+                    </div>
                 </div>
                 <div class="jk-mt-8 jk-small">
                     <i class="bi bi-clock"></i> @item.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")
@@ -65,6 +106,23 @@
                 <div class="jk-mt-8">
                     <span class="jk-badge">@(item.EstadoTurno != null ? item.EstadoTurno.Nombre : "Sin estado")</span>
                 </div>
+                @if (puedeIniciar || puedeFinalizar || puedeCancelar)
+                {
+                    <div class="jk-flex jk-gap-8 jk-mt-8">
+                        @if (puedeIniciar)
+                        {
+                            <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-success" data-accion data-url="@Url.Action("IniciarAtencion", "Turnos")" data-turno="@item.Id">Iniciar</button>
+                        }
+                        @if (puedeFinalizar)
+                        {
+                            <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-success" data-accion data-url="@Url.Action("FinalizarAtencion", "Turnos")" data-turno="@item.Id">Finalizar</button>
+                        }
+                        @if (puedeCancelar)
+                        {
+                            <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-danger" data-accion data-url="@Url.Action("CancelarAtencion", "Turnos")" data-turno="@item.Id">Cancelar</button>
+                        }
+                    </div>
+                }
             </div>
         }
     </div>
@@ -101,6 +159,8 @@
 }
 
 @helper FilterContent() {
+    var todosEstados = ViewBag.Estados as JKTurnos.Models.Entities.EstadoTurnoBase[];
+    var estadosElegidos = ViewBag.EstadosElegidos as List<string> ?? new List<string>();
     <form method="get" action="@Url.Action("Index")" class="jk-filter-bar">
         @Html.Partial("~/Views/Shared/Components/_SearchFilter.cshtml",
             new ViewDataDictionary {
@@ -119,6 +179,24 @@
                 { "InicioLabel", "Desde" },
                 { "FinLabel", "Hasta" }
             })
+
+        <div class="jk-filter-group" title="Filtro por estado del turno">
+            <span class="jk-filter-label"><i class="bi bi-funnel"></i> Estado</span>
+            <div class="jk-checkbox-group">
+            @if (todosEstados != null)
+            {
+                foreach (var est in todosEstados)
+                {
+                    var marcado = estadosElegidos.Contains(est.Codigo);
+                    <label class="jk-checkbox-item">
+                        <input type="checkbox" name="estados" value="@est.Codigo" @(marcado ? "checked" : "") />
+                        <span class="jk-checkbox-swatch" style="background-color: @est.Color;"></span>
+                        <span class="jk-checkbox-label">@est.Nombre</span>
+                    </label>
+                }
+            }
+            </div>
+        </div>
 
         <button type="submit" class="jk-btn jk-btn-primary">
             <i class="bi bi-search"></i> Buscar
@@ -140,4 +218,64 @@
     ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
 }
 
+@Html.AntiForgeryToken()
+
 @Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")
+
+@Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-turnos" } })
+
+@section scripts {
+    <script>
+        (function () {
+            'use strict';
+
+            function showToast(message, type) {
+                var container = document.getElementById('jk-toast-turnos');
+                if (!container) return;
+                var toast = document.createElement('div');
+                toast.className = 'jk-toast jk-toast-' + type;
+                toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
+                    + '"></i> ' + message;
+                container.appendChild(toast);
+                setTimeout(function () { toast.remove(); }, 4000);
+            }
+
+            // Acciones contextuales de cambio de estado (same pattern as Edit, P5):
+            // fetch POST + anti-forgery + recarga. El timeblock cancelado deja de
+            // mostrarse en la Agenda porque la grilla filtra cancelados (D-042).
+            var estadoToken = document.querySelector('input[name="__RequestVerificationToken"]');
+
+            document.querySelectorAll('[data-accion]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var accionUrl = btn.getAttribute('data-url');
+                    var turnoId = btn.getAttribute('data-turno');
+                    if (!estadoToken) return;
+
+                    var body = '__RequestVerificationToken=' + encodeURIComponent(estadoToken.value) +
+                               '&turnoId=' + encodeURIComponent(turnoId);
+
+                    btn.disabled = true;
+
+                    fetch(accionUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                        body: body
+                    })
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        btn.disabled = false;
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            showToast(data.message || 'No se pudo realizar la accion', 'error');
+                        }
+                    })
+                    .catch(function () {
+                        btn.disabled = false;
+                        showToast('Error de conexion al realizar la accion', 'error');
+                    });
+                });
+            });
+        })();
+    </script>
+}

@@ -65,6 +65,8 @@ namespace JKTurnos.Controllers
         {
             ViewBag.TenantId = TenantId;
 
+            ViewBag.EsAdmin = IsAdmin;
+
             ViewBag.UserName =
                 User.Identity.Name;
 
@@ -74,9 +76,9 @@ namespace JKTurnos.Controllers
 
             ViewBag.ConfiguracionLogo =
                 config != null
-                    ? (!string.IsNullOrWhiteSpace(config.AvatarUrl)
-                        ? config.AvatarUrl
-                        : config.LogoUrl)
+                    ? (!string.IsNullOrWhiteSpace(config.LogoUrl)
+                        ? config.LogoUrl
+                        : config.AvatarUrl)
                     : null;
 
             ViewBag.ConfiguracionNombre =

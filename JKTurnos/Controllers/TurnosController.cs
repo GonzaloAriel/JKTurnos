@@ -68,6 +68,10 @@ namespace JKTurnos.Controllers
             var situacionClave = SituacionTemporal.Calcular(turno);
             var situacion = situacionClave != null ? SituacionTemporal.De(situacionClave) : null;
 
+            // D-040: flags de acciones contextuales segun el Codigo (P5), para operar
+            // el estado directo desde el Drawer de detalle sin ir al Edit.
+            var estadoCodigoDrawer = turno.EstadoTurno != null ? turno.EstadoTurno.Codigo : null;
+
             var model = new TurnoDetailViewModel
             {
                 Id = turno.Id,
@@ -83,6 +87,10 @@ namespace JKTurnos.Controllers
                 EstadoNombre = turno.EstadoTurno != null ? turno.EstadoTurno.Nombre : "Sin estado",
                 EstadoColor = turno.EstadoTurno != null ? turno.EstadoTurno.Color : null,
                 EstadoIcono = turno.EstadoTurno != null ? turno.EstadoTurno.Icono : "bi-circle-fill",
+                PuedeIniciar = estadoCodigoDrawer == EstadosTurnoBase.Pendiente,
+                PuedeFinalizar = estadoCodigoDrawer == EstadosTurnoBase.EnCurso,
+                PuedeCancelar = estadoCodigoDrawer == EstadosTurnoBase.Pendiente ||
+                                estadoCodigoDrawer == EstadosTurnoBase.EnCurso,
                 SituacionClave = situacionClave,
                 SituacionLabel = situacion != null ? situacion.Label : null,
                 SituacionColor = situacion != null ? situacion.Color : null,
@@ -237,7 +245,12 @@ namespace JKTurnos.Controllers
                 var lunes = fechaSeleccionada.AddDays(diff);
                 var domingo = lunes.AddDays(6);
 
-                model.Turnos = _turnoService.GetTurnosEnRango(lunes, domingo);
+                // El turno cancelado libera su slot en la Agenda (D-042): el
+                // timeblock desaparece y la grilla/horarios libres lo tratan como
+                // disponible. El Index de Turnos SÍ conserva el cancelado como registro.
+                model.Turnos = _turnoService.GetTurnosEnRango(lunes, domingo)
+                    .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
+                    .ToList();
 
                 if (lunes.Month == domingo.Month && lunes.Year == domingo.Year)
                 {
@@ -254,7 +267,11 @@ namespace JKTurnos.Controllers
             }
             else
             {
-                model.Turnos = _turnoService.GetTurnosDelDia(fechaSeleccionada);
+                // Ver nota en la rama "semana": el turno cancelado libera su slot
+                // en la Agenda (D-042); el Index conserva el cancelado como registro.
+                model.Turnos = _turnoService.GetTurnosDelDia(fechaSeleccionada)
+                    .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
+                    .ToList();
                 ViewBag.CurrentDateDisplay = dayNames[(int)fechaSeleccionada.DayOfWeek] + " " + fechaSeleccionada.Day + " " + monthNames[fechaSeleccionada.Month - 1] + ", " + fechaSeleccionada.Year;
             }
 
@@ -271,13 +288,27 @@ namespace JKTurnos.Controllers
         }
 
         // GET: Turnos
-        public ActionResult Index(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        public ActionResult Index(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null, string[] estados = null)
         {
-            var turnos = _turnoService.GetFiltrados(busqueda, fechaInicio, fechaFin);
+            // D-045: filtro por estados con default Pendiente + En curso (los turnos
+            // activos). Si el usuario no eligio estados, se muestran los operativos.
+            var estadosFiltro = (estados != null && estados.Length > 0)
+                ? estados.Where(e => !string.IsNullOrWhiteSpace(e)).ToList()
+                : null;
+
+            var estadosElegidos = estadosFiltro ?? new List<string>
+            {
+                EstadosTurnoBase.Pendiente,
+                EstadosTurnoBase.EnCurso
+            };
+
+            var turnos = _turnoService.GetFiltrados(busqueda, fechaInicio, fechaFin, estadosElegidos);
 
             ViewBag.Busqueda = busqueda;
             ViewBag.FechaInicio = fechaInicio;
             ViewBag.FechaFin = fechaFin;
+            ViewBag.Estados = EstadosTurnoBase.Todos;
+            ViewBag.EstadosElegidos = estadosElegidos;
 
             return View(turnos);
         }
@@ -445,6 +476,9 @@ namespace JKTurnos.Controllers
         }
 
         // GET: Turnos/Delete/5
+        // Solo el Admin del tenant elimina turnos (el User operador no tiene
+        // permiso, se le oculta el boton y se blinda el endpoint en el server).
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult Delete(int id)
         {
             var turno = _turnoService.GetById(id);
@@ -457,6 +491,7 @@ namespace JKTurnos.Controllers
         // POST: Turnos/DeleteConfirmed/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult DeleteConfirmed(int id)
         {
             _turnoService.Delete(id);

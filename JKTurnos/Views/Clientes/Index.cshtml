@@ -22,6 +22,8 @@
                             <td>
                                 @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
                                     new ViewDataDictionary {
+                                        { "ViewUrl", Url.Action("Details", new { id = item.Id }) },
+                                        { "ViewLabel", "Historial" },
                                         { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                                         { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                                         { "ItemName", item.Nombre },
@@ -43,6 +45,8 @@
                     <strong>@item.Nombre</strong>
                     @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
                         new ViewDataDictionary {
+                            { "ViewUrl", Url.Action("Details", new { id = item.Id }) },
+                            { "ViewLabel", "Historial" },
                             { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                             { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                             { "ItemName", item.Nombre },

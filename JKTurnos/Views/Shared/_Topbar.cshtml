@@ -11,6 +11,19 @@
         <span class="jk-topbar-title">JKTurnos</span>
     </div>
 
+    <div class="jk-search jk-search-global" id="jk-search-global">
+        <form action="@Url.Action("Index", "Busqueda")" method="get" role="search" aria-label="Busqueda global">
+            <input type="text"
+                   id="jk-search-global-input"
+                   name="termino"
+                   placeholder="Buscar clientes, turnos, servicios..."
+                   autocomplete="off"
+                   aria-label="Busqueda global"
+                   data-buscar-global-url="@Url.Action("Buscar", "Busqueda")" />
+        </form>
+        <div class="jk-autocomplete dropdown-menu" id="jk-search-global-results" aria-hidden="true"></div>
+    </div>
+
     <div class="jk-topbar-right">
         @if (User.Identity.IsAuthenticated)
         {

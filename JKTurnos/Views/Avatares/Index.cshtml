@@ -26,10 +26,10 @@
                                 @item.Url
                             </td>
                             <td>
-                                <a href="@Url.Action("Editar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm">
+                                <a href="@Url.Action("Editar", new { id = item.Id })" class="jk-btn jk-btn-sm jk-btn-soft-primary" title="Editar" aria-label="Editar @item.Nombre">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <a href="@Url.Action("Eliminar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm jk-text-danger">
+                                <a href="@Url.Action("Eliminar", new { id = item.Id })" class="jk-btn jk-btn-sm jk-btn-soft-danger" title="Eliminar" aria-label="Eliminar @item.Nombre">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
@@ -51,11 +51,11 @@
                              onerror="this.style.display='none'" />
                         <strong>@item.Nombre</strong>
                     </div>
-                    <div>
-                        <a href="@Url.Action("Editar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm">
+                    <div class="jk-flex jk-gap-4">
+                        <a href="@Url.Action("Editar", new { id = item.Id })" class="jk-btn jk-btn-sm jk-btn-soft-primary" title="Editar" aria-label="Editar @item.Nombre">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <a href="@Url.Action("Eliminar", new { id = item.Id })" class="jk-btn jk-btn-ghost jk-btn-sm jk-text-danger">
+                        <a href="@Url.Action("Eliminar", new { id = item.Id })" class="jk-btn jk-btn-sm jk-btn-soft-danger" title="Eliminar" aria-label="Eliminar @item.Nombre">
                             <i class="bi bi-trash"></i>
                         </a>
                     </div>

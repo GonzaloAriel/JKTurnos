@@ -16,7 +16,7 @@
 }
 
 @helper EditarButton(JKTurnos.Models.Entities.Pago item) {
-    <button type="button" class="jk-btn jk-btn-sm jk-btn-ghost"
+    <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-primary"
             data-jk-open-drawer="drawer-pago-editar"
             data-pago-id="@item.Id"
             data-pago-monto="@item.Monto.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
@@ -28,7 +28,7 @@
 }
 
 @helper AnularButton(JKTurnos.Models.Entities.Pago item) {
-    <button type="button" class="jk-btn jk-btn-sm jk-btn-danger"
+    <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-danger"
             data-jk-open-drawer="drawer-pago-anular"
             data-pago-id="@item.Id"
             aria-label="Anular pago de @(item.Monto.ToString("0.00"))">
@@ -37,7 +37,7 @@
 }
 
 @helper VerTurnoLink(JKTurnos.Models.Entities.Pago item) {
-    <button type="button" class="jk-btn jk-btn-sm jk-btn-ghost"
+    <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-info"
             data-ver-turno="@item.TurnoId"
             aria-label="Ver turno del pago">
         <i class="bi bi-calendar-event"></i> Ver turno
@@ -244,12 +244,31 @@
     </div>
 }
 
+@helper TurnoFilterBanner() {
+    if (ViewBag.TurnoId != null)
+    {
+        <div class="jk-card jk-card-compact jk-mb-16 jk-flex-between">
+            <div class="jk-flex jk-gap-8 jk-flex-items-center">
+                <i class="bi bi-calendar-event"></i>
+                <span>
+                    <strong>Pagos del turno:</strong>
+                    @(ViewBag.TurnoEtiqueta != null ? ViewBag.TurnoEtiqueta : "Turno #" + ViewBag.TurnoId)
+                </span>
+            </div>
+            <a href="@Url.Action("Index")" class="jk-btn jk-btn-sm jk-btn-ghost">
+                <i class="bi bi-arrow-counterclockwise"></i> Ver todos los pagos
+            </a>
+        </div>
+    }
+}
+
 @{
     ViewBag.Title = "Pagos";
     ViewBag.Subtitle = "Cobros y senias registrados";
 
     ViewBag.PageContent = MvcHtmlString.Create(
         ToastContent().ToString()
+        + TurnoFilterBanner().ToString()
         + RegisterContent().ToString()
         + FilterContent().ToString()
         + (Model.Any() ? ListContent().ToString() : EmptyContent().ToString()));

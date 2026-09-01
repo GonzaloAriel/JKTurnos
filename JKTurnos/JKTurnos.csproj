@@ -177,6 +177,7 @@
     <Compile Include="Controllers\NotificacionesController.cs" />
     <Compile Include="Controllers\AyudaController.cs" />
     <Compile Include="Controllers\AuditoriaController.cs" />
+    <Compile Include="Controllers\BusquedaController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\GlobalRepository.cs" />
     <Compile Include="Data\JKContext.cs" />
@@ -272,6 +273,7 @@
     <Compile Include="Models\ViewModels\PanelTenantsViewModel.cs" />
     <Compile Include="Models\ViewModels\PagoViewModel.cs" />
     <Compile Include="Models\ViewModels\LoginVM.cs" />
+    <Compile Include="Models\ViewModels\ClienteFichaViewModel.cs" />
     <Compile Include="Models\ViewModels\RecursoViewModel.cs" />
     <Compile Include="Models\ViewModels\ServicioViewModel.cs" />
     <Compile Include="Models\ViewModels\SuscripcionTenantViewModel.cs" />
@@ -282,6 +284,7 @@
     <Compile Include="Models\ViewModels\UsuarioViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistrarPagoViewModel.cs" />
     <Compile Include="Models\ViewModels\AvatarPlataformaViewModel.cs" />
+    <Compile Include="Models\ViewModels\BusquedaViewModel.cs" />
     <Compile Include="Models\ViewModels\PagoSuscripcionItemViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
@@ -301,6 +304,7 @@
     <Compile Include="Services\ConfiguracionService.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\RecordatorioService.cs" />
+    <Compile Include="Services\BusquedaService.cs" />
     <Compile Include="Services\TurnoEstadoMotor.cs" />
     <Compile Include="Services\TurnoService.cs" />
     <Compile Include="Services\UserService.cs" />
@@ -328,6 +332,7 @@
     <Content Include="Content\DesignSystem\jk-layout.css" />
     <Content Include="Content\DesignSystem\jk-tokens.css" />
     <Content Include="Content\DesignSystem\jk-utilities.css" />
+    <Content Include="Content\Pages\jk-busqueda.css" />
     <Content Include="Content\Pages\jk-agenda.css" />
     <Content Include="Content\Pages\jk-pagos.css" />
     <Content Include="Content\Pages\jk-dashboard-section.css" />
@@ -397,6 +402,7 @@
     <Content Include="Views\Clientes\Create.cshtml" />
     <Content Include="Views\Clientes\Edit.cshtml" />
     <Content Include="Views\Clientes\Delete.cshtml" />
+    <Content Include="Views\Clientes\Details.cshtml" />
     <Content Include="Views\Servicios\Index.cshtml" />
     <Content Include="Views\Servicios\Create.cshtml" />
     <Content Include="Views\Servicios\Edit.cshtml" />
@@ -438,6 +444,7 @@
     <Content Include="Views\Dashboard\Index.cshtml" />
     <Content Include="Views\Ayuda\Index.cshtml" />
     <Content Include="Views\Auditoria\Index.cshtml" />
+    <Content Include="Views\Busqueda\Index.cshtml" />
     <Content Include="Views\Tenants\Create.cshtml" />
     <Content Include="Views\Tenants\Delete.cshtml" />
     <Content Include="Views\Tenants\Edit.cshtml" />

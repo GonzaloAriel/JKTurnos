@@ -1,0 +1,222 @@
+@model JKTurnos.Models.ViewModels.ClienteFichaViewModel
+@using JKTurnos.Models.Entities
+
+@{
+    ViewBag.Title = Model.Cliente.Nombre;
+    ViewBag.Subtitle = "Ficha del cliente e historial de turnos";
+    ViewBag.PrimaryAction = Url.Action("Agenda", "Turnos");
+    ViewBag.PrimaryActionLabel = "Nuevo turno";
+    ViewBag.PrimaryActionIcon = "plus-lg";
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="fade-in">
+
+    <!-- ===== 1. DATOS DE CONTACTO ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="jk-card-header">
+            <h3 class="jk-card-title">Contacto</h3>
+            <a href="@Url.Action("Edit", new { id = Model.Cliente.Id })" class="jk-btn jk-btn-sm jk-btn-soft-primary">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-item">
+                <div class="kpi-label">Telefono</div>
+                <div class="kpi-value">
+                    @if (string.IsNullOrEmpty(Model.Cliente.Telefono))
+                    {
+                        <span class="text-secondary">Sin datos</span>
+                    }
+                    else
+                    {
+                        <span>@Model.Cliente.Telefono</span>
+                        if (!string.IsNullOrEmpty(Model.WhatsappLink))
+                        {
+                            <a href="@Model.WhatsappLink" target="_blank" rel="noopener" class="jk-btn jk-btn-sm jk-btn-soft-success jk-mt-8"
+                               aria-label="Abrir WhatsApp">
+                                <i class="bi bi-whatsapp"></i> WhatsApp
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Email</div>
+                <div class="kpi-value">
+                    @if (string.IsNullOrEmpty(Model.Cliente.Email))
+                    {
+                        <span class="text-secondary">Sin datos</span>
+                    }
+                    else
+                    {
+                        @Model.Cliente.Email
+                    }
+                </div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Direccion</div>
+                <div class="kpi-value">
+                    @if (string.IsNullOrEmpty(Model.Cliente.Direccion))
+                    {
+                        <span class="text-secondary">Sin datos</span>
+                    }
+                    else
+                    {
+                        @Model.Cliente.Direccion
+                    }
+                </div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Notas</div>
+                <div class="kpi-value">
+                    @if (string.IsNullOrEmpty(Model.Cliente.Notas))
+                    {
+                        <span class="text-secondary">Sin notas</span>
+                    }
+                    else
+                    {
+                        @Model.Cliente.Notas
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. RESUMEN CRM ===== -->
+    <div class="jk-grid jk-mt-24">
+        <div class="jk-col-4">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Ultimo turno</h3>
+                </div>
+                @if (Model.UltimoTurno != null)
+                {
+                    <p class="jk-mb-0">
+                        <strong>@Model.UltimoTurno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</strong><br />
+                        <span class="jk-small">
+                            @(Model.UltimoTurno.Servicio?.Nombre ?? "Sin servicio") &middot; @(Model.UltimoTurno.Recurso?.Nombre ?? "-")
+                        </span>
+                    </p>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">Aun no tiene turnos finalizados.</p>
+                }
+            </div>
+        </div>
+
+        <div class="jk-col-4">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Proximo turno</h3>
+                </div>
+                @if (Model.ProximoTurno != null)
+                {
+                    <p class="jk-mb-0">
+                        <strong>@Model.ProximoTurno.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</strong><br />
+                        <span class="jk-small">
+                            @(Model.ProximoTurno.Servicio?.Nombre ?? "Sin servicio") &middot; @(Model.ProximoTurno.Recurso?.Nombre ?? "-")
+                        </span>
+                    </p>
+                }
+                else
+                {
+                    <p class="jk-small text-secondary jk-mb-0">No tiene turnos programados.</p>
+                }
+            </div>
+        </div>
+
+        <div class="jk-col-4">
+            <div class="jk-card">
+                <div class="jk-card-header">
+                    <h3 class="jk-card-title">Actividad</h3>
+                </div>
+                <p class="jk-mb-0"><strong>@Model.TotalTurnos</strong> turnos en total</p>
+                <p class="jk-small text-secondary jk-mb-0">
+                    @Model.TurnosFinalizados finalizado(s) y @(Model.TotalTurnos - Model.TurnosFinalizados) resto
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 3. HISTORIAL DE TURNOS ===== -->
+    <div class="jk-card jk-mt-24">
+        <div class="jk-card-header">
+            <h3 class="jk-card-title">Historial de turnos</h3>
+        </div>
+
+        @if (Model.Turnos.Count == 0)
+        {
+            <p class="jk-small text-secondary jk-mb-0">El cliente no tiene turnos registrados.</p>
+        }
+        else
+        {
+            <div class="jk-hide-mobile">
+                <div class="jk-table-wrap">
+                    <table class="jk-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Servicio</th>
+                                <th>Recurso</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.Turnos)
+                            {
+                                <tr>
+                                    <td>@t.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@(t.Servicio?.Nombre ?? "-")</td>
+                                    <td>@(t.Recurso?.Nombre ?? "-")</td>
+                                    <td>
+                                        <span class="jk-badge" style="@(t.EstadoTurno != null ? "background:" + t.EstadoTurno.Color + "22; color:" + t.EstadoTurno.Color : "")">
+                                            <i class="bi @(t.EstadoTurno?.Icono ?? "bi-circle-fill")"></i> @(t.EstadoTurno?.Nombre ?? "-")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("Agenda", "Turnos", new { openTurnoId = t.Id })"
+                                           aria-label="Ver detalle del turno">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+                @foreach (var t in Model.Turnos)
+                {
+                    <div class="jk-card jk-card-compact">
+                        <div class="jk-flex-between">
+                            <strong>@t.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</strong>
+                            <span class="jk-badge" style="@(t.EstadoTurno != null ? "background:" + t.EstadoTurno.Color + "22; color:" + t.EstadoTurno.Color : "")">
+                                <i class="bi @(t.EstadoTurno?.Icono ?? "bi-circle-fill")"></i> @(t.EstadoTurno?.Nombre ?? "-")
+                            </span>
+                        </div>
+                        <div class="jk-small jk-mt-8">
+                            @(t.Servicio?.Nombre ?? "Sin servicio") &middot; @(t.Recurso?.Nombre ?? "-")
+                        </div>
+                        <a class="jk-btn jk-btn-sm jk-btn-soft-info jk-mt-8" href="@Url.Action("Agenda", "Turnos", new { openTurnoId = t.Id })">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="jk-mt-24">
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+            <i class="bi bi-arrow-left"></i> Volver a clientes
+        </a>
+    </div>
+
+</div>

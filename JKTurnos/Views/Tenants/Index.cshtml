@@ -99,7 +99,7 @@
                                 <span class="jk-flex jk-gap-8">
                                     @if (item.IsActive)
                                     {
-                                        <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-icon" title="Registrar pago">
+                                        <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-icon jk-btn-soft-warning" title="Registrar pago" aria-label="Registrar pago de @item.Nombre">
                                             <i class="bi bi-cash-stack"></i>
                                         </a>
                                         @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
@@ -114,7 +114,7 @@
                                     }
                                     else
                                     {
-                                        <a href="@Url.Action("Reactivar", new { id = item.TenantId })" class="jk-btn jk-btn-icon jk-btn-success" title="Reactivar">
+                                        <a href="@Url.Action("Reactivar", new { id = item.TenantId })" class="jk-btn jk-btn-icon jk-btn-soft-success" title="Reactivar" aria-label="Reactivar @item.Nombre">
                                             <i class="bi bi-arrow-clockwise"></i>
                                         </a>
                                     }
@@ -144,13 +144,13 @@
                 <div class="jk-mt-8 jk-flex jk-gap-8">
                     @if (item.IsActive)
                     {
-                        <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-cash-stack"></i> Pago</a>
-                        <a href="@Url.Action("Desactivar", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-danger"><i class="bi bi-pause-circle"></i> Desactivar</a>
-                        <a href="@Url.Action("Edit", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-ghost"><i class="bi bi-pencil"></i> Editar</a>
+                        <a href="@Url.Action("Registrar", "PagosSuscripcion", new { tenantId = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-soft-warning"><i class="bi bi-cash-stack"></i> Pago</a>
+                        <a href="@Url.Action("Desactivar", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-soft-danger"><i class="bi bi-pause-circle"></i> Desactivar</a>
+                        <a href="@Url.Action("Edit", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-soft-primary"><i class="bi bi-pencil"></i> Editar</a>
                     }
                     else
                     {
-                        <a href="@Url.Action("Reactivar", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-success"><i class="bi bi-arrow-clockwise"></i> Reactivar</a>
+                        <a href="@Url.Action("Reactivar", new { id = item.TenantId })" class="jk-btn jk-btn-sm jk-btn-soft-success"><i class="bi bi-arrow-clockwise"></i> Reactivar</a>
                     }
                 </div>
             </div>
