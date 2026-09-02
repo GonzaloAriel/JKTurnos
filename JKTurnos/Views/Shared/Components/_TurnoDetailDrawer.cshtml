@@ -68,10 +68,48 @@
                     <i class="bi bi-x-lg"></i> Cancelar
                 </button>
             }
-            <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("Edit", "Turnos", new { id = Model.Id })" title="Re agendar" aria-label="Re agendar @Model.ClienteNombre">
-                <i class="bi bi-arrow-clockwise"></i> Re agendar
-            </a>
+            <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-info" data-mover-toggle title="Mover turno a otro horario o recurso" aria-label="Mover turno de @Model.ClienteNombre">
+                <i class="bi bi-arrows-move"></i> Mover turno
+            </button>
         </div>
+
+        @*
+            M-07: formulario inline "Mover turno" (alternativa al drag & drop,
+            pensado tambien para mobile). POST ajax a Turnos/Mover con el mismo
+            patron QuickCreate (D-013); el backend valida disponibilidad.
+        *@
+        <form class="jk-mover-form jk-mt-12" data-turno-id="@Model.Id" data-mover-url="@Url.Action("Mover", "Turnos")" hidden novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="turnoId" value="@Model.Id" />
+            <input type="hidden" name="fechaHoraInicio" />
+            <div class="jk-form-group">
+                <label class="jk-label">Recurso</label>
+                <select name="recursoId" class="jk-input">
+                    @if (Model.Recursos != null)
+                    {
+                        foreach (var r in Model.Recursos)
+                        {
+                            <option value="@r.Value" @(Model.RecursoId.ToString() == r.Value ? "selected" : "")>@r.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="jk-flex jk-gap-8">
+                <div class="jk-form-group jk-flex-1">
+                    <label class="jk-label">Fecha</label>
+                    <input type="date" name="moverFecha" class="jk-input" value="@Model.FechaHoraInicio.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="jk-form-group jk-flex-1">
+                    <label class="jk-label">Hora</label>
+                    <input type="time" name="moverHora" class="jk-input" value="@Model.FechaHoraInicio.ToString("HH:mm")" />
+                </div>
+            </div>
+            <div class="jk-flex jk-gap-8">
+                <button type="submit" class="jk-btn jk-btn-primary jk-btn-sm">Mover</button>
+                <button type="button" class="jk-btn jk-btn-ghost jk-btn-sm" data-mover-cancel>Cancelar</button>
+            </div>
+            <p class="jk-field-error jk-mover-error jk-mt-8" hidden></p>
+        </form>
     </div>
 }
 
@@ -197,7 +235,7 @@
                 <select name="TipoPago" class="jk-select">
                     <option value="PagoParcial">Pago parcial</option>
                     <option value="PagoTotal">Pago total</option>
-                    <option value="Senia">Senia</option>
+                    <option value="Senia">Seña</option>
                 </select>
             </div>
             <div class="jk-form-group">

@@ -69,6 +69,11 @@ namespace JKTurnos.Models.Entities
         [Column(TypeName = "nvarchar(max)")]
         public string RecordatoriosOcultos { get; set; }
 
+        // M-08: habilita el portal publico de reservas por subdominio. Solo un
+        // tenant VALIDO, IsActive y con PortalHabilitado=true renderiza el flujo
+        // de reserva. Los existentes arrancan en false (opt-in explicito del admin).
+        public bool PortalHabilitado { get; set; }
+
         [ForeignKey("TenantId")]
         public virtual Tenant Tenant { get; set; }
     }

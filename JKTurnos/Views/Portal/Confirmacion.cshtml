@@ -1,0 +1,32 @@
+@model JKTurnos.Models.ViewModels.PortalViewModel
+
+@{
+    ViewBag.Title = "Reserva confirmada";
+    Layout = "~/Views/Portal/_PortalLayout.cshtml";
+    ViewBag.PortalNegocio = Model.NegocioNombre;
+    ViewBag.PortalLogo = Model.NegocioLogo;
+}
+
+<div class="jk-portal-card">
+    <h1 class="jk-portal-step-title">Reserva creada</h1>
+    <p class="jk-portal-step-sub">
+        Quedó pendiente de confirmación. Para confirmarla, tocá el botón y enviá el
+        mensaje de WhatsApp al número de tu negocio.
+    </p>
+
+    <p>
+        <strong>@Model.RecursoNombre</strong><br>
+        @Model.FechaHoraLegible
+    </p>
+
+    <a href="@Model.WhatsAppLink" target="_blank" rel="noopener"
+        class="jk-btn jk-btn-whatsapp">
+        <i class="bi bi-whatsapp"></i> Confirmar por WhatsApp
+    </a>
+
+    <p class="jk-portal-otra">
+        <a href="@Url.Action("Inicio", "Portal")" class="jk-btn jk-btn-secondary">
+            Sacar otro turno
+        </a>
+    </p>
+</div>

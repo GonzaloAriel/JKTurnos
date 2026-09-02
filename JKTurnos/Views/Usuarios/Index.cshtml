@@ -49,6 +49,7 @@
                                             { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                                             { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                                             { "ItemName", item.Nombre },
+                                            { "ShowDelete", item.Role != RolesConst.AdminGlobal },
                                             { "Compact", false }
                                         })
                                     if (item.Id != (int)ViewBag.CurrentUserId)
@@ -86,6 +87,7 @@
                                     { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                                     { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                                     { "ItemName", item.Nombre },
+                                    { "ShowDelete", item.Role != RolesConst.AdminGlobal },
                                     { "Compact", true }
                                 })
                         }

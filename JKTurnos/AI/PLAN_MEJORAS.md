@@ -30,6 +30,14 @@ riesgo y estado.
   servicio, recurso) con autocomplete y redireccion al detalle.
 - Riesgo: BAJO. Endpoint de lectura + UI en topbar.
 - Estado: EN PROGRESO (2026-08-31).
+- Avance (2026-09-01, pendiente confirmacion TEAM LEAD): los turnos de la
+  busqueda ya NO navegan a la Agenda. El autocomplete del topbar y las cards de
+  la pagina de resultados abren el drawer de detalle del turno (`GetDetailDrawer`)
+  en la misma pagina via `Scripts/jk-turnos-drawer.js` (compartido, expone
+  `window.openTurnDrawer(id)`; drawer global en `_Layout`, drawer local en
+  Busqueda). Se agrego ademas un icono de detalle (ojo, `data-ver-turno`) en la
+  grilla de Turnos (desktop y mobile) que abre el mismo drawer en esa pagina
+  (`Views/Turnos/Index.cshtml`). MSBuild Debug 0 errores.
 
 ### M-03 CLIENTES: HISTORIAL + CRM LIGERO + BUSQUEDA INTELIGENTE  [PRIORIDAD ALTA]
 - Problema: el roadmap marca en Clientes (pendiente): Historial, ultimo turno,
@@ -46,10 +54,53 @@ riesgo y estado.
   desde el drawer. Conecta con el "Re agendar" mejorado.
 - Riesgo: MEDIO. UX de arrastre + persistencia + validacion de disponibilidad.
 
+AVANCE (2026-09-01): EN PROGRESO. Backend + frontend implementados:
+- `TurnoService.Mover(turnoId, recursoId, nuevaFechaHoraInicio)`: recalcula fin
+  con `CalcularFin`, valida disponibilidad excluyendo el propio turno
+  (`ValidarDisponibilidad`), solo mueve turnos Pendiente/En curso (D-040) y
+  rechaza mover al pasado. Reusa `_repo.Update` + auditoria.
+- `TurnosController.Mover`: POST ajax + anti-forgery (patron QuickCreate D-013).
+- Drag & Drop HTML5 (native) en `_AgendaGrid` (snap 30 min por celda) y
+  `_AgendaGridSemanal` (snap 5 min por posicion, conserva el recurso del
+  timeblock). Solo los bloques movibles son draggable=true.
+- `jk-agenda.js`: `shift+dragover/drop`, flag `dragJustEnded` que suprime el
+  click sintetico del drop (no abre drawer ni Quick Create),
+  `body.jk-dragging` desactiva pointer-events de bloques durante el arrastre,
+  toast + recarga de la agenda al mover.
+- `_TurnoDetailDrawer`: boton "Mover turno" con formulario inline (recurso/
+  fecha/hora) que POSTea a Mover (alternativa para mobile). Reemplaza el link
+  "Re agendar" que navegaba a Edit.
+- `TurnoDetailViewModel`: +`RecursoId` y +`Recursos` (dropdown).
+- **Refresco suave sin F5** (pedido del usuario): `TurnosController.GetAgendaGrid`
+  devuelve el partial de la grilla (Dia/Semana) por AJAX; `Agenda.cshtml` agrega
+  `data-agenda-content-url` y envuelve la grilla en `<div id="jk-agenda-grid-container">`;
+  `jk-agenda.js.refreshAgendaGrid()` reemplaza solo el inner del wrapper via
+  DOMParser (conservando scroll + listeners de teclado). Mover por drag y por
+  "Mover turno" ya no recarga la pagina completa (sin parpadeo F5 ni salto al inicio).
+- Compila 0 errores; `node --check` OK. Refresco suave confirmado por TEAM LEAD
+  (2026-09-01): al mover el timeblock (drag y "Mover turno") ya no hay F5 ni salto
+  al inicio, el bloque aparece en su nueva posicion y el drawer sigue abriendo.
+  CONSOLIDADO por TEAM LEAD (2026-09-01).
+
 ### M-08 PORTAL DE RESERVAS ONLINE + WHATSAPP  [PRIORIDAD ALTA - Fase 6]
 - Portal publico por subdominio: el cliente elige recurso/fecha y reserva.
 - Reserva via WhatsApp con link precargado. Cierra clientes para el SaaS.
 - Riesgo: MEDIO-ALTO. Requiere tenant publico (ya existe subdominio).
+- Avance (2026-09-01): migracion `AddPortalPublico` (+`PortalHabilitado`),
+  `PortalReservaService`, `AuditService.RegistrarPublico`, `PortalController`
+  [AllowAnonymous], `PortalViewModel` (con `FechaLegible`/`FechaHoraLegible`),
+  layout publico `_PortalLayout`, `jk-portal.css`, vistas `Inicio/FechaHora/
+  Datos/Confirmacion/NoDisponible`, checkbox `PortalHabilitado` en DatosNegocio,
+  appSetting `JKPortalDominioRaiz`, rewritepath raiz en `Global.asax`.
+  MSBuild `Debug` y `/p:MvcBuildViews=true` = 0 errores.
+- D-0xx (2026-09-01): en este proyecto las vistas precompiladas usan la variable
+  de modelo `Model` (mayuscula, NO `model`) y los bloques de control (`if`/
+  `foreach`/`using`) dentro de un bloque `@using(){ }` van SIN prefijo `@`.
+  Por eso las vistas del portal usan `@Model.X` y `@using(...) { if(...) }`.
+- D-0xx (2026-09-01): las fechas `DateTime?`/`string` no se formatean dentro de
+  las vistas; el controlador pre-armo `FechaLegible` y `FechaHoraLegible` para
+  evitar llamar `.ToString(fmt)` sobre valores nullable/string en Razor
+  (falla la compilacion de vistas con `MvcBuildViews=true`).
 
 ### M-09 CONFIGURACION PROGRESIVA + ONBOARDING  [PRIORIDAD MEDIA - Fase 4]
 - Wizard inicial que guie el alta (logo, horarios, servicio, recurso) sin obligar.

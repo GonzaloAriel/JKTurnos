@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Mvc;
 
 namespace JKTurnos.Models.ViewModels
 {
@@ -20,6 +21,11 @@ namespace JKTurnos.Models.ViewModels
 
         public string RecursoNombre { get; set; }
         public string RecursoColor { get; set; }
+
+        // M-07: recursos del tenant para el dropdown de "Mover turno" del drawer
+        // (preseleccionado con RecursoId actual del turno).
+        public int RecursoId { get; set; }
+        public IEnumerable<SelectListItem> Recursos { get; set; }
 
         public int EstadoTurnoId { get; set; }
         public string EstadoNombre { get; set; }

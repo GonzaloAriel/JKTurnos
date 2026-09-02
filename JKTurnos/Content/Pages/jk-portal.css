@@ -1,0 +1,215 @@
+/* JKTurnos - Portal publico de reservas (M-08).
+   Estilo alegre y entusiasta dentro de la paleta JKTurnos (D-035/D-036):
+   crema/sage/marron + gradiente tricolor identity (coral->butter->teal). */
+
+.jk-portal {
+    min-height: 100vh;
+    background:
+        radial-gradient(1200px 500px at 90% -10%, var(--jk-butter-light, #F7EDD2) 0%, transparent 60%),
+        radial-gradient(900px 420px at -10% 10%, var(--jk-coral-light, #F9E7DF) 0%, transparent 55%),
+        linear-gradient(180deg, #FBF7F0 0%, var(--jk-accent-light, #DCE9D7) 130%);
+}
+
+.jk-portal-shell {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.jk-portal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 0.7rem 1.2rem;
+    border-radius: var(--jk-radius-lg, 18px);
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 12px rgba(74, 64, 56, 0.06);
+}
+
+.jk-portal-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+        var(--jk-gradient-tricolor) border-box;
+}
+
+.jk-portal-logo-icon {
+    font-size: 1.7rem;
+    background: var(--jk-gradient-tricolor);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.jk-portal-negocio {
+    font-family: var(--jk-font-display, Nunito, sans-serif);
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--jk-text-primary, #41382f);
+}
+
+.jk-portal-main {
+    width: 100%;
+}
+
+.jk-portal-card {
+    position: relative;
+    background: var(--jk-surface, #ffffff);
+    border-radius: var(--jk-radius-xl, 22px);
+    box-shadow: 0 10px 30px rgba(95, 122, 93, 0.22);
+    padding: 2rem 1.8rem 1.8rem;
+    border-top: 5px solid var(--jk-gradient-tricolor);
+    border-top: 5px solid var(--jk-gradient-tricolor);
+}
+
+.jk-portal-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1.8rem;
+    right: 1.8rem;
+    height: 5px;
+    border-radius: 0 0 8px 8px;
+    background: var(--jk-gradient-tricolor);
+}
+
+.jk-portal-step-title {
+    font-family: var(--jk-font-display, Nunito, sans-serif);
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--jk-text-primary, #41382f);
+    margin-bottom: 0.4rem;
+    background: var(--jk-gradient-tricolor);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 0.35rem;
+}
+
+.jk-portal-step-sub {
+    font-size: 0.98rem;
+    color: var(--jk-text-secondary, #6b6a64);
+    margin-bottom: 1.4rem;
+}
+
+/* Cards de recurso (radio buttons) - alegres */
+.jk-portal-recurso-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.2rem;
+    border: 2px solid var(--jk-border-light, #e6e0d8);
+    border-radius: var(--jk-radius, 14px);
+    cursor: pointer;
+    margin-bottom: 0.7rem;
+    background: #fff;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.jk-portal-recurso-card:hover {
+    border-color: var(--jk-teal, #5FA8AD);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(74, 64, 56, 0.1);
+}
+
+.jk-portal-recurso-card:has(input:checked) {
+    border-color: var(--jk-coral, #E88A6F);
+    background: var(--jk-coral-light, #F9E7DF);
+}
+
+.jk-portal-recurso-card input[type="radio"] {
+    accent-color: var(--jk-coral, #E88A6F);
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.jk-portal-recurso-card strong {
+    font-family: var(--jk-font-display, Nunito, sans-serif);
+    color: var(--jk-text-primary, #41382f);
+    font-size: 1.05rem;
+}
+
+.jk-portal-recurso-card small {
+    color: var(--jk-text-secondary, #7B6F65);
+}
+
+/* Fecha y hora */
+.jk-portal-date {
+    margin-bottom: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.jk-portal-slot {
+    display: inline-block;
+    padding: 0.65rem 1.1rem;
+    margin: 0.3rem;
+    border-radius: var(--jk-radius-full, 9999px);
+    border: 2px solid var(--jk-teal, #5FA8AD);
+    background: var(--jk-teal-light, #DAF0EF);
+    color: var(--jk-text-primary, #41382f);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.jk-portal-slot:hover {
+    background: var(--jk-teal, #5FA8AD);
+    color: var(--jk-white, #fff);
+    transform: translateY(-1px);
+}
+
+/* Formulario de datos del cliente: espaciado y aire */
+.jk-portal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 1.5rem;
+}
+
+.jk-portal-field .jk-label {
+    font-weight: 700;
+    color: var(--jk-text-primary, #41382f);
+}
+
+.jk-portal-field .jk-input {
+    padding: 0.9rem 1rem;
+    border: 2px solid var(--jk-border, #E4D8C8);
+    border-radius: var(--jk-radius, 14px);
+    font-size: 1rem;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.jk-portal-field .jk-input:focus {
+    border-color: var(--jk-teal, #5FA8AD);
+    box-shadow: 0 0 0 4px var(--jk-teal-light, #DAF0EF);
+    outline: none;
+}
+
+.jk-portal-footer {
+    text-align: center;
+}
+
+.jk-portal-otra {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.jk-link {
+    color: var(--jk-accent, #5F7A5D);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.jk-link:hover {
+    text-decoration: underline;
+}

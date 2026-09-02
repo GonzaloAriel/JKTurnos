@@ -47,6 +47,67 @@
     transform: translateY(-1px);
 }
 
+.jk-search-card-btn {
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: var(--jk-text-base);
+    cursor: pointer;
+}
+
+/* Secciones con fondo pastel del DS (D-036: coral/butter/teal). */
+.jk-search-card--clientes {
+    background: var(--jk-coral-light);
+}
+
+.jk-search-card--clientes:hover {
+    border-color: var(--jk-coral);
+}
+
+.jk-search-card--servicios {
+    background: var(--jk-butter-light);
+}
+
+.jk-search-card--servicios:hover {
+    border-color: var(--jk-warning);
+}
+
+.jk-search-card--recursos {
+    background: var(--jk-accent-light);
+}
+
+.jk-search-card--recursos:hover {
+    border-color: var(--jk-accent);
+}
+
+.jk-search-card--turnos {
+    background: var(--jk-teal-light);
+}
+
+.jk-search-card--turnos:hover {
+    border-color: var(--jk-teal);
+}
+
+.jk-search-card--clientes .jk-search-card-icon {
+    background: var(--jk-white);
+    color: var(--jk-coral);
+}
+
+.jk-search-card--servicios .jk-search-card-icon {
+    background: var(--jk-white);
+    color: var(--jk-warning);
+}
+
+.jk-search-card--recursos .jk-search-card-icon {
+    background: var(--jk-white);
+    color: var(--jk-accent);
+}
+
+.jk-search-card--turnos .jk-search-card-icon {
+    background: var(--jk-white);
+    color: var(--jk-teal);
+}
+
 .jk-search-card-icon {
     flex-shrink: 0;
     width: 40px;

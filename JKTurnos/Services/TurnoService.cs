@@ -241,6 +241,56 @@ namespace JKTurnos.Services
                 cambios);
         }
 
+        // M-07: mover un turno (drag & drop del timeblock de la agenda o "Mover
+        // turno" desde el drawer). Recibe el destino calculado por la UI;
+        // recalcula el fin con la duracion del servicio y valida disponibilidad
+        // excluyendo el propio turno. Solo se mueven turnos operativos
+        // (Pendiente/En curso); Finalizado y Cancelado son terminales (D-040).
+        // No se admite mover al pasado (misma regla que Crear).
+        public void Mover(int turnoId, int recursoId, DateTime nuevaFechaHoraInicio)
+        {
+            var turno = GetById(turnoId);
+
+            if (turno == null)
+                throw new ArgumentException("Turno no encontrado.");
+
+            var estadoCodigo = turno.EstadoTurno != null ? turno.EstadoTurno.Codigo : null;
+            if (estadoCodigo != EstadosTurnoBase.Pendiente && estadoCodigo != EstadosTurnoBase.EnCurso)
+                throw new InvalidOperationException(
+                    "Solo se pueden mover los turnos Pendientes o En curso.");
+
+            if (turno.RecursoId == recursoId && turno.FechaHoraInicio == nuevaFechaHoraInicio)
+                return;
+
+            if (nuevaFechaHoraInicio < DateTime.Now)
+                throw new InvalidOperationException(
+                    "La fecha y hora del turno no puede ser anterior a la fecha y hora actual.");
+
+            var nuevoFin = CalcularFin(nuevaFechaHoraInicio, turno.ServicioId);
+
+            if (!ValidarDisponibilidad(recursoId, nuevaFechaHoraInicio, nuevoFin, turno.Id))
+                throw new InvalidOperationException(
+                    "El recurso no esta disponible en el horario seleccionado.");
+
+            var desde = turno.FechaHoraInicio;
+
+            turno.RecursoId = recursoId;
+            turno.FechaHoraInicio = nuevaFechaHoraInicio;
+            turno.FechaHoraFin = nuevoFin;
+
+            ValidarReferenciasTenant(turno);
+
+            _repo.Update(turno);
+
+            new AuditService().Registrar(
+                AuditService.A_Editar,
+                AuditService.E_Turno,
+                "Movio el turno de " + NombreCliente(turno.ClienteId) +
+                " de " + desde.ToString("dd/MM/yyyy HH:mm") +
+                " a " + nuevaFechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
+                turno.Id);
+        }
+
         public void CambiarEstado(int turnoId, int estadoTurnoId)
         {
             _turnoEstadoMotor.CambiarEstado(turnoId, estadoTurnoId);

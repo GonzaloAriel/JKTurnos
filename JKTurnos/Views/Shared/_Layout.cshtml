@@ -51,9 +51,24 @@
 
     @Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-global" } })
 
+    <div class="jk-drawer-backdrop" id="drawer-turno-global-backdrop"></div>
+    <div class="jk-drawer" id="drawer-turno-global" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-global-title"
+         data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
+         data-registrar-pago-url="@Url.Action("RegistrarPago", "Turnos")"
+         data-toast-id="jk-toast-global">
+        <div class="jk-drawer-header">
+            <h3 class="jk-drawer-title" id="drawer-turno-global-title">Detalle del turno</h3>
+            <button type="button" class="jk-drawer-close" id="drawer-turno-global-close" aria-label="Cerrar">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="jk-drawer-body" id="drawer-turno-global-body"></div>
+    </div>
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     <script src="~/Scripts/jk-layout.js"></script>
+    <script src="~/Scripts/jk-turnos-drawer.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

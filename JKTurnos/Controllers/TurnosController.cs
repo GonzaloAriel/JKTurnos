@@ -83,6 +83,12 @@ namespace JKTurnos.Controllers
                 ServicioPrecio = precios,
                 RecursoNombre = turno.Recurso != null ? turno.Recurso.Nombre : "Sin recurso",
                 RecursoColor = turno.Recurso != null ? turno.Recurso.Color : null,
+                RecursoId = turno.RecursoId,
+                Recursos = _recursoService.GetAll().Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.Nombre
+                }),
                 EstadoTurnoId = turno.EstadoTurnoId,
                 EstadoNombre = turno.EstadoTurno != null ? turno.EstadoTurno.Nombre : "Sin estado",
                 EstadoColor = turno.EstadoTurno != null ? turno.EstadoTurno.Color : null,
@@ -222,12 +228,68 @@ namespace JKTurnos.Controllers
             }
         }
 
+        // M-07: mover un turno a otro horario y/o recurso, desde el drag & drop
+        // del timeblock de la agenda o el formulario "Mover turno" del drawer.
+        // POST ajax, patron QuickCreate (D-013). La validacion de negocio vive
+        // en TurnoService.Mover (estados operativos, no pasado, disponibilidad).
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Mover(int turnoId, int recursoId, DateTime fechaHoraInicio)
+        {
+            try
+            {
+                _turnoService.Mover(turnoId, recursoId, fechaHoraInicio);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         public ActionResult Agenda(DateTime? fecha = null, string vista = null, int? openRecursoId = null, int? openTurnoId = null)
         {
             var hoy = DateTime.Today;
             var fechaSeleccionada = (fecha ?? hoy).Date;
             var vistaNormalizada = vista == "semana" ? "semana" : "dia";
 
+            var model = BuildAgendaModel(fechaSeleccionada, vistaNormalizada, openRecursoId);
+
+            ViewBag.Vista = vistaNormalizada;
+            ViewBag.FechaNavegacion = fechaSeleccionada;
+            ViewBag.OpenTurnoId = openTurnoId;
+
+            // Modelo de dropdowns para el drawer de Quick Create (D-017).
+            var quickModel = new TurnoViewModel();
+            PopulateDropdowns(quickModel);
+            ViewBag.TurnoQuickModel = quickModel;
+
+            return View(model);
+        }
+
+        // GET: Turnos/AgendaGrid (M-07, refresco suave sin F5).
+        // Devuelve SOLO el partial de la grilla (evita el parpadeo y el salto al
+        // inicio de pantalla del window.location.reload). El JS reemplaza el
+        // subtree de la grilla conservando el contenedor (scroll + albedo de
+        // clave). Son los mismos modelos que Agenda; los partials de grilla
+        // dependen solo de Model, no de ViewBag.
+        public ActionResult GetAgendaGrid(DateTime? fecha = null, string vista = null)
+        {
+            var hoy = DateTime.Today;
+            var fechaSeleccionada = (fecha ?? hoy).Date;
+            var vistaNormalizada = vista == "semana" ? "semana" : "dia";
+
+            var model = BuildAgendaModel(fechaSeleccionada, vistaNormalizada, null);
+
+            var partial = vistaNormalizada == "semana"
+                ? "~/Views/Shared/Components/_AgendaGridSemanal.cshtml"
+                : "~/Views/Shared/Components/_AgendaGrid.cshtml";
+
+            return PartialView(partial, model);
+        }
+
+        private AgendaViewModel BuildAgendaModel(DateTime fechaSeleccionada, string vistaNormalizada, int? openRecursoId)
+        {
             var dayNames = new[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
             var monthNames = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
 
@@ -275,16 +337,7 @@ namespace JKTurnos.Controllers
                 ViewBag.CurrentDateDisplay = dayNames[(int)fechaSeleccionada.DayOfWeek] + " " + fechaSeleccionada.Day + " " + monthNames[fechaSeleccionada.Month - 1] + ", " + fechaSeleccionada.Year;
             }
 
-            ViewBag.Vista = vistaNormalizada;
-            ViewBag.FechaNavegacion = fechaSeleccionada;
-            ViewBag.OpenTurnoId = openTurnoId;
-
-            // Modelo de dropdowns para el drawer de Quick Create (D-017).
-            var quickModel = new TurnoViewModel();
-            PopulateDropdowns(quickModel);
-            ViewBag.TurnoQuickModel = quickModel;
-
-            return View(model);
+            return model;
         }
 
         // GET: Turnos

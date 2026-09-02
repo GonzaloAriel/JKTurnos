@@ -177,6 +177,7 @@
     <Compile Include="Controllers\NotificacionesController.cs" />
     <Compile Include="Controllers\AyudaController.cs" />
     <Compile Include="Controllers\AuditoriaController.cs" />
+    <Compile Include="Controllers\PortalController.cs" />
     <Compile Include="Controllers\BusquedaController.cs" />
     <Compile Include="Data\BaseRepository.cs" />
     <Compile Include="Data\GlobalRepository.cs" />
@@ -243,6 +244,10 @@
     <Compile Include="Migrations\202608281509241_AddCatalogoEstados.Designer.cs">
       <DependentUpon>202608281509241_AddCatalogoEstados.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202609011421381_AddPortalPublico.cs" />
+    <Compile Include="Migrations\202609011421381_AddPortalPublico.Designer.cs">
+      <DependentUpon>202609011421381_AddPortalPublico.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
@@ -286,6 +291,7 @@
     <Compile Include="Models\ViewModels\AvatarPlataformaViewModel.cs" />
     <Compile Include="Models\ViewModels\BusquedaViewModel.cs" />
     <Compile Include="Models\ViewModels\PagoSuscripcionItemViewModel.cs" />
+    <Compile Include="Models\ViewModels\PortalViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\AuditService.cs" />
@@ -295,6 +301,7 @@
     <Compile Include="Services\PagoService.cs" />
     <Compile Include="Services\AvatarPlataformaService.cs" />
     <Compile Include="Services\PagoSuscripcionService.cs" />
+    <Compile Include="Services\PortalReservaService.cs" />
     <Compile Include="Services\RecursoService.cs" />
     <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
@@ -554,6 +561,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202608281509241_AddCatalogoEstados.resx">
       <DependentUpon>202608281509241_AddCatalogoEstados.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202609011421381_AddPortalPublico.resx">
+      <DependentUpon>202609011421381_AddPortalPublico.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

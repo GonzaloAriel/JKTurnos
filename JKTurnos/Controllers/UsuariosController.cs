@@ -161,6 +161,13 @@ namespace JKTurnos.Controllers
             if (user == null)
                 return HttpNotFound();
 
+            // Un Admin Global no puede ser eliminado (ni siquiera por otro Admin Global).
+            if (user.Role == Roles.AdminGlobal)
+            {
+                TempData["Error"] = "El rol AdminGlobal no puede eliminarse para preservar la plataforma.";
+                return RedirectToAction("Index");
+            }
+
             return View(user);
         }
 
@@ -169,19 +176,26 @@ namespace JKTurnos.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+            var user = _service.GetById(id);
+            if (user != null && user.Role == Roles.AdminGlobal)
+            {
+                ModelState.AddModelError("", "El rol AdminGlobal no puede eliminarse para preservar la plataforma.");
+                return View("Delete", user);
+            }
+
             try
             {
                 _service.Delete(id);
             }
             catch (Exception ex)
             {
-                var user = _service.GetById(id);
+                var existingUser = _service.GetById(id);
 
-                if (user == null)
+                if (existingUser == null)
                     return RedirectToAction("Index");
 
                 ModelState.AddModelError("", ex.Message);
-                return View("Delete", user);
+                return View("Delete", existingUser);
             }
 
             return RedirectToAction("Index");

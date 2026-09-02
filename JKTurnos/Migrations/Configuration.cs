@@ -84,6 +84,7 @@ namespace JKTurnos.Migrations
                     EmailAsunto = NotificacionService.DefaultEmailAsunto,
                     EmailTemplate = NotificacionService.DefaultEmailTemplate,
                     SmtpHabilitado = false,
+                    PortalHabilitado = true, // demo listo para testear el portal publico
                     IsActive = true,
                     CreatedAt = DateTime.Now
                 });

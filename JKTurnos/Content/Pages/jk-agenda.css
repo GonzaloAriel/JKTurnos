@@ -853,3 +853,36 @@
 .jk-pago-form .jk-form-group {
     margin-bottom: var(--jk-space-12);
 }
+
+/* ===== M-07 DRAG & DROP ===== */
+
+.jk-agenda-time-block[data-movible="true"],
+.jk-agenda-week-block[data-movible="true"] {
+    cursor: grab;
+}
+
+.jk-agenda-time-block[data-movible="true"]:active,
+.jk-agenda-week-block[data-movible="true"]:active {
+    cursor: grabbing;
+}
+
+.jk-agenda-time-block.is-dragging,
+.jk-agenda-week-block.is-dragging {
+    opacity: 0.4;
+    --jk-block-bg: color-mix(in srgb, var(--jk-block-color) 45%, var(--jk-surface));
+}
+
+.jk-drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: var(--jk-shadow);
+    --jk-block-bg: color-mix(in srgb, var(--jk-block-color) 45%, var(--jk-surface));
+}
+
+.jk-agenda-cell.is-drop-target,
+.jk-agenda-week-day-body.is-drop-target {
+    background: var(--jk-accent-light);
+    outline: 2px dashed var(--jk-accent);
+    outline-offset: -2px;
+}

@@ -13,6 +13,14 @@
     var detailUrl = agenda.getAttribute('data-turno-detail-url');
 
     /*
+     * M-07: tras un drag real de un time block, los navegadores sintetizan un
+     * click sobre el destino del drop. Este flag (seteado en dragend y limpiado
+     * por el primer click o por timeout) suprime ese click para que el drop
+     * no abra el drawer de detalle ni el Quick Create de la celda.
+     */
+    var dragJustEnded = false;
+
+    /*
      * Turno Detail Drawer (V1)
      * Click / Enter / Space on a Time Block loads _TurnoDetailDrawer into the
      * drawer container via fetch and opens it. V2/V3 (state actions, economics)
@@ -139,7 +147,8 @@
                 btn.disabled = false;
                 if (data.success) {
                     showToast('Estado actualizado', 'success');
-                    window.location.reload();
+                    closeTurnoDetail();
+                    refreshAgendaGrid();
                 } else {
                     showToast(data.message || 'No se pudo realizar la accion', 'error');
                 }
@@ -150,7 +159,51 @@
             });
         }
 
+        /*
+         * M-07: "Mover turno" desde el drawer. Envia el formulario inline
+         * (turnoId + recursoId + fechaHoraInicio = fecha 'T' hora) via fetch
+         * POST (anti-forgery, patron QuickCreate D-013). Al exito recarga la
+         * agenda de la misma fecha/vista; si falla muestra el error inline.
+         */
+        function submitMoverForm(form) {
+            var errEl = form.querySelector('.jk-mover-error');
+            if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+
+            var fechaEl = form.querySelector('input[name="moverFecha"]');
+            var horaEl = form.querySelector('input[name="moverHora"]');
+            var fechaHoraEl = form.querySelector('input[name="fechaHoraInicio"]');
+            if (fechaHoraEl && fechaEl) {
+                fechaHoraEl.value = fechaEl.value + 'T' + ((horaEl && horaEl.value) ? horaEl.value : '00:00');
+            }
+
+            var url = form.getAttribute('data-mover-url') || moverUrl;
+            if (!url) return;
+
+            var submitBtn = form.querySelector('[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            fetch(url, { method: 'POST', body: new FormData(form) })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (data && data.success) {
+                        showToast('Turno movido correctamente', 'success');
+                        form.hidden = true;
+                        refreshAgendaGrid();
+                    } else {
+                        var msg = (data && data.message) ? data.message : 'No se pudo mover el turno';
+                        if (errEl) { errEl.textContent = msg; errEl.hidden = false; }
+                    }
+                })
+                .catch(function () {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (errEl) { errEl.textContent = 'No se pudo mover el turno'; errEl.hidden = false; }
+                });
+        }
+
         agenda.addEventListener('click', function (e) {
+            if (dragJustEnded) { dragJustEnded = false; return; }
+
             var pagoBtn = e.target.closest('.jk-agenda-time-block-pago');
             if (pagoBtn) {
                 e.preventDefault();
@@ -268,6 +321,28 @@
                 return;
             }
 
+            var moverToggle = e.target.closest('[data-mover-toggle]');
+            if (moverToggle) {
+                e.preventDefault();
+                var moverForm = drawer.querySelector('.jk-mover-form');
+                if (moverForm) {
+                    moverForm.hidden = !moverForm.hidden;
+                    if (!moverForm.hidden) {
+                        var moverErr = moverForm.querySelector('.jk-mover-error');
+                        if (moverErr) { moverErr.hidden = true; moverErr.textContent = ''; }
+                    }
+                }
+                return;
+            }
+
+            var moverCancel = e.target.closest('[data-mover-cancel]');
+            if (moverCancel) {
+                e.preventDefault();
+                var mcForm = moverCancel.closest('.jk-mover-form');
+                if (mcForm) mcForm.hidden = true;
+                return;
+            }
+
             var accionBtn = e.target.closest('[data-pago-accion]');
             if (accionBtn) {
                 e.preventDefault();
@@ -285,6 +360,13 @@
         });
 
         drawer.addEventListener('submit', function (e) {
+            var moverForm = e.target.closest('.jk-mover-form');
+            if (moverForm) {
+                e.preventDefault();
+                submitMoverForm(moverForm);
+                return;
+            }
+
             var form = e.target.closest('.jk-pago-form');
             if (!form) return;
 
@@ -373,6 +455,7 @@
     var agendaFecha = agenda.getAttribute('data-agenda-fecha');
     var agendaVista = agenda.getAttribute('data-agenda-vista');
     var agendaBaseUrl = agenda.getAttribute('data-agenda-base-url');
+    var agendaContentUrl = agenda.getAttribute('data-agenda-content-url');
     var quickCreateUrl = agenda.getAttribute('data-quick-create-url');
     var recursosUrl = agenda.getAttribute('data-recursos-url');
     var recursosTodosUrl = agenda.getAttribute('data-recursos-todos-url');
@@ -470,6 +553,8 @@
         }
 
         agenda.addEventListener('click', function (e) {
+            if (dragJustEnded) { dragJustEnded = false; return; }
+
             var weekBlock = e.target.closest('.jk-agenda-week-block');
             if (weekBlock) return;
 
@@ -625,6 +710,281 @@
                 })
                 .then(function () { submitBtn.disabled = false; });
         });
+    }
+
+    /*
+     * M-07 DRAG & DROP gerenciado (mousedown/mousemove/mouseup): mover el time
+     * block arrastrandolo en la grilla del dia (celdas de 30 min) o en el cuerpo
+     * del dia semanal (posicion libre, snap a 5 min). No depende del drag & drop
+     * nativo de HTML5: el umbral de 6px distingue click (abre el drawer) de drag,
+     * un ghost sigue el puntero y el hit-test busca la celda/dia bajo el cursor.
+     * POST ajax a Turnos/Mover (patron QuickCreate D-013); al exito recarga la
+     * agenda de la misma fecha/vista (valida disponibilidad server). Solo los
+     * time blocks movibles (Pendiente/En curso) traen data-movible=true.
+     */
+    var moverUrl = agenda.getAttribute('data-mover-url');
+    if (moverUrl) {
+        var moverTokenEl = document.querySelector('#form-turno-quick input[name="__RequestVerificationToken"]');
+        var moverToken = moverTokenEl ? moverTokenEl.value : '';
+
+        var dragState = {
+            active: false,
+            turnoId: null,
+            source: null,
+            ghost: null,
+            target: null,
+            startX: 0,
+            startY: 0
+        };
+        var pressOverBlock = false;
+        var pointerX = 0;
+        var pointerY = 0;
+
+        function mover(turnoId, recursoId, fechaHora) {
+            return fetch(moverUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: '__RequestVerificationToken=' + encodeURIComponent(moverToken) +
+                      '&turnoId=' + encodeURIComponent(turnoId) +
+                      '&recursoId=' + encodeURIComponent(recursoId) +
+                      '&fechaHoraInicio=' + encodeURIComponent(fechaHora)
+            }).then(function (res) { return res.json(); });
+        }
+
+        function clearDropTargets() {
+            document.querySelectorAll('.is-drop-target').forEach(function (el) {
+                el.classList.remove('is-drop-target');
+            });
+        }
+
+        function findDropTarget(x, y) {
+            var best = null;
+            var bestArea = 0;
+
+            agenda.querySelectorAll('.jk-agenda-cell').forEach(function (cell) {
+                var rect = cell.getBoundingClientRect();
+                if (x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom) {
+                    var area = rect.width * rect.height;
+                    if (!best || area < bestArea) { best = cell; bestArea = area; }
+                }
+            });
+
+            if (!best) {
+                agenda.querySelectorAll('.jk-agenda-week-day-body').forEach(function (wb) {
+                    var rect = wb.getBoundingClientRect();
+                    if (x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom) {
+                        var area = rect.width * rect.height;
+                        if (!best || area < bestArea) { best = wb; bestArea = area; }
+                    }
+                });
+            }
+
+            return best;
+        }
+
+        function computeDrop(turnoId, source, target) {
+            var cell = target.closest('.jk-agenda-cell');
+            if (cell) {
+                return {
+                    recursoId: cell.getAttribute('data-recurso-id'),
+                    fechaHora: agendaFecha + 'T' + cell.getAttribute('data-hour')
+                };
+            }
+
+            var weekBody = target.closest('.jk-agenda-week-day-body');
+            if (weekBody) {
+                var recursoId = source ? source.getAttribute('data-recurso-id') : '';
+                var fecha = weekBody.getAttribute('data-agenda-fecha');
+                var start = weekBody.getAttribute('data-agenda-time-start');
+                if (start) {
+                    var sp = start.split(':');
+                    var startMin = parseInt(sp[0], 10) * 60 + parseInt(sp[1], 10);
+                    var pxPerMin = parseFloat(weekBody.getAttribute('data-agenda-px-per-min') || '0.8');
+                    var rect = weekBody.getBoundingClientRect();
+                    var relMin = (pointerY - rect.top) / pxPerMin;
+                    var mins = Math.round((startMin + relMin) / 5) * 5;
+                    var maxMin = startMin + parseInt(weekBody.getAttribute('data-agenda-span-min') || '690', 10) - 5;
+                    mins = Math.min(Math.max(mins, startMin), maxMin);
+                    var hh = Math.floor(mins / 60);
+                    var mm = mins % 60;
+                    return { recursoId: recursoId, fechaHora: fecha + 'T' + ('0' + hh).slice(-2) + ':' + ('0' + mm).slice(-2) };
+                }
+            }
+
+            return null;
+        }
+
+        function activateDrag(source) {
+            dragState.active = true;
+            document.body.classList.add('jk-dragging');
+            source.classList.add('is-dragging');
+
+            var rect = source.getBoundingClientRect();
+            var ghost = source.cloneNode(true);
+            ghost.classList.add('jk-drag-ghost');
+            ghost.removeAttribute('tabindex');
+            ghost.setAttribute('role', 'presentation');
+            ghost.querySelectorAll('button, .jk-agenda-time-block-pago, [data-mover-toggle], [data-pago-accion]')
+                .forEach(function (b) {
+                    b.disabled = true;
+                    b.removeAttribute('tabindex');
+                });
+            ghost.style.position = 'fixed';
+            ghost.style.left = rect.left + 'px';
+            ghost.style.top = rect.top + 'px';
+            ghost.style.width = rect.width + 'px';
+            ghost.style.height = rect.height + 'px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '9999';
+            document.body.appendChild(ghost);
+            dragState.ghost = ghost;
+        }
+
+        function endDrag() {
+            if (dragState.ghost) { dragState.ghost.remove(); }
+            document.body.classList.remove('jk-dragging');
+            if (dragState.source) { dragState.source.classList.remove('is-dragging'); }
+            clearDropTargets();
+            dragState.active = false;
+            dragState.turnoId = null;
+            dragState.source = null;
+            dragState.ghost = null;
+            dragState.target = null;
+            pressOverBlock = false;
+            dragJustEnded = true;
+            setTimeout(function () { dragJustEnded = false; }, 300);
+        }
+
+        document.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            if (e.target.closest('.jk-agenda-time-block-pago, [data-mover-toggle], [data-pago-accion]')) return;
+
+            var block = e.target.closest('.jk-agenda-time-block, .jk-agenda-week-block');
+            if (!block || block.getAttribute('data-movible') !== 'true') return;
+
+            pressOverBlock = true;
+            dragState.turnoId = block.getAttribute('data-turno-id');
+            dragState.source = block;
+            dragState.startX = e.clientX;
+            dragState.startY = e.clientY;
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (!pressOverBlock && !dragState.active) return;
+
+            pointerX = e.clientX;
+            pointerY = e.clientY;
+
+            if (!dragState.active) {
+                var dx = e.clientX - dragState.startX;
+                var dy = e.clientY - dragState.startY;
+                if (Math.abs(dx) <= 6 && Math.abs(dy) <= 6) return;
+                activateDrag(dragState.source);
+            }
+
+            if (dragState.active) {
+                if (dragState.ghost) {
+                    dragState.ghost.style.left = e.clientX + 'px';
+                    dragState.ghost.style.top = e.clientY + 'px';
+                }
+
+                var target = findDropTarget(e.clientX, e.clientY);
+                if (target !== dragState.target) {
+                    clearDropTargets();
+                    dragState.target = target;
+                    if (target) target.classList.add('is-drop-target');
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', function (e) {
+            if (!pressOverBlock && !dragState.active) return;
+
+            if (dragState.active) {
+                e.preventDefault();
+                var turnoId = dragState.turnoId;
+                var source = dragState.source;
+                var target = dragState.target;
+                endDrag();
+
+                var drop = target ? computeDrop(turnoId, source, target) : null;
+
+                if (!drop) {
+                    qcToast('Suelta el turno sobre una celda libre o un dia', 'error');
+                    return;
+                }
+
+                mover(turnoId, drop.recursoId, drop.fechaHora)
+                    .then(function (data) {
+                        if (data && data.success) {
+                            qcToast('Turno movido correctamente', 'success');
+                            refreshAgendaGrid();
+                        } else {
+                            qcToast((data && data.message) ? data.message : 'No se pudo mover el turno', 'error');
+                        }
+                    })
+                    .catch(function () {
+                        qcToast('Error de conexion al mover el turno', 'error');
+                    });
+            } else {
+                pressOverBlock = false;
+            }
+        });
+
+        document.addEventListener('mouseleave', function (e) {
+            if (e.target !== document.body) return;
+            if (dragState.active) endDrag();
+        });
+    }
+
+    /*
+     * M-07: refresco suave del grid (sin F5). Re-render server-side vía
+     * Turnos/GetAgendaGrid del partial de la grilla y reemplaza SOLO el inner
+     * del wrapper (.jk-agenda-grid-wrap / .jk-agenda-week), conservando el
+     * nodo contenedor: se mantienen el scroll del wrapper y los listeners de
+     * teclado (delegados en el wrapper persistente) y el drag/click de
+     * document/agenda. Evita el parpadeo y el salto al inicio de pantalla del
+     * window.location.reload tras mover un turno.
+     */
+    function refreshAgendaGrid() {
+        if (!agendaContentUrl) return;
+        var container = document.getElementById('jk-agenda-grid-container');
+        if (!container) return;
+
+        var url = agendaContentUrl
+            + '?fecha=' + encodeURIComponent(agendaFecha || '')
+            + '&vista=' + encodeURIComponent(agendaVista || 'dia');
+
+        fetch(url)
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.text();
+            })
+            .then(function (html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var newWrap = doc.querySelector('.jk-agenda-grid-wrap') || doc.querySelector('.jk-agenda-week');
+                var target = container.querySelector('.jk-agenda-grid-wrap') || container.querySelector('.jk-agenda-week');
+
+                if (newWrap && target) {
+                    var sl = target.scrollLeft;
+                    var st = target.scrollTop;
+                    target.innerHTML = newWrap.innerHTML;
+                    target.scrollLeft = sl;
+                    target.scrollTop = st;
+
+                    var gw = target.querySelector('.jk-agenda-grid');
+                    if (gw) {
+                        gw.querySelectorAll('.jk-agenda-cell').forEach(function (cell) {
+                            cell.setAttribute('tabindex', '-1');
+                        });
+                    }
+                }
+
+                if (typeof applyDesktopResourceFilter === 'function') {
+                    applyDesktopResourceFilter();
+                }
+            })
+            .catch(function () { });
     }
 
     function applyDesktopResourceFilter() {

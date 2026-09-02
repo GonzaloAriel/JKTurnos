@@ -49,6 +49,8 @@
     }
 
     int bodyHeight = Math.Max(1, (int)((semanaFin - semanaInicio).TotalHours * pxPorHora));
+    int spanMinutos = (int)(semanaFin - semanaInicio).TotalMinutes;
+    string pxPorMinutoTexto = pxPorMinuto.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
 
     var turnosPorDia = new Dictionary<int, List<Turno>>();
     for (int i = 0; i < 7; i++)
@@ -111,7 +113,7 @@
                 <span class="jk-agenda-week-day-number">@dia.Day</span>
             </a>
 
-            <div class="jk-agenda-week-day-body" style="height: @(bodyHeight)px;" data-agenda-fecha="@fechaStr">
+            <div class="jk-agenda-week-day-body" style="height: @(bodyHeight)px;" data-agenda-fecha="@fechaStr" data-agenda-time-start="@semanaInicio.ToString("HH:mm")" data-agenda-px-per-min="@pxPorMinutoTexto" data-agenda-span-min="@spanMinutos">
                 @if (n == 0)
                 {
                     <span class="jk-agenda-week-day-empty">Sin turnos</span>
@@ -135,6 +137,8 @@
                         var recursoColor = colorRecurso.ContainsKey(t.RecursoId) ? colorRecurso[t.RecursoId] : "#7295B5";
                         var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
                         var estadoIcono = t.EstadoTurno != null ? t.EstadoTurno.Icono : "bi-circle-fill";
+                        var estadoCodigo = t.EstadoTurno != null ? t.EstadoTurno.Codigo : null;
+                        var movible = estadoCodigo == EstadosTurnoBase.Pendiente || estadoCodigo == EstadosTurnoBase.EnCurso;
                         var situacionClave = SituacionTemporal.Calcular(t);
                         var situacionAlarma = situacionClave != null && SituacionTemporal.EsAlarma(situacionClave) ? SituacionTemporal.De(situacionClave) : null;
 
@@ -143,6 +147,8 @@
                              tabindex="0"
                              data-turno-id="@t.Id"
                              data-recurso-id="@t.RecursoId"
+                             data-estado-codigo="@estadoCodigo"
+                             data-movible="@(movible ? "true" : "false")"
                              style="top: @topPx.ToString("0.##")px; height: @heightPx.ToString("0.##")px; left: @leftPct.ToString("0.##")%; width: @widthPct.ToString("0.##")%; --jk-block-color: @recursoColor;"
                              aria-label="Turno de @clienteNombre, @servicioNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                             <div class="jk-agenda-week-block-band">

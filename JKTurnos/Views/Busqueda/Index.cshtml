@@ -43,7 +43,7 @@ else if (!hasResults)
             <div class="jk-search-grid">
                 @foreach (var c in Model.Clientes)
                 {
-                    <a href="@Url.Action("Details", "Clientes", new { id = c.Id })" class="jk-search-card">
+                    <a href="@Url.Action("Details", "Clientes", new { id = c.Id })" class="jk-search-card jk-search-card--clientes">
                         <div class="jk-search-card-icon">
                             <i class="bi bi-person"></i>
                         </div>
@@ -69,7 +69,7 @@ else if (!hasResults)
             <div class="jk-search-grid">
                 @foreach (var s in Model.Servicios)
                 {
-                    <a href="@Url.Action("Edit", "Servicios", new { id = s.Id })" class="jk-search-card">
+                    <a href="@Url.Action("Edit", "Servicios", new { id = s.Id })" class="jk-search-card jk-search-card--servicios">
                         <div class="jk-search-card-icon">
                             <i class="bi bi-scissors"></i>
                         </div>
@@ -95,7 +95,7 @@ else if (!hasResults)
             <div class="jk-search-grid">
                 @foreach (var r in Model.Recursos)
                 {
-                    <a href="@Url.Action("Edit", "Recursos", new { id = r.Id })" class="jk-search-card">
+                    <a href="@Url.Action("Edit", "Recursos", new { id = r.Id })" class="jk-search-card jk-search-card--recursos">
                         <div class="jk-search-card-icon">
                             <i class="bi bi-person-gear"></i>
                         </div>
@@ -121,7 +121,7 @@ else if (!hasResults)
             <div class="jk-search-grid">
                 @foreach (var t in Model.Turnos)
                 {
-                    <a href="@Url.Action("Agenda", "Turnos", new { openTurnoId = t.Id })" class="jk-search-card">
+                    <button type="button" class="jk-search-card jk-search-card-btn jk-search-card--turnos" data-ver-turno="@t.Id">
                         <div class="jk-search-card-icon">
                             <i class="bi bi-calendar-check"></i>
                         </div>
@@ -132,12 +132,26 @@ else if (!hasResults)
                                 <div class="jk-search-card-sub">@t.Sub</div>
                             }
                         </div>
-                    </a>
+                    </button>
                 }
             </div>
         </div>
     }
 }
+
+<div class="jk-drawer-backdrop" id="drawer-turno-local-backdrop"></div>
+<div class="jk-drawer" id="drawer-turno-local" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-local-title"
+     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
+     data-registrar-pago-url="@Url.Action("RegistrarPago", "Turnos")"
+     data-toast-id="jk-toast-global">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-turno-local-title">Detalle del turno</h3>
+        <button type="button" class="jk-drawer-close" id="drawer-turno-local-close" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body" id="drawer-turno-local-body"></div>
+</div>
 
 @section PageStyles {
     <link href="~/Content/Pages/jk-busqueda.css" rel="stylesheet" />

@@ -35,8 +35,19 @@ namespace JKTurnos.Services
         /// <summary>
         /// Genera el link `wa.me` con el mensaje prellenado para el cliente del turno.
         /// Devuelve null si el cliente no tiene telefono (no se puede notificar).
+        /// Usa la configuracion del tenant autenticado (claim TenantId).
         /// </summary>
         public string GenerarLinkWhatsApp(Turno turno)
+        {
+            return GenerarLinkWhatsApp(turno, null);
+        }
+
+        /// <summary>
+        /// Overload para flujos ANONIMOS (portal publico M-08): la config se pasa
+        /// explícita (ya resuelta por tenantId sin claim). Si `config` es null, cae
+        /// en la config del tenant autenticado (comportamiento original).
+        /// </summary>
+        public string GenerarLinkWhatsApp(Turno turno, ConfiguracionTenant config)
         {
             if (turno == null || turno.Cliente == null)
                 return null;
@@ -45,13 +56,19 @@ namespace JKTurnos.Services
             if (string.IsNullOrEmpty(telefono))
                 return null;
 
-            var mensaje = GenerarMensaje(turno);
+            var mensaje = GenerarMensaje(turno, config);
             return "https://wa.me/" + telefono + "?text=" + Uri.EscapeDataString(mensaje);
         }
 
         public string GenerarMensaje(Turno turno)
         {
-            var config = _configService.GetConfiguracion();
+            return GenerarMensaje(turno, null);
+        }
+
+        private string GenerarMensaje(Turno turno, ConfiguracionTenant config)
+        {
+            if (config == null)
+                config = _configService.GetConfiguracion();
 
             // Si el turno es del mismo dia, se usa la plantilla de confirmacion
             // del dia (WhatsAppTemplateDia); si esta vacia, cae en la general.

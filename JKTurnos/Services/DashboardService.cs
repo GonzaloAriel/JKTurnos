@@ -127,7 +127,7 @@ namespace JKTurnos.Services
 
                     return new PagosPorTipoItem
                     {
-                        Tipo = tipo == TipoPago.Senia ? "Senia" : (tipo == TipoPago.PagoParcial ? "Pago parcial" : "Pago total"),
+                        Tipo = tipo == TipoPago.Senia ? "Seña" : (tipo == TipoPago.PagoParcial ? "Pago parcial" : "Pago total"),
                         Cantidad = items.Count,
                         Total = items.Sum(p => p.Monto)
                     };

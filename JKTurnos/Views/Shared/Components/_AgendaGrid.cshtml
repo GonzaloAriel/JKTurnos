@@ -154,6 +154,8 @@ else
                 var recursoColor = recurso.Color ?? "#7295B5";
                 var estadoNombre = t.EstadoTurno != null ? t.EstadoTurno.Nombre : "";
                 var estadoIcono = t.EstadoTurno != null ? t.EstadoTurno.Icono : "bi-circle-fill";
+                var estadoCodigo = t.EstadoTurno != null ? t.EstadoTurno.Codigo : null;
+                var movible = estadoCodigo == EstadosTurnoBase.Pendiente || estadoCodigo == EstadosTurnoBase.EnCurso;
                 var situacionClave = SituacionTemporal.Calcular(t);
                 var situacionAlarma = situacionClave != null && SituacionTemporal.EsAlarma(situacionClave) ? SituacionTemporal.De(situacionClave) : null;
 
@@ -162,6 +164,8 @@ else
                      tabindex="0"
                      data-turno-id="@t.Id"
                      data-recurso-id="@t.RecursoId"
+                     data-estado-codigo="@estadoCodigo"
+                     data-movible="@(movible ? "true" : "false")"
                      style="grid-column: @gridColumn; grid-row: @gridRowStart / @gridRowEnd; --jk-block-color: @recursoColor;"
                      aria-label="Turno de @clienteNombre, @servicioNombre, @estadoNombre, @t.FechaHoraInicio.ToString("HH:mm")">
                     <div class="jk-agenda-time-block-band">

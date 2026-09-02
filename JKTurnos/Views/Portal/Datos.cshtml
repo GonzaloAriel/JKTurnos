@@ -1,0 +1,55 @@
+@model JKTurnos.Models.ViewModels.PortalViewModel
+
+@{
+    ViewBag.Title = "Tus datos";
+    Layout = "~/Views/Portal/_PortalLayout.cshtml";
+    ViewBag.PortalNegocio = Model.NegocioNombre;
+    ViewBag.PortalLogo = Model.NegocioLogo;
+}
+
+<div class="jk-portal-card">
+    <h1 class="jk-portal-step-title">Completá tus datos</h1>
+    <p class="jk-portal-step-sub">
+        @Model.FechaHoraLegible
+    </p>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="jk-form-error">
+            @Html.ValidationSummary(true)
+        </div>
+    }
+
+    @using (Html.BeginForm("Confirmar", "Portal", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.TenantId)
+        @Html.HiddenFor(x => x.RecursoId)
+        @Html.HiddenFor(x => x.Fecha)
+        @Html.HiddenFor(x => x.HoraSeleccionada)
+
+        <div class="jk-portal-field">
+            <label class="jk-label" for="Nombre">Nombre</label>
+            @Html.TextBoxFor(x => x.Nombre, new { @class = "jk-input", placeholder = "Tu nombre completo" })
+            @Html.ValidationMessageFor(x => x.Nombre, "", new { @class = "jk-field-error" })
+        </div>
+
+        <div class="jk-portal-field">
+            <label class="jk-label" for="Telefono">Telefono (por WhatsApp)</label>
+            @Html.TextBoxFor(x => x.Telefono, new { @class = "jk-input", placeholder = "+54 9 11 1234-5678" })
+            @Html.ValidationMessageFor(x => x.Telefono, "", new { @class = "jk-field-error" })
+        </div>
+
+        <div class="jk-portal-field">
+            <label class="jk-label" for="Email">Email (opcional)</label>
+            @Html.TextBoxFor(x => x.Email, new { @class = "jk-input", placeholder = "tu@correo.com", type = "email" })
+        </div>
+
+        <div class="jk-portal-field">
+            <label class="jk-label" for="Observaciones">Observaciones (opcional)</label>
+            @Html.TextAreaFor(x => x.Observaciones, new { @class = "jk-input", rows = 3, placeholder = "Algo que debamos saber…" })
+        </div>
+
+        <button type="submit" class="jk-btn jk-btn-primary">Confirmar reserva</button>
+    }
+</div>

@@ -491,7 +491,9 @@
                 : 'bi-person-gear';
             var label = it.label || '';
             var sub = it.sub ? '<span class="jk-autocomplete-sub">' + it.sub + '</span>' : '';
-            return '<a href="' + (it.url || '#') + '" class="jk-autocomplete-item" data-index="' + i + '">'
+            return '<a href="' + (it.url || '#') + '" class="jk-autocomplete-item" data-index="' + i + '"'
+                + ' data-item-tipo="' + (it.tipo || '') + '"'
+                + ' data-item-id="' + (it.id != null ? it.id : '') + '">'
                 + '<i class="bi ' + icon + '"></i>'
                 + '<span class="jk-autocomplete-label">' + label + '</span>'
                 + sub
@@ -519,6 +521,20 @@
             });
     }
 
+    function openItem(item) {
+        if (!item) return;
+        if (item.tipo === 'turno') {
+            closeResults();
+            if (typeof window.openTurnDrawer === 'function' && item.id != null) {
+                window.openTurnDrawer(item.id);
+            }
+            return;
+        }
+        if (item.url) {
+            window.location.href = item.url;
+        }
+    }
+
     input.addEventListener('input', function () {
         clearTimeout(timer);
         timer = setTimeout(doSearch, 250);
@@ -539,10 +555,7 @@
         } else if (e.key === 'Enter') {
             if (rendered && highlightIndex >= 0) {
                 e.preventDefault();
-                var item = items[highlightIndex];
-                if (item && item.url) {
-                    window.location.href = item.url;
-                }
+                openItem(items[highlightIndex]);
             }
             // Si no hay item seleccionado, el formulario se submita solo (GET a /Busqueda/Index)
         } else if (e.key === 'Escape' || e.keyCode === 27) {
@@ -561,10 +574,11 @@
         var itemEl = e.target.closest ? e.target.closest('.jk-autocomplete-item') : null;
         if (!itemEl) return;
         e.preventDefault();
-        var href = itemEl.getAttribute('href');
-        if (href && href !== '#') {
-            window.location.href = href;
-        }
+        openItem({
+            tipo: itemEl.getAttribute('data-item-tipo'),
+            id: itemEl.getAttribute('data-item-id'),
+            url: itemEl.getAttribute('href')
+        });
     });
 
     document.addEventListener('click', function (e) {

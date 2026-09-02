@@ -52,6 +52,9 @@
                                     <a class="jk-btn jk-btn-sm jk-btn-soft-warning" href="@Url.Action("Index", "Pagos", new { turnoId = item.Id })" title="Ver pagos" aria-label="Ver pagos">
                                         <i class="bi bi-cash-coin"></i>
                                     </a>
+                                    <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-info" data-ver-turno="@item.Id" title="Ver detalle" aria-label="Ver detalle del turno">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                     @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
                                         new ViewDataDictionary {
                                             { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
@@ -81,10 +84,13 @@
                 <div class="jk-flex-between">
                     <strong>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</strong>
                     <div class="jk-flex jk-gap-4">
-                        <a class="jk-btn jk-btn-sm jk-btn-soft-warning" href="@Url.Action("Index", "Pagos", new { turnoId = item.Id })" title="Ver pagos" aria-label="Ver pagos">
-                            <i class="bi bi-cash-coin"></i>
-                        </a>
-                        @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+<a class="jk-btn jk-btn-sm jk-btn-soft-warning" href="@Url.Action("Index", "Pagos", new { turnoId = item.Id })" title="Ver pagos" aria-label="Ver pagos">
+                                <i class="bi bi-cash-coin"></i>
+                            </a>
+                            <button type="button" class="jk-btn jk-btn-sm jk-btn-soft-info" data-ver-turno="@item.Id" title="Ver detalle" aria-label="Ver detalle del turno">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
                             new ViewDataDictionary {
                                 { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                                 { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
@@ -223,6 +229,20 @@
 @Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")
 
 @Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", "jk-toast-turnos" } })
+
+<div class="jk-drawer-backdrop" id="drawer-turno-local-backdrop"></div>
+<div class="jk-drawer" id="drawer-turno-local" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-turno-local-title"
+     data-turno-detail-url="@Url.Action("GetDetailDrawer", "Turnos")"
+     data-registrar-pago-url="@Url.Action("RegistrarPago", "Turnos")"
+     data-toast-id="jk-toast-turnos">
+    <div class="jk-drawer-header">
+        <h3 class="jk-drawer-title" id="drawer-turno-local-title">Detalle del turno</h3>
+        <button type="button" class="jk-drawer-close" id="drawer-turno-local-close" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="jk-drawer-body" id="drawer-turno-local-body"></div>
+</div>
 
 @section scripts {
     <script>

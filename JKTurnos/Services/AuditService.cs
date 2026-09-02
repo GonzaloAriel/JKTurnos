@@ -67,6 +67,14 @@ namespace JKTurnos.Services
                 usuarioId, usuarioNombre, rol, detalle, cambios, GetIp());
         }
 
+        // M-08: registra una accion desde el portal publico (sin sesion autenticada).
+        // El tenant se pasa explicitamente (resuelto por host), sin claim.
+        public void RegistrarPublico(int tenantId, string accion, string entidad, string detalle, int? entidadId = null)
+        {
+            Guardar(tenantId, accion, entidad, entidadId,
+                null, null, null, detalle, null, GetIp());
+        }
+
         // Registra un intento de login (aun no hay sesion autenticada).
         public void RegistrarLogin(int tenantId, int? usuarioId, string usuarioNombre, string rol,
             string email, bool exito)

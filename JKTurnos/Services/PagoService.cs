@@ -40,7 +40,7 @@ namespace JKTurnos.Services
 
             if (tipo == TipoPago.Senia &&
                 _repo.GetAll().Any(p => p.TurnoId == turnoId && p.TipoPago == TipoPago.Senia))
-                throw new InvalidOperationException("La senia se registra una sola vez.");
+                throw new InvalidOperationException("La seña se registra una sola vez.");
 
             var pago = new Pago
             {
@@ -251,14 +251,14 @@ namespace JKTurnos.Services
         public string CalcularEstadoEconomico(List<Pago> pagos, decimal? precio)
         {
             if (pagos == null || pagos.Count == 0)
-                return "Sin senia";
+                return "Sin seña";
 
             var acumulado = pagos.Sum(p => p.Monto);
 
             if (!precio.HasValue)
             {
                 var soloSenias = pagos.All(p => p.TipoPago == TipoPago.Senia);
-                return soloSenias ? "Senia pagada" : "Pago completo";
+                return soloSenias ? "Seña pagada" : "Pago completo";
             }
 
             if (acumulado >= precio.Value)
@@ -266,7 +266,7 @@ namespace JKTurnos.Services
 
             var tieneSenia = pagos.Any(p => p.TipoPago == TipoPago.Senia);
             if (tieneSenia)
-                return "Senia pagada";
+                return "Seña pagada";
 
             return "Pago parcial";
         }
