@@ -31,8 +31,10 @@ namespace JKTurnos.Services
         public const string E_Pago = "Pago";
         public const string E_EstadoTurno = "EstadoTurno";
         public const string E_Configuracion = "Configuracion";
-        public const string E_Autenticacion = "Autenticacion";
 
+        public const string E_Vidriera = "Vidriera";
+
+        public const string E_Autenticacion = "Autenticacion";
         // Registra una accion dentro de una sesion autenticada.
         public void Registrar(string accion, string entidad, string detalle, int? entidadId = null, string cambios = null)
         {

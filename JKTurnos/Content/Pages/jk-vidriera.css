@@ -1,0 +1,485 @@
+﻿/*
+   JKTurnos - Vidriera Publica (M-13, D-042)
+   Vista publica read-only del tenant. Estilo propagandistico tipo MONITOR/TV:
+   diseno de dashboard en dos columnas que entra en una pantalla LED de 17"
+   (min 1024x768) SIN scroll, siguiendo el DS v2 (D-035/D-036).
+   Dependencies: jk-tokens.css, jk-base.css.
+*/
+
+/* ===== CONTENEDOR (viewport fijo, sin scroll) ===== */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    background-color: var(--jk-bg);
+}
+
+.jk-vidriera {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: var(--jk-space-24);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-20);
+    color: var(--jk-text-primary);
+    overflow: hidden;
+}
+
+/* Blob decorativo de marca (identidad, D-036) ===== */
+
+.jk-vidriera::before {
+    content: "";
+    position: fixed;
+    top: -160px;
+    right: -160px;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    background: var(--jk-gradient-tricolor);
+    opacity: 0.10;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ===== HEADER / IDENTIDAD ===== */
+
+.jk-vidriera-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--jk-space-24);
+    background: linear-gradient(135deg, var(--jk-surface) 0%, #FFFFFF 100%);
+    border: 1px solid var(--jk-border-light);
+    border-radius: var(--jk-radius-xl);
+    box-shadow: var(--jk-shadow);
+    padding: var(--jk-space-20) var(--jk-space-24);
+    flex: 0 0 auto;
+}
+
+.jk-vidriera-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-20);
+    min-width: 0;
+}
+
+.jk-vidriera-marca {
+    display: inline-flex;
+    padding: 5px;
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-white);
+    box-shadow: 0 0 0 4px var(--jk-accent-light), var(--jk-shadow);
+    flex-shrink: 0;
+}
+
+.jk-vidriera-logo {
+    width: 84px;
+    height: 84px;
+    border-radius: var(--jk-radius-full);
+    object-fit: cover;
+}
+
+.jk-vidriera-logo-fallback {
+    width: 84px;
+    height: 84px;
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-gradient-tricolor);
+    color: #fff;
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-3xl);
+    font-weight: var(--jk-weight-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jk-vidriera-brand-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-2);
+    min-width: 0;
+}
+
+.jk-vidriera-nombre {
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-3xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.jk-vidriera-titulo {
+    margin: 0;
+    font-size: var(--jk-text-lg);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-accent);
+}
+
+.jk-vidriera-descripcion {
+    margin: var(--jk-space-4) 0 0 0;
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-base);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ===== CONTACTO ===== */
+
+.jk-vidriera-contacto {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-8);
+    color: var(--jk-text-primary);
+    font-size: var(--jk-text-base);
+    flex-shrink: 0;
+}
+
+.jk-vidriera-contacto-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+    padding: var(--jk-space-8) var(--jk-space-12);
+    background: var(--jk-accent-light);
+    border-radius: var(--jk-radius-full);
+    white-space: nowrap;
+}
+
+.jk-vidriera-contacto-item i {
+    color: var(--jk-accent);
+}
+
+/* ===== MENSAJE / BIENVENIDA ===== */
+
+.jk-vidriera-mensaje {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-20);
+    background: var(--jk-gradient-tricolor);
+    color: #fff;
+    border-radius: var(--jk-radius-lg);
+    padding: var(--jk-space-16) var(--jk-space-24);
+    box-shadow: var(--jk-shadow);
+    flex: 0 0 auto;
+}
+
+.jk-vidriera-mensaje-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+    padding: var(--jk-space-8) var(--jk-space-16);
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: var(--jk-radius-full);
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.jk-vidriera-mensaje-texto {
+    margin: 0;
+    font-size: var(--jk-text-xl);
+    font-weight: var(--jk-weight-bold);
+    line-height: 1.3;
+}
+
+/* ===== GRID PRINCIPAL (2 columnas, para no hacer scroll) ===== */
+
+.jk-vidriera-grid {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: var(--jk-space-20);
+}
+
+.jk-vidriera-side {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-20);
+    overflow: hidden;
+}
+
+/* ===== SECCION / TARJETA ===== */
+
+.jk-vidriera-seccion {
+    position: relative;
+    background: var(--jk-white);
+    border: 1px solid var(--jk-border-light);
+    border-radius: var(--jk-radius-xl);
+    box-shadow: var(--jk-shadow);
+    padding: var(--jk-space-20) var(--jk-space-24);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.jk-vidriera-seccion-head {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    margin-bottom: var(--jk-space-16);
+    padding-bottom: var(--jk-space-12);
+    border-bottom: 1px solid var(--jk-border-light);
+}
+
+.jk-vidriera-seccion-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--jk-radius);
+    background: var(--jk-accent-light);
+    color: var(--jk-accent);
+    font-size: var(--jk-text-lg);
+    flex-shrink: 0;
+}
+
+.jk-vidriera-seccion-icono-teal {
+    background: var(--jk-teal-light);
+    color: var(--jk-teal);
+}
+
+.jk-vidriera-seccion-titulo {
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-xl);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+.jk-vidriera-vacio {
+    color: var(--jk-text-secondary);
+    margin: 0;
+    font-size: var(--jk-text-base);
+}
+
+/* ===== SERVICIOS ===== */
+
+.jk-vidriera-servicios-card {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.jk-vidriera-servicios {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-8);
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--jk-border) transparent;
+}
+
+.jk-vidriera-servicio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--jk-space-16);
+    padding: var(--jk-space-12) var(--jk-space-12);
+    background: var(--jk-surface);
+    border-radius: var(--jk-radius);
+    border-left: 4px solid var(--jk-accent);
+}
+
+.jk-vidriera-servicio-cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-2);
+    min-width: 0;
+}
+
+.jk-vidriera-servicio-nombre {
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-md);
+    font-weight: var(--jk-weight-semibold);
+}
+
+.jk-vidriera-servicio-descripcion {
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jk-vidriera-servicio-duracion {
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+}
+
+.jk-vidriera-servicio-precio {
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-xl);
+    font-weight: var(--jk-weight-bold);
+    color: var(--jk-accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ===== OFERTA ===== */
+
+.jk-vidriera-oferta {
+    position: relative;
+    background: linear-gradient(135deg, var(--jk-warning-light) 0%, var(--jk-butter-light) 100%);
+    border: 2px solid var(--jk-warning);
+    border-radius: var(--jk-radius-xl);
+    padding: var(--jk-space-16) var(--jk-space-20);
+    box-shadow: var(--jk-shadow);
+    flex: 0 0 auto;
+    overflow: hidden;
+}
+
+.jk-vidriera-oferta::before {
+    content: "";
+    position: absolute;
+    right: -34px;
+    top: -34px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--jk-warning);
+    opacity: 0.12;
+    pointer-events: none;
+}
+
+.jk-vidriera-oferta-etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+    padding: var(--jk-space-4) var(--jk-space-12);
+    background: var(--jk-warning);
+    color: #fff;
+    border-radius: var(--jk-radius-full);
+    font-size: var(--jk-text-xs);
+    font-weight: var(--jk-weight-bold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: var(--jk-space-12);
+}
+
+.jk-vidriera-oferta-titulo {
+    margin: 0;
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-xl);
+    font-weight: var(--jk-weight-bold);
+    color: var(--jk-text-primary);
+    line-height: 1.2;
+}
+
+.jk-vidriera-oferta-descripcion {
+    margin: var(--jk-space-8) 0 0 0;
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-base);
+    line-height: 1.4;
+}
+
+/* ===== DISPONIBILIDAD ===== */
+
+.jk-vidriera-disponibilidad-card {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.jk-vidriera-disponibilidad {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-16);
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--jk-border) transparent;
+}
+
+.jk-vidriera-disponibilidad-recurso {
+    display: flex;
+    flex-direction: column;
+    gap: var(--jk-space-8);
+}
+
+.jk-vidriera-disponibilidad-recurso-nombre {
+    font-family: var(--jk-font-display);
+    font-size: var(--jk-text-base);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-teal);
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-8);
+}
+
+.jk-vidriera-disponibilidad-recurso-nombre i {
+    color: var(--jk-teal);
+}
+
+.jk-vidriera-disponibilidad-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--jk-space-8);
+}
+
+.jk-vidriera-disponibilidad-slot {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--jk-space-8) var(--jk-space-16);
+    border: 1px solid var(--jk-teal);
+    border-radius: var(--jk-radius-full);
+    background: var(--jk-teal-light);
+    font-size: var(--jk-text-base);
+    font-weight: var(--jk-weight-bold);
+    color: var(--jk-teal);
+}
+
+/* ===== RESPONSIVE (mantener sin scroll abajo) ===== */
+
+@media (max-width: 840px) {
+    .jk-vidriera {
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+    }
+
+    .jk-vidriera-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .jk-vidriera-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body {
+        overflow: auto;
+    }
+}

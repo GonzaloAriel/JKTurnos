@@ -74,21 +74,9 @@
         Si la imagen no aparece, verifica que sea una URL directa y no un enlace a una pagina web.
     </div>
 
-    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
-
-    <div class="jk-form-group">
-        <label class="jk-label" for="PortalHabilitado">Portal de reservas online</label>
-        <label class="jk-checkbox-row" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
-            @Html.CheckBoxFor(m => m.PortalHabilitado, new { @class = "jk-checkbox", id = "PortalHabilitado" })
-            <span>Habilitar el portal publico de reservas por subdominio</span>
-        </label>
-        <small class="jk-small text-secondary">
-            Con esta opcion, tus clientes pueden reservar desde tu subdominio (ej. miturnos.jkturnos.com) sin
-            necesitar cuenta: eligen servicio, fecha y hora, cargan sus datos y confirman por WhatsApp.
-        </small>
-    </div>
-
 }
+
+
 
 @{
     ViewBag.Title = "Datos del negocio";

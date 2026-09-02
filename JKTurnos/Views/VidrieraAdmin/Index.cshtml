@@ -1,0 +1,140 @@
+@model JKTurnos.Models.ViewModels.VidrieraAdminViewModel
+
+@{
+    ViewBag.Title = "Vidriera publica";
+    ViewBag.Subtitle = "Configura tu pagina publica y compartila con tus clientes";
+
+    var titulo = Model.YaExiste ? (Model.Habilitada ? "Publicada" : "Despublicada")
+                                : "Todavia no creaste tu vidriera";
+    var estadoClase = Model.YaExiste ? (Model.Habilitada ? "jk-badge jk-badge-success" : "jk-badge jk-badge-neutral")
+                                     : "jk-badge jk-badge-neutral";
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="jk-mt-24">
+    <div class="row">
+        <div class="col-md-8 col-lg-7">
+
+            <div class="jk-card jk-mb-16">
+                <div class="jk-flex jk-align-center jk-gap-8 jk-flex-wrap">
+                    <span class="@estadoClase">
+                        <i class="bi bi-globe2"></i> @titulo
+                    </span>
+                    @if (Model.YaExiste)
+                    {
+                        <a class="jk-small" href="@Url.Content(Model.UrlPublica)" target="_blank">
+                            <i class="bi bi-box-arrow-up-right"></i> Ver publica
+                        </a>
+                        <code class="jk-small text-secondary">@Url.Content(Model.UrlPublica)</code>
+                    }
+                </div>
+            </div>
+
+            <div class="jk-card">
+                @using (Html.BeginForm("Guardar", "VidrieraAdmin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "jk-form-error" })
+
+                    <div class="jk-form-group">
+                        <label class="jk-label" for="Slug">Direccion (slug)</label>
+                        <div class="jk-flex jk-align-center jk-gap-8">
+                            <span class="jk-small text-secondary">/vidriera/</span>
+                            @Html.TextBoxFor(m => m.Slug, new { @class = "jk-input", placeholder = "mi-negocio", id = "Slug" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Slug, "", new { @class = "jk-field-error" })
+                        <small class="jk-small text-secondary">
+                            Define la URL publica. Se normaliza a minusculas, sin espacios.
+                            Al cambiarlo, la direccion anterior deja de funcionar.
+                        </small>
+                    </div>
+
+                    <div class="jk-form-group">
+                        <label class="jk-label jk-flex jk-gap-8">
+                            @Html.CheckBoxFor(m => m.Habilitada, new { @class = "jk-checkbox", id = "Habilitada" })
+                            <span>Publica la vidriera</span>
+                        </label>
+                        <small class="jk-small text-secondary">
+                            Si esta desactivada, la pagina publica no es visible (404) hasta que la publiques.
+                        </small>
+                    </div>
+
+                    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
+
+                    <div class="jk-form-group">
+                        <label class="jk-label" for="Titulo">Titulo</label>
+                        @Html.TextBoxFor(m => m.Titulo, new { @class = "jk-input", placeholder = "Bienvenido a mi negocio", id = "Titulo" })
+                        @Html.ValidationMessageFor(m => m.Titulo, "", new { @class = "jk-field-error" })
+                    </div>
+
+                    <div class="jk-form-group">
+                        <label class="jk-label" for="Descripcion">Descripcion</label>
+                        @Html.TextAreaFor(m => m.Descripcion, 3, 1, new { @class = "jk-input", placeholder = "Conta brevemente que ofrece tu negocio", id = "Descripcion" })
+                        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "jk-field-error" })
+                    </div>
+
+                    <div class="jk-form-group">
+                        <label class="jk-label" for="MensajePrincipal">Mensaje principal</label>
+                        @Html.TextAreaFor(m => m.MensajePrincipal, 3, 1, new { @class = "jk-input", placeholder = "Un mensaje destacado para tus clientes", id = "MensajePrincipal" })
+                        @Html.ValidationMessageFor(m => m.MensajePrincipal, "", new { @class = "jk-field-error" })
+                        <small class="jk-small text-secondary">Solo se muestra si esta marcado "Mostrar mensaje" mas abajo.</small>
+                    </div>
+
+                    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
+
+                    <div class="jk-grid">
+                        <div class="jk-col-6">
+                            <div class="jk-form-group">
+                                <label class="jk-label" for="OfertaTitulo">Titulo de la oferta</label>
+                                @Html.TextBoxFor(m => m.OfertaTitulo, new { @class = "jk-input", placeholder = "2x1 en cortes", id = "OfertaTitulo" })
+                                @Html.ValidationMessageFor(m => m.OfertaTitulo, "", new { @class = "jk-field-error" })
+                            </div>
+                        </div>
+                        <div class="jk-col-6">
+                            <div class="jk-form-group">
+                                <label class="jk-label" for="OfertaDescripcion">Descripcion de la oferta</label>
+                                @Html.TextAreaFor(m => m.OfertaDescripcion, 2, 1, new { @class = "jk-input", placeholder = "Detalle de la promocion", id = "OfertaDescripcion" })
+                                @Html.ValidationMessageFor(m => m.OfertaDescripcion, "", new { @class = "jk-field-error" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
+
+                    <div class="jk-form-group">
+                        <span class="jk-label">Secciones visibles</span>
+                        <div class="jk-flex jk-flex-wrap jk-gap-16">
+                            <label class="jk-label jk-flex jk-gap-8">
+                                @Html.CheckBoxFor(m => m.MostrarServicios, new { @class = "jk-checkbox", id = "MostrarServicios" })
+                                <span>Servicios</span>
+                            </label>
+                            <label class="jk-label jk-flex jk-gap-8">
+                                @Html.CheckBoxFor(m => m.MostrarPrecios, new { @class = "jk-checkbox", id = "MostrarPrecios" })
+                                <span>Precios</span>
+                            </label>
+                            <label class="jk-label jk-flex jk-gap-8">
+                                @Html.CheckBoxFor(m => m.MostrarDisponibilidad, new { @class = "jk-checkbox", id = "MostrarDisponibilidad" })
+                                <span>Disponibilidad de hoy</span>
+                            </label>
+                            <label class="jk-label jk-flex jk-gap-8">
+                                @Html.CheckBoxFor(m => m.MostrarOfertas, new { @class = "jk-checkbox", id = "MostrarOfertas" })
+                                <span>Ofertas</span>
+                            </label>
+                            <label class="jk-label jk-flex jk-gap-8">
+                                @Html.CheckBoxFor(m => m.MostrarMensaje, new { @class = "jk-checkbox", id = "MostrarMensaje" })
+                                <span>Mensaje principal</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    @Html.Partial("~/Views/Shared/Components/_FormActions.cshtml",
+                        new ViewDataDictionary {
+                            { "SubmitText", "Guardar" },
+                            { "CancelUrl", Url.Action("Index", "Home") }
+                        })
+                }
+            </div>
+        </div>
+    </div>
+</div>

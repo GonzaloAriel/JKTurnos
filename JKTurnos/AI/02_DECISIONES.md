@@ -57,6 +57,10 @@ Cuando se registra una decision, indicar el numero siguiente libre (D-001, D-002
 | D-039 | Ciclo de vida del Tenant: solo 2 estados (Activo / Baja). Desactivar = cascade soft-delete (Tenant + Users + ConfiguracionTenant + EstadosTurno) + bloqueo de login. Reactivar = restaura Tenant + Users. Sin pausa/suspension manual (SuspendidoManual eliminado del UI). Pantalla de confirmacion para cada accion. Filtros de busqueda y estado en grilla AdminGlobal | 2026-08-26 | VIGENTE |
 || D-040 | Estados del Turno = catalogo operativo FIJO del sistema (Pendiente, En curso, Finalizado, Cancelado), NO configurables por tenant. El usuario no elige el estado al crear; el sistema asigna Pendiente. EstadoTurnoId sigue NOT NULL. Lo extra (No asistio, Confirmado, etc.) se modela a futuro como eventos/motivos/atributos, no inflando EstadoTurno. Situacion temporal (reloj) = calculada y separada del estado; el reloj NUNCA muta el estado. Plan: AI/SESION_20260828_PLAN_ESTADOS.md | 2026-08-28 | VIGENTE |
 || D-041 | Drawer Quick Create de Agenda (D-017, implementado 2026-08-28): al abrir desde una celda, el Recurso se preselecciona Y el dropdown de Servicios se filtra a los vinculados (GetServiciosPorRecurso). Si recurso tiene 1 servicio vinculado, se preselecciona automaticamente. Cambio de Recurso re-filtra Servicios; cambio de Servicio preserva el Recurso si sigue siendo valido. Reduce de 3 selecciones a 1-2. Coherente con D-013, D-014, D-040 y la vinculacion N:M bidireccional. | 2026-08-28 | VIGENTE |
+| D-042 | Vidriera Publica del Tenant (M-13, reemplaza a M-08): entidad nueva VidrieraPublica (1:1 Tenant) con Slug unico global + Habilitada independiente del contenido + contenido manual minimo (Titulo, Descripcion, MensajePrincipal, Oferta*) + flags de visibilidad. Precios/ofertas/mensaje/disponibilidad OPCIONALES (la ausencia nunca impide publicar); servicios = contenido principal (todos los activos en v1). NO duplica servicios/turnos/precios (consulta Servicio/RecursoServicio/ConfiguracionTenant/Turno). Vista publica read-only aislada del backoffice por slug. Plan: Posta 0-2 aprobadas (AI/CONTRATO, AUDITORIA, DISENO). | 2026-09-02 | VIGENTE |
+| D-043 | Migracion de VidrieraPublica (M-13, Posta 3A) por AUTO-MIGRACION de EF6, NO por migracion explicita Add-VidrieraPublica. La app usa MigrateDatabaseToLatestVersion + AutomaticMigrationsEnabled=true, y crear la tabla VidrieraPublicas (tabla NUEVA, sin operacion de datos) NO es perdida de datos, asi que la auto-migracion la crea al arrancar con los indices unicos (Slug UNIQUE, TenantId UNIQUE) configurados en JKContext.OnModelCreating. Motivo: no se puede ejecutar Add-Migration (requiere la Package Manager Console de VS, host restringido) y fabricar a mano el snapshot EDMX del Designer.cs fue lo que provoco el fallo NullReferenceException de RemovePortalHabilitado. DECISION DEL TEAM LEAD (2026-09-02). Consecuencia: la tabla se crea sola en el arranque del primer request; no hay archivos de migracion para VidrieraPublica (deuda tecnica registrada: creacion implicita en __MigrationHistory). | 2026-09-02 | VIGENTE |
+| D-044 | Disponibilidad publica de la Vidriera (M-13, Posta 4): se muestra POR RECURSO y SOLO para HOY (jornada fija 08:00-19:30, D-012, hasta M-01) con franjas de 30 min. Regla de ocupacion IDENTICA a TurnoService.ValidarDisponibilidad (misma fuente de verdad del backoffice): una franja esta ocupada si se solapa con un turno del recurso en estado NO Cancelado (D-040/D-042; el Cancelado libera su slot). La seccion se renderiza SOLO si VidrieraPublica.MostrarDisponibilidad=true y SIEMPRE muestra estado vacio ("Sin turnos disponibles hoy") cuando un recurso no tiene slots libres. Aislamiento por TenantId (mismo tenant del slug). Diseno y criterios en AI/DISENO_VIDRIERA_M13_POSTA3.md seccion 13. | 2026-09-02 | VIGENTE |
+| D-045 | Panel de administracion de la Vidriera (M-13, Posta 5): seccion de Gestion del backoffice (solo rol Admin via [Authorize(Roles=Roles.Admin)]) para administrar la fila `VidrieraPublica` del tenant: slug editable UNICO GLOBAL (RegEx de normalizacion; rechaza el slug ya usado por OTRO tenant con mensaje "Ese slug ya esta en uso. Elegi otro."), Habilitada (publicar/despublicar), contenido manual (Titulo, Descripcion, MensajePrincipal, OfertaTitulo, OfertaDescripcion), flags de visibilidad (MostrarServicios, MostrarPrecios, MostrarDisponibilidad, MostrarOfertas, MostrarMensaje) y enlace de vista previa publica. Publicar = crear la fila si no existe; despublicar o fila inexistente = 404 publico. Auditoria E_Vidriera (Crear/Editar). Diseno y criterios en AI/DISENO_VIDRIERA_M13_POSTA3.md seccion 14. | 2026-09-02 | VIGENTE |
 
 ## Detalle
 
@@ -620,6 +624,71 @@ Motivo: coherente con D-013 (QuickCreate), D-014 (Servicio opcional), D-040 (cat
 Consecuencias: `jk-agenda.js` `openQuickCreate` ahora filtra Servicios por recurso y preselecciona si hay 1. Nuevo handler `qcRecurso.addEventListener('change')` para re-filtrar Servicios. Handler modificado `qcServicio.addEventListener('change')` preserva Recurso si sigue valido. `closeQuickCreate` limpia `data-prev-value`. `Agenda.cshtml` agrega `data-servicios-por-recurso-url` apuntando a `GetServiciosPorRecurso`. Sin cambios en el modelo de datos ni en el servidor (reuso de endpoint existente).
 
 Reemplaza a: ninguna (mejora de D-017 existente)
+
+Estado: VIGENTE
+
+### D-042
+
+Fecha: 2026-09-02
+
+Decision: Modulo Vidriera Publica del Tenant (M-13), reemplaza al M-08 (Portal de Reservas, DESCARTADO por cambio de vision). La Vidriera es una vista publica, informativa y read-only que muestra en tiempo real datos operativos del tenant (servicios, precios, disponibilidad, ofertas, identidad) para monitores/capturas/landing, PERO no realiza ninguna accion interna (sin reservas, sin login, sin pagos, sin CMS).
+
+Modelo aprobado (Posta 2A): entidad NUEVA `VidrieraPublica` (1:1 con Tenant, ITenantEntity) con:
+- `TenantId` FK unico (garantiza 1:1), `Slug` UNICO GLOBAL (id publico, lower, no-guessable, NO basado en un ID interno), `Habilitada` (interruptor de publicacion INDEPENDIENTE del contenido).
+- Contenido manual minimo: `Titulo`, `Descripcion`, `MensajePrincipal`, `OfertaTitulo`, `OfertaDescripcion`.
+- Flags de visibilidad: `MostrarServicios` (default true), `MostrarPrecios`, `MostrarDisponibilidad`, `MostrarOfertas`, `MostrarMensaje`.
+
+PRECIOS, OFERTAS, MENSAJE y DISPONIBILIDAD son OPCIONALES: no obligan a cargar datos; la ausencia de contenido opcional NUNCA impide publicar la vidriera (importante comercialmente: el tenant no queda obligado a revelar precios). Los SERVICIOS son el contenido principal: en v1 la vidriera muestra TODOS los servicios activos del tenant (sin tabla de exclusion VidrieraServicio). NO se duplica informacion: identidad desde ConfiguracionTenant, servicios/precios/duracion desde Servicio, recursos desde RecursoServicio, disponibilidad calculada desde Turno+EstadoTurno (metodo GetAvailableSlots nuevo, Posta 4). URL v1: `/vidriera/{slug}` (sin subdominio; evolucion posterior al mismo motor). Habilitada=false o tenant inactivo -> 404 (no expone).
+
+Motivo: deliverable visual/comercial del SaaS ("cada negocio tiene su vidriera digital conectada a JKTurnos") sin la complejidad del Portal de Reservas (subdominios locales, Whatsapp, flujo de reserva). Separar la config manual de los datos operativos evita duplicacion (D-007).
+
+Consecuencias: nuevas clases Models/Entities/VidrieraPublica.cs, Services/VidrieraService.cs (lectura publica + GetAvailableSlots), Controllers/VidrieraController.cs (AllowAnonymous, read-only), Views/Vidriera/Index.cshtml + layout publico (base _LoginLayout), seccion Gestion del panel (Posta 5). Cambios: JKContext (+DbSet), JKTurnos.csproj, RouteConfig (ruta nombrada "Vidriera"). Migracion AddVidrieraPublica (tabla, UNIQUE Slug, UNIQUE TenantId). SIN cambios a Tenant.cs, ConfiguracionTenant.cs, Servicio.cs, Turno.cs, Recurso.cs, EstadoTurno.cs, RecursoServicio.cs.
+
+Registro: CONTRATO (Posta 0) AI/CONTRATO_VIDRIERA_M13.md, AUDITORIA (Posta 1) AI/AUDITORIA_VIDRIERA_M13.md, DISENO (Posta 2A) AI/DISENO_VIDRIERA_M13_POSTA2A.md. Postas 0, 1, 2 APROBADAS por TEAM LEAD (2026-09-02). Pendientes: Posta 3 (primera vista funcional por slug, datos reales), 4 (disponibilidad calculada), 5 (panel), 6 (refresh periodico), 7 (modo monitor), 8 (seguridad).
+
+Reemplaza a: M-08 (Portal de Reservas Online + WhatsApp, eliminado del codigo y del plan).
+
+Estado: VIGENTE (Plan aprobado; Postas 0-2 consolidadas; Posta 3 (3A+3B) CONSOLIDADA 2026-09-02; Postas 4-8 pendientes)
+
+### D-043
+
+Fecha: 2026-09-02
+
+Decision: La creacion de la tabla `VidrieraPublicas` (entidad VidrieraPublica de M-13/D-042) se maneja por AUTO-MIGRACION de EF6, NO por una migracion explicita `AddVidrieraPublica` con archivos Designer. La app usa `MigrateDatabaseToLatestVersion<JKContext, Configuration>()` (Global.asax.cs) con `AutomaticMigrationsEnabled = true` (Migrations/Configuration.cs). Como crear una tabla NUEVA es una operacion aditiva que NO pierde datos, la auto-migracion la crea al arrancar del primer request sin chocar con `AutomaticMigrationDataLossAllowed = false`. Los indices unicos (Slug UNIQUE GLOBAL y TenantId UNIQUE) quedan definidos en `JKContext.OnModelCreating` y la auto-migracion los crea junto con la tabla desde el modelo.
+
+Motivo: no se puede invocar `Add-Migration` fuera de la Package Manager Console de Visual Studio (el modulo EntityFramework6 exige el host "Package Manager Host"); fabricar manualmente el snapshot EDMX del `Designer.resx` (CSDL/SSDL/MSL comprimido) es lo que provoco la excepcion NullReferenceException del fallido `RemovePortalHabilitado` en la limpieza de M-08. La auto-migracion delega el snapshot a EF mismo (no a una fabricacion manual), eliminando ese riesgo.
+
+Consecuencias: no existen archivos de migracion para VidrieraPublica; la tabla y su registro en `__MigrationHistory` se generan implicitamente en el arranque (deuda tecnica registrada: una migracion explicita a futuro debera reconciliar el snapshot con la tabla ya creada). Antes de desplegar, la BD local se crea/actualiza sola al abrir la app. Coherente con D-027 (auto-migracion al arranque como estrategia de deploy del hosting).
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-044
+
+Fecha: 2026-09-02
+
+Decision: La disponibilidad publica de la Vidriera (M-13, Posta 4) se calcula y se muestra POR RECURSO y SOLO para el dia de HOY (jornada fija 08:00-19:30 segun D-012, limitacion v1 hasta M-01), en franjas de 30 min. La regla de ocupacion es IDENTICA a `TurnoService.ValidarDisponibilidad` (la fuente de verdad del negocio/backoffice): una franja esta ocupada si se solapa con un turno del recurso en estado NO Cancelado (`EstadoTurno.Codigo != CANCELADO`; D-040/D-042), de modo que un turno Cancelado libera su slot. La seccion se renderiza SOLO si `VidrieraPublica.MostrarDisponibilidad = true` y SIEMPRE indica el estado vacio ("Sin turnos disponibles hoy") cuando un recurso no tiene slots libres (o no hay recursos). Aislamiento por TenantId: la disponibilidad se consulta aislada por el mismo tenant del slug.
+
+Motivo: los turnos se asignan a un Recurso (Turno.RecursoId), asi que la ocupacion se calcula directa y sin ambiguedad desde la fuente de verdad de Turno + EstadoTurno. Presentarla por servicio exigiria agregar slots de recursos vinculados (RecursoServicio) y podria mostrar horarios que no respetan la duracion del servicio. El alcance "hoy" es coherente con la agenda del backoffice (por dia) y evita recorrer dias futuros; la duracion real por servicio se resuelve en M-01. Se muestran franjas individuales de 30 min (no rangos fusionados) por claridad de "proximos slots libres".
+
+Consecuencias: nuevos archivos `Models/ViewModels/VidrieraDisponibilidadVM.cs` (recurso + SlotsLibres) y en `VidrieraService` el metodo `GetAvailableSlots(int tenantId)` (+ helper `GetAvailableSlotsInContext`) que se carga desde `GetVidrieraPublica` solo cuando `MostrarDisponibilidad = true`. La vista `Views/Vidriera/Index.cshtml` gana la seccion "Disponibilidad de hoy" y `jk-vidriera.css` sus estilos. No se escriben turnos desde la vidriera (sigue read-only).
+
+Reemplaza a: ninguna
+
+Estado: VIGENTE
+
+### D-045
+
+Fecha: 2026-09-02
+
+Decision: El panel de administracion de la Vidriera (M-13, Posta 5) es una seccion de Gestion del backoffice restringida a rol Admin (`[Authorize(Roles = Roles.Admin)]`), sin controller publico. `VidrieraAdminController` expone `Index` (GET) y `Guardar` (POST) y la vista `Views/VidrieraAdmin/Index.cshtml` es un form propio que postea a `Guardar`. Administra la fila `VidrieraPublica` del tenant: Slug (editable, Required, max 100, normalizado en minusculas/sin tildes ni espacios; UNICO GLOBAL excluyendo el propio registro — si otro tenant ya usa el slug se muestra "Ese slug ya esta en uso. Elegi otro." y NO se persiste nada), Habilitada (publicar/despublicar; despublicada o fila inexistente -> 404 publico), contenido manual (Titulo, Descripcion, MensajePrincipal, OfertaTitulo, OfertaDescripcion con StringLength) y los flags de visibilidad (MostrarServicios, MostrarPrecios, MostrarDisponibilidad, MostrarOfertas, MostrarMensaje). La vista muestra un badge de estado (publicada / despublicada / sin vidriera) y el enlace de vista previa publica (`/vidriera/{slug}`). Si no existe la fila, `Guardar` la crea (upsert por TenantId).
+
+Motivo: el tenant Admin necesita gestionar su vidriera (esencialmente crear/publicar, editar contenido y despublicar) desde el panel, sin tocar la BD y sin que la Vista Publica (read-only) exponga ningun camino de edicion (aislamiento D-042). El slug editable con unicidad global exige el rechazo cross-tenant para no romper la resolucion por slug unico del modelo.
+
+Consecuencias: nuevos archivos `Models/ViewModels/VidrieraAdminViewModel.cs`, `Controllers/VidrieraAdminController.cs`, `Services/VidrieraService.cs` (metodos de admin: `GetVidrieraAdmin`, `GuardarVidriera`, `NormalizarSlug`, `GetUrlPublica`, `MapAdmin`), `Views/VidrieraAdmin/Index.cshtml`; item de navegacion "Vidriera" en `_Sidebar.cshtml` (icono bi-globe2, grupo Configuracion, resalta estado activo); `E_Vidriera` en `AuditService` (acciones Crear/Editar). Registrados en JKTurnos.csproj. Corrige el quirk EF6 de `TargetException` resolviendo `actualId` a variable local antes del query. No cambia la Vista Publica (sigue read-only).
+
+Reemplaza a: ninguna
 
 Estado: VIGENTE
 

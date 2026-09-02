@@ -82,26 +82,6 @@ AVANCE (2026-09-01): EN PROGRESO. Backend + frontend implementados:
   al inicio, el bloque aparece en su nueva posicion y el drawer sigue abriendo.
   CONSOLIDADO por TEAM LEAD (2026-09-01).
 
-### M-08 PORTAL DE RESERVAS ONLINE + WHATSAPP  [PRIORIDAD ALTA - Fase 6]
-- Portal publico por subdominio: el cliente elige recurso/fecha y reserva.
-- Reserva via WhatsApp con link precargado. Cierra clientes para el SaaS.
-- Riesgo: MEDIO-ALTO. Requiere tenant publico (ya existe subdominio).
-- Avance (2026-09-01): migracion `AddPortalPublico` (+`PortalHabilitado`),
-  `PortalReservaService`, `AuditService.RegistrarPublico`, `PortalController`
-  [AllowAnonymous], `PortalViewModel` (con `FechaLegible`/`FechaHoraLegible`),
-  layout publico `_PortalLayout`, `jk-portal.css`, vistas `Inicio/FechaHora/
-  Datos/Confirmacion/NoDisponible`, checkbox `PortalHabilitado` en DatosNegocio,
-  appSetting `JKPortalDominioRaiz`, rewritepath raiz en `Global.asax`.
-  MSBuild `Debug` y `/p:MvcBuildViews=true` = 0 errores.
-- D-0xx (2026-09-01): en este proyecto las vistas precompiladas usan la variable
-  de modelo `Model` (mayuscula, NO `model`) y los bloques de control (`if`/
-  `foreach`/`using`) dentro de un bloque `@using(){ }` van SIN prefijo `@`.
-  Por eso las vistas del portal usan `@Model.X` y `@using(...) { if(...) }`.
-- D-0xx (2026-09-01): las fechas `DateTime?`/`string` no se formatean dentro de
-  las vistas; el controlador pre-armo `FechaLegible` y `FechaHoraLegible` para
-  evitar llamar `.ToString(fmt)` sobre valores nullable/string en Razor
-  (falla la compilacion de vistas con `MvcBuildViews=true`).
-
 ### M-09 CONFIGURACION PROGRESIVA + ONBOARDING  [PRIORIDAD MEDIA - Fase 4]
 - Wizard inicial que guie el alta (logo, horarios, servicio, recurso) sin obligar.
 - Riesgo: BAJO-MEDIO.
@@ -125,5 +105,4 @@ AVANCE (2026-09-01): EN PROGRESO. Backend + frontend implementados:
 2. M-02 busqueda global
 3. M-03 clientes historial/CRM
 4. M-07 mover turno / drag & drop
-5. M-08 portal de reservas online
-6. M-09 onboarding
+5. M-09 onboarding

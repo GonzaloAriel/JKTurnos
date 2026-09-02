@@ -1,0 +1,174 @@
+@model JKTurnos.Models.ViewModels.VidrieraPublicaViewModel
+
+@{
+    Layout = "~/Views/Shared/_VidrieraLayout.cshtml";
+    ViewBag.Title = Model.NombreNegocio;
+}
+
+<header class="jk-vidriera-header">
+    <div class="jk-vidriera-brand">
+        <a class="jk-vidriera-marca" href="~/vidriera/@Model.Slug">
+            @if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+            {
+                <img class="jk-vidriera-logo" src="@Model.LogoUrl" alt="@Model.NombreNegocio" />
+            }
+            else
+            {
+                <div class="jk-vidriera-logo-fallback" aria-hidden="true">
+                    @{
+                        var inicial = string.IsNullOrWhiteSpace(Model.NombreNegocio)
+                            ? "?"
+                            : Model.NombreNegocio.Trim().Substring(0, 1).ToUpper();
+                    }
+                    @inicial
+                </div>
+            }
+        </a>
+        <div class="jk-vidriera-brand-info">
+            <h1 class="jk-vidriera-nombre">@Model.NombreNegocio</h1>
+            @if (!string.IsNullOrWhiteSpace(Model.Titulo))
+            {
+                <p class="jk-vidriera-titulo">@Model.Titulo</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Descripcion))
+            {
+                <p class="jk-vidriera-descripcion">@Model.Descripcion</p>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Telefono) ||
+         !string.IsNullOrWhiteSpace(Model.Email) ||
+         !string.IsNullOrWhiteSpace(Model.Direccion))
+    {
+        <div class="jk-vidriera-contacto">
+            @if (!string.IsNullOrWhiteSpace(Model.Telefono))
+            {
+                <span class="jk-vidriera-contacto-item" title="Telefono">
+                    <i class="bi bi-telephone"></i> @Model.Telefono
+                </span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Email))
+            {
+                <span class="jk-vidriera-contacto-item" title="Email">
+                    <i class="bi bi-envelope"></i> @Model.Email
+                </span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Direccion))
+            {
+                <span class="jk-vidriera-contacto-item" title="Direccion">
+                    <i class="bi bi-geo-alt"></i> @Model.Direccion
+                </span>
+            }
+        </div>
+    }
+</header>
+
+@if (Model.MostrarMensaje && !string.IsNullOrWhiteSpace(Model.MensajePrincipal))
+{
+    <section class="jk-vidriera-mensaje">
+        <span class="jk-vidriera-mensaje-badge"><i class="bi bi-megaphone"></i> Atencion</span>
+        <p class="jk-vidriera-mensaje-texto">@Model.MensajePrincipal</p>
+    </section>
+}
+
+<div class="jk-vidriera-grid">
+
+    @if (Model.MostrarServicios)
+    {
+        <section class="jk-vidriera-seccion jk-vidriera-servicios-card">
+            <header class="jk-vidriera-seccion-head">
+                <span class="jk-vidriera-seccion-icono"><i class="bi bi-list-ul"></i></span>
+                <h2 class="jk-vidriera-seccion-titulo">Servicios</h2>
+            </header>
+
+            @if (Model.Servicios.Count == 0)
+            {
+                <p class="jk-vidriera-vacio">Aun no hay servicios publicados.</p>
+            }
+            else
+            {
+                <ul class="jk-vidriera-servicios">
+                    @foreach (var s in Model.Servicios)
+                    {
+                        <li class="jk-vidriera-servicio">
+                            <div class="jk-vidriera-servicio-cuerpo">
+                                <span class="jk-vidriera-servicio-nombre">@s.Nombre</span>
+                                @if (!string.IsNullOrWhiteSpace(s.Descripcion))
+                                {
+                                    <span class="jk-vidriera-servicio-descripcion">@s.Descripcion</span>
+                                }
+                                <span class="jk-vidriera-servicio-duracion">
+                                    <i class="bi bi-clock"></i> @s.DuracionMinutos min
+                                </span>
+                            </div>
+                            @if (s.MostrarPrecio)
+                            {
+                                <span class="jk-vidriera-servicio-precio">$@s.Precio.ToString("0.##")</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+
+    <div class="jk-vidriera-side">
+
+        @if (Model.MostrarOfertas && (!string.IsNullOrWhiteSpace(Model.OfertaTitulo) || !string.IsNullOrWhiteSpace(Model.OfertaDescripcion)))
+        {
+            <section class="jk-vidriera-oferta">
+                <span class="jk-vidriera-oferta-etiqueta"><i class="bi bi-percent"></i> Oferta</span>
+                @if (!string.IsNullOrWhiteSpace(Model.OfertaTitulo))
+                {
+                    <h2 class="jk-vidriera-oferta-titulo">@Model.OfertaTitulo</h2>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.OfertaDescripcion))
+                {
+                    <p class="jk-vidriera-oferta-descripcion">@Model.OfertaDescripcion</p>
+                }
+            </section>
+        }
+
+        @if (Model.MostrarDisponibilidad)
+        {
+            <section class="jk-vidriera-seccion jk-vidriera-disponibilidad-card">
+                <header class="jk-vidriera-seccion-head">
+                    <span class="jk-vidriera-seccion-icono jk-vidriera-seccion-icono-teal"><i class="bi bi-calendar-check"></i></span>
+                    <h2 class="jk-vidriera-seccion-titulo">Disponibilidad de hoy</h2>
+                </header>
+
+                @if (Model.Disponibilidad.Count == 0)
+                {
+                    <p class="jk-vidriera-vacio">Sin turnos disponibles hoy.</p>
+                }
+                else
+                {
+                    <ul class="jk-vidriera-disponibilidad">
+                        @foreach (var d in Model.Disponibilidad)
+                        {
+                            <li class="jk-vidriera-disponibilidad-recurso">
+                                <span class="jk-vidriera-disponibilidad-recurso-nombre"><i class="bi bi-people"></i> @d.RecursoNombre</span>
+                                @if (d.SinDisponibilidad)
+                                {
+                                    <p class="jk-vidriera-vacio">Sin turnos disponibles hoy.</p>
+                                }
+                                else
+                                {
+                                    <div class="jk-vidriera-disponibilidad-slots">
+                                        @foreach (var slot in d.SlotsLibres)
+                                        {
+                                            <span class="jk-vidriera-disponibilidad-slot">@slot</span>
+                                        }
+                                    </div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+            </section>
+        }
+
+    </div>
+
+</div>

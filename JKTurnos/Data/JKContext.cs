@@ -26,6 +26,7 @@ namespace JKTurnos.Data
         public DbSet<NotificacionSistema> NotificacionesSistema { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
         public DbSet<AvatarPlataforma> AvataresPlataforma { get; set; }
+        public DbSet<VidrieraPublica> VidrieraPublicas { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -60,6 +61,20 @@ namespace JKTurnos.Data
             modelBuilder.Entity<AvatarPlataforma>()
                 .Property(x => x.Url)
                 .HasMaxLength(500);
+
+            // D-042: VidrieraPublica 1:1 con Tenant. TenantId unico (1:1) y Slug
+            // unico (la llave publica de URL /vidriera/{slug}).
+            modelBuilder.Entity<VidrieraPublica>()
+                .Property(x => x.Slug)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<VidrieraPublica>()
+                .HasIndex(x => x.Slug)
+                .IsUnique();
+
+            modelBuilder.Entity<VidrieraPublica>()
+                .HasIndex(x => x.TenantId)
+                .IsUnique();
         }
     }
 }

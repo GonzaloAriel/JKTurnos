@@ -13,6 +13,14 @@ namespace JKTurnos
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            // D-042 / Posta 3: vidriera publica por slug (M-13). Antes de la ruta
+            // default para que {controller} no la capture. Unica entrada publica.
+            routes.MapRoute(
+                name: "Vidriera",
+                url: "vidriera/{slug}",
+                defaults: new { controller = "Vidriera", action = "Index", slug = UrlParameter.Optional }
+            );
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
