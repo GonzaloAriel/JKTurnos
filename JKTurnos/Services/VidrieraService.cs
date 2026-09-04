@@ -185,6 +185,11 @@ namespace JKTurnos.Services
             if (servicios.Count == 0)
                 return new List<VidrieraDisponibilidadSemanalVM>();
 
+            // Dias laborables del tenant: solo se renderizan estos dias en la vidriera.
+            var configVidriera = ctx.ConfiguracionesTenant
+                .FirstOrDefault(c => c.TenantId == tenantId && c.IsActive);
+            var diasLaborales = ParsearDiasLaborales(configVidriera?.DiasLaborales);
+
             var recursosActivos = ctx.Recursos
                 .Where(r => r.TenantId == tenantId && r.IsActive)
                 .ToList();
@@ -248,6 +253,11 @@ namespace JKTurnos.Services
                 for (int i = 0; i < 7; i++)
                 {
                     var dia = hoy.AddDays(i);
+
+                    // Solo procesar dias laborables del tenant.
+                    if (!diasLaborales.Contains(dia.DayOfWeek))
+                        continue;
+
                     bool esHoy = i == 0;
 
                     // Union de inicios libres (relativos al dia) de todos los recursos
@@ -321,40 +331,21 @@ namespace JKTurnos.Services
         }
 
         // Convierte un conjunto ordenado de inicios (TimeSpan relativos al dia, paso
-        // de 30 min) en rangos legibles: los consecutivos se funden en "HH:mm-HH:mm"
-        // y un slot suelto se muestra como "HH:mm".
+        // de 30 min) en horas individuales legibles para chips de la vidriera.
+        // Cada hora de inicio de slot se muestra como un chip independiente.
         private List<string> ConstruirRangos(SortedSet<TimeSpan> libres)
         {
             var rangos = new List<string>();
             if (libres.Count == 0)
                 return rangos;
 
-            var lista = libres.ToList();
-            var inicio = lista[0];
-            var prox = inicio.Add(TimeSpan.FromMinutes(30));
-
-            foreach (var s in lista)
+            foreach (var s in libres)
             {
-                if (s > prox)
-                {
-                    // Hay un hueco: cierro el rango actual y abro uno nuevo.
-                    rangos.Add(FormatearRango(inicio, prox));
-                    inicio = s;
-                }
-                prox = s.Add(TimeSpan.FromMinutes(30));
+                // Mostrar la hora de inicio del slot como chip individual.
+                rangos.Add(DateTime.Today.Add(s).ToString("HH:mm"));
             }
-            rangos.Add(FormatearRango(inicio, prox));
 
             return rangos;
-        }
-
-        private string FormatearRango(TimeSpan inicio, TimeSpan fin)
-        {
-            string sIni = DateTime.Today.Add(inicio).ToString("HH:mm");
-            string sFin = DateTime.Today.Add(fin).ToString("HH:mm");
-            if (fin - inicio <= TimeSpan.FromMinutes(30))
-                return sIni; // slot unico
-            return sIni + "-" + sFin;
         }
 
         // True si un BloqueoRecurso dado se solapa con la ventana [inicioVentana, finVentana).
@@ -576,6 +567,32 @@ namespace JKTurnos.Services
                 YaExiste = true,
                 UrlPublica = GetUrlPublica(v.Slug)
             };
+        }
+
+        // Parsea "1,2,3,4,5,6" a HashSet<DayOfWeek>. Default Lun-Sab.
+        private HashSet<DayOfWeek> ParsearDiasLaborales(string valor)
+        {
+            var defaultDias = new HashSet<DayOfWeek>
+            {
+                DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
+                DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday
+            };
+
+            if (string.IsNullOrWhiteSpace(valor))
+                return defaultDias;
+
+            var resultado = new HashSet<DayOfWeek>();
+            foreach (var parte in valor.Split(','))
+            {
+                int num;
+                if (int.TryParse(parte.Trim(), out num) && num >= 1 && num <= 7)
+                {
+                    var dow = num == 7 ? DayOfWeek.Sunday : (DayOfWeek)num;
+                    resultado.Add(dow);
+                }
+            }
+
+            return resultado.Count > 0 ? resultado : defaultDias;
         }
     }
 }

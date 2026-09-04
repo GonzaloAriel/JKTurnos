@@ -98,6 +98,53 @@
         </small>
     </div>
 
+    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
+
+    <div class="jk-form-group">
+        <label class="jk-label">Dias laborales</label>
+        @{
+            var diasActuales = new HashSet<int>();
+            if (!string.IsNullOrWhiteSpace(Model.DiasLaborales))
+            {
+                foreach (var p in Model.DiasLaborales.Split(','))
+                {
+                    int n;
+                    if (int.TryParse(p.Trim(), out n) && n >= 1 && n <= 7)
+                    {
+                        diasActuales.Add(n);
+                    }
+                }
+            }
+            if (diasActuales.Count == 0)
+            {
+                diasActuales = new HashSet<int> { 1, 2, 3, 4, 5, 6 };
+            }
+        }
+        @Html.HiddenFor(m => m.DiasLaborales, new { id = "DiasLaboralesHidden" })
+        <div style="display:flex;flex-wrap:wrap;gap:var(--jk-space-12);">
+            @foreach (var dia in new[] {
+                new { Num = 1, Label = "Lun" },
+                new { Num = 2, Label = "Mar" },
+                new { Num = 3, Label = "Mie" },
+                new { Num = 4, Label = "Jue" },
+                new { Num = 5, Label = "Vie" },
+                new { Num = 6, Label = "Sab" },
+                new { Num = 7, Label = "Dom" }
+            })
+            {
+                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--jk-surface);border:1px solid var(--jk-border-light);border-radius:var(--jk-radius-full);cursor:pointer;font-size:var(--jk-text-sm);font-weight:600;user-select:none;transition:background var(--jk-transition-fast),border-color var(--jk-transition-fast);">
+                    <input type="checkbox" class="jk-dia-check" value="@dia.Num"
+                           @(diasActuales.Contains(dia.Num) ? "checked" : "")
+                           style="accent-color:var(--jk-accent);" />
+                    @dia.Label
+                </label>
+            }
+        </div>
+        <small class="jk-small text-secondary">
+            Solo se mostraran los dias seleccionados en la agenda y en la vidriera publica.
+        </small>
+    </div>
+
 }
 
 
@@ -140,5 +187,22 @@
 
         ddl.addEventListener('change', updatePreview);
         updatePreview();
+    })();
+
+    (function () {
+        var hidden = document.getElementById('DiasLaboralesHidden');
+        var checks = document.querySelectorAll('.jk-dia-check');
+
+        function syncDias() {
+            var seleccionados = [];
+            checks.forEach(function (cb) {
+                if (cb.checked) seleccionados.push(cb.value);
+            });
+            hidden.value = seleccionados.join(',');
+        }
+
+        checks.forEach(function (cb) {
+            cb.addEventListener('change', syncDias);
+        });
     })();
 </script>

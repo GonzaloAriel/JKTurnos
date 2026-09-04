@@ -84,6 +84,7 @@ namespace JKTurnos.Migrations
                     EmailAsunto = NotificacionService.DefaultEmailAsunto,
                     EmailTemplate = NotificacionService.DefaultEmailTemplate,
                     SmtpHabilitado = false,
+                    DiasLaborales = "1,2,3,4,5,6",
                     IsActive = true,
                     CreatedAt = DateTime.Now
                 });

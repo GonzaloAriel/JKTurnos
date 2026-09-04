@@ -1,12 +1,12 @@
 ﻿/*
    JKTurnos - Vidriera Publica (M-13, D-042)
-   Vista publica read-only del tenant. Estilo propagandistico tipo MONITOR/TV:
-   diseno de dashboard en dos columnas que entra en una pantalla LED de 17"
-   (min 1024x768) SIN scroll, siguiendo el DS v2 (D-035/D-036).
-   Dependencies: jk-tokens.css, jk-base.css.
+   Diseno editorial tipo MASSETA: fondo crema con textura, tipografia serif de
+   marca, tabla de disponibilidad por servicios (columnas) x dias (filas), chips
+   individuales por hora, promo condicional.
+   Dependencies: jk-tokens.css, jk-base.css, Playfair Display (Google Fonts).
 */
 
-/* ===== CONTENEDOR (viewport fijo, sin scroll) ===== */
+/* ===== PANTALLA (viewport fijo, sin scroll) ===== */
 
 html, body {
     height: 100%;
@@ -15,147 +15,152 @@ html, body {
 }
 
 body {
-    background-color: var(--jk-bg);
-}
-
-.jk-vidriera {
-    position: relative;
-    height: 100vh;
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: var(--jk-space-24);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-20);
+    background: var(--jk-bg);
     color: var(--jk-text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.screen {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
     overflow: hidden;
+    padding: 3.5vh 4vw;
+    background:
+        radial-gradient(
+            ellipse at 5% 100%,
+            rgba(230, 200, 109, .18),
+            transparent 28%
+        ),
+        radial-gradient(
+            ellipse at 100% 0%,
+            rgba(156, 186, 161, .22),
+            transparent 30%
+        ),
+        var(--jk-bg);
 }
 
-/* Blob decorativo de marca (identidad, D-036) ===== */
+/* Textura editorial: grilla sutil */
 
-.jk-vidriera::before {
+.screen::before {
     content: "";
-    position: fixed;
-    top: -160px;
-    right: -160px;
-    width: 460px;
-    height: 460px;
-    border-radius: 50%;
-    background: var(--jk-gradient-tricolor);
-    opacity: 0.10;
+    position: absolute;
+    inset: 0;
+    opacity: .28;
     pointer-events: none;
-    z-index: 0;
+    background-image:
+        linear-gradient(rgba(79, 64, 56, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 64, 56, .025) 1px, transparent 1px);
+    background-size: 26px 26px;
 }
 
-/* ===== HEADER / IDENTIDAD ===== */
+/* ===== FORMAS DECORATIVAS ===== */
+
+.shape {
+    position: absolute;
+    pointer-events: none;
+}
+
+.shape.circle {
+    width: 18vw;
+    height: 18vw;
+    right: -7vw;
+    top: -8vw;
+    border-radius: 50%;
+    background: var(--jk-accent);
+    opacity: .12;
+}
+
+.shape.arc {
+    width: 22vw;
+    height: 11vw;
+    left: -8vw;
+    bottom: -5vw;
+    border: 3px solid var(--jk-coral);
+    border-radius: 50%;
+    opacity: .20;
+}
+
+.shape.dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--jk-butter);
+}
+
+.dot-a { right: 22%; top: 11%; }
+.dot-b { right: 25%; top: 14%; }
+.dot-c { left: 17%; bottom: 8%; }
+
+/* ===== HEADER ===== */
 
 .jk-vidriera-header {
     position: relative;
-    z-index: 1;
-    display: flex;
+    z-index: 2;
+    height: 18%;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--jk-space-24);
-    background: linear-gradient(135deg, var(--jk-surface) 0%, #FFFFFF 100%);
-    border: 1px solid var(--jk-border-light);
-    border-radius: var(--jk-radius-xl);
-    box-shadow: var(--jk-shadow);
-    padding: var(--jk-space-20) var(--jk-space-24);
-    flex: 0 0 auto;
+    border-bottom: 1px solid var(--jk-border);
 }
 
 .jk-vidriera-brand {
     display: flex;
     align-items: center;
-    gap: var(--jk-space-20);
-    min-width: 0;
-}
-
-.jk-vidriera-marca {
-    display: inline-flex;
-    padding: 5px;
-    border-radius: var(--jk-radius-full);
-    background: var(--jk-white);
-    box-shadow: 0 0 0 4px var(--jk-accent-light), var(--jk-shadow);
-    flex-shrink: 0;
-}
-
-.jk-vidriera-logo {
-    width: 84px;
-    height: 84px;
-    border-radius: var(--jk-radius-full);
-    object-fit: cover;
-}
-
-.jk-vidriera-logo-fallback {
-    width: 84px;
-    height: 84px;
-    border-radius: var(--jk-radius-full);
-    background: var(--jk-gradient-tricolor);
-    color: #fff;
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-3xl);
-    font-weight: var(--jk-weight-bold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.jk-vidriera-brand-info {
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-2);
-    min-width: 0;
+    gap: 1.5vw;
 }
 
 .jk-vidriera-nombre {
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-3xl);
-    font-weight: var(--jk-weight-bold);
-    letter-spacing: -0.02em;
+    font-family: 'Playfair Display', 'Nunito', serif;
+    font-size: clamp(48px, 5.3vw, 88px);
+    line-height: .9;
+    letter-spacing: .025em;
+    font-weight: 600;
+    color: var(--jk-text-primary);
     margin: 0;
-    line-height: 1.1;
+}
+
+.jk-vidriera-brand-rule {
+    width: 1px;
+    height: 58px;
+    background: var(--jk-border);
+    flex-shrink: 0;
+}
+
+.jk-vidriera-brand-description {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .jk-vidriera-titulo {
     margin: 0;
-    font-size: var(--jk-text-lg);
-    font-weight: var(--jk-weight-semibold);
-    color: var(--jk-accent);
+    font-size: clamp(16px, 1.35vw, 24px);
+    font-weight: 700;
+    color: var(--jk-text-primary);
 }
 
 .jk-vidriera-descripcion {
-    margin: var(--jk-space-4) 0 0 0;
+    margin: 0;
+    font-size: clamp(12px, .9vw, 16px);
     color: var(--jk-text-secondary);
-    font-size: var(--jk-text-base);
-    line-height: 1.4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
 }
-
-/* ===== CONTACTO ===== */
 
 .jk-vidriera-contacto {
     display: flex;
-    flex-direction: column;
     gap: var(--jk-space-8);
-    color: var(--jk-text-primary);
-    font-size: var(--jk-text-base);
+    flex-wrap: wrap;
     flex-shrink: 0;
 }
 
 .jk-vidriera-contacto-item {
     display: inline-flex;
     align-items: center;
-    gap: var(--jk-space-8);
-    padding: var(--jk-space-8) var(--jk-space-12);
-    background: var(--jk-accent-light);
+    gap: 6px;
+    padding: 5px 14px;
+    background: var(--jk-surface);
     border-radius: var(--jk-radius-full);
+    font-size: var(--jk-text-sm);
     white-space: nowrap;
 }
 
@@ -163,492 +168,375 @@ body {
     color: var(--jk-accent);
 }
 
-/* ===== MENSAJE / BIENVENIDA ===== */
-
-.jk-vidriera-mensaje {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    gap: var(--jk-space-20);
-    background: var(--jk-gradient-tricolor);
-    color: #fff;
-    border-radius: var(--jk-radius-lg);
-    padding: var(--jk-space-16) var(--jk-space-24);
-    box-shadow: var(--jk-shadow);
-    flex: 0 0 auto;
+.jk-vidriera-week-label {
+    text-align: right;
 }
 
-.jk-vidriera-mensaje-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--jk-space-8);
-    padding: var(--jk-space-8) var(--jk-space-16);
-    background: rgba(255, 255, 255, 0.22);
-    border-radius: var(--jk-radius-full);
-    font-size: var(--jk-text-sm);
-    font-weight: var(--jk-weight-bold);
-    letter-spacing: 0.04em;
+.jk-vidriera-week-label small {
+    display: block;
     text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
+    font-size: clamp(9px, .7vw, 13px);
+    font-weight: 800;
+    letter-spacing: .18em;
+    color: var(--jk-text-secondary);
+    margin-bottom: 5px;
 }
 
-.jk-vidriera-mensaje-texto {
-    margin: 0;
-    font-size: var(--jk-text-xl);
-    font-weight: var(--jk-weight-bold);
-    line-height: 1.3;
+.jk-vidriera-week-label strong {
+    display: block;
+    font-family: 'Playfair Display', 'Nunito', serif;
+    font-size: clamp(22px, 2vw, 34px);
+    font-weight: 600;
 }
 
-/* ===== GRID PRINCIPAL (2 columnas, para no hacer scroll) ===== */
+/* ===== MAIN (2 columnas: tabla + promo) ===== */
 
-.jk-vidriera-grid {
+.jk-vidriera-main {
     position: relative;
-    z-index: 1;
-    flex: 1 1 auto;
-    min-height: 0;
+    z-index: 2;
+    height: 79%;
     display: grid;
-    grid-template-columns: 3fr 1fr;
-    gap: var(--jk-space-16);
+    grid-template-columns: minmax(0, 1fr) 18%;
+    gap: 2vw;
+    padding-top: 2vh;
 }
 
-.jk-vidriera-side {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-12);
+.jk-vidriera-main.no-promo {
+    grid-template-columns: 1fr;
+}
+
+/* ===== TABLA DE DISPONIBILIDAD ===== */
+
+.jk-vidriera-schedule {
+    min-width: 0;
+    display: grid;
+    background: #fffaf3;
+    border: 1px solid var(--jk-border);
+    border-radius: 24px;
     overflow: hidden;
+    box-shadow: 0 18px 50px rgba(79, 64, 56, .07);
 }
 
-/* ===== SECCION / TARJETA ===== */
+/* Cabecera: corner + servicios */
 
-.jk-vidriera-seccion {
+.jk-vidriera-schedule .corner {
+    background: #f2e8da;
+    border-right: 1px solid var(--jk-border);
+    border-bottom: 1px solid var(--jk-border);
+}
+
+.jk-vidriera-schedule .service {
     position: relative;
-    background: var(--jk-white);
-    border: 1px solid var(--jk-border-light);
-    border-radius: var(--jk-radius-xl);
-    box-shadow: var(--jk-shadow);
-    padding: var(--jk-space-20) var(--jk-space-24);
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-
-.jk-vidriera-seccion-head {
     display: flex;
     align-items: center;
-    gap: var(--jk-space-12);
-    margin-bottom: var(--jk-space-16);
-    padding-bottom: var(--jk-space-12);
-    border-bottom: 1px solid var(--jk-border-light);
+    justify-content: center;
+    border-bottom: 1px solid var(--jk-border);
+    border-right: 1px solid var(--jk-border);
+    text-transform: uppercase;
+    font-size: clamp(14px, 1.15vw, 22px);
+    font-weight: 800;
+    letter-spacing: .07em;
 }
 
-.jk-vidriera-seccion-icono {
+.jk-vidriera-schedule .service:last-child {
+    border-right: 0;
+}
+
+.jk-vidriera-schedule .service::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 38px;
+    height: 4px;
+    transform: translateX(-50%);
+    border-radius: 10px 10px 0 0;
+}
+
+/* Filas: dia */
+
+.jk-vidriera-schedule .day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5ecdf;
+    border-right: 1px solid var(--jk-border);
+    border-bottom: 1px solid var(--jk-border);
+    font-size: clamp(13px, 1vw, 19px);
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.jk-vidriera-schedule .day:last-of-type {
+    border-bottom: 0;
+}
+
+/* Celdas */
+
+.jk-vidriera-schedule .cell {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(4px, .5vw, 9px);
+    padding: 5px 8px;
+    border-right: 1px solid var(--jk-border);
+    border-bottom: 1px solid var(--jk-border);
+    background: rgba(255, 250, 243, .75);
+}
+
+.jk-vidriera-schedule .cell:last-child {
+    border-right: 0;
+}
+
+.jk-vidriera-schedule .day-row-soft {
+    background: #fcf7ef;
+}
+
+/* Chips de hora */
+
+.jk-vidriera-schedule .time {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: var(--jk-radius);
-    background: var(--jk-accent-light);
-    color: var(--jk-accent);
-    font-size: var(--jk-text-lg);
-    flex-shrink: 0;
+    height: clamp(29px, 2.5vw, 44px);
+    min-width: clamp(49px, 3.8vw, 72px);
+    padding: 0 .7vw;
+    border-radius: 9px;
+    font-size: clamp(11px, .85vw, 17px);
+    font-weight: 800;
+    white-space: nowrap;
 }
 
-.jk-vidriera-seccion-icono-teal {
-    background: var(--jk-teal-light);
-    color: var(--jk-teal);
+/* Celda vacia */
+
+.jk-vidriera-schedule .empty {
+    font-family: 'Playfair Display', 'Nunito', serif;
+    font-size: clamp(20px, 1.4vw, 28px);
+    color: #ad9c8e;
 }
 
-.jk-vidriera-seccion-titulo {
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-xl);
-    font-weight: var(--jk-weight-bold);
-    letter-spacing: -0.01em;
-    margin: 0;
+/* ===== COLORES POR SERVICIO (12 paleta vintage) ===== */
+
+.svc-0 { background: #f9ddd2; color: #a65b48; }
+.svc-0::after { background: #E88A6F; }
+.svc-0-head { background: #fff4ee; color: #a65b48; }
+
+.svc-1 { background: #dce9dd; color: #55735d; }
+.svc-1::after { background: #9CBAA1; }
+.svc-1-head { background: #f0f6ef; color: #55735d; }
+
+.svc-2 { background: #f8e9ae; color: #806929; }
+.svc-2::after { background: #E6C868; }
+.svc-2-head { background: #fff9e9; color: #806929; }
+
+.svc-3 { background: #DAF0EF; color: #3d7a7e; }
+.svc-3::after { background: #5FA8AD; }
+.svc-3-head { background: #eef8f8; color: #3d7a7e; }
+
+.svc-4 { background: #F6DCD6; color: #8e4438; }
+.svc-4::after { background: #BE5B50; }
+.svc-4-head { background: #fdf0ec; color: #8e4438; }
+
+.svc-5 { background: #E4EEDF; color: #4a6b47; }
+.svc-5::after { background: #759572; }
+.svc-5-head { background: #f2f8ef; color: #4a6b47; }
+
+.svc-6 { background: #F8EFCB; color: #7a6520; }
+.svc-6::after { background: #D9A441; }
+.svc-6-head { background: #fdf8eb; color: #7a6520; }
+
+.svc-7 { background: #f3ddd2; color: #96503e; }
+.svc-7::after { background: #c97b6d; }
+.svc-7-head { background: #fdf0ea; color: #96503e; }
+
+.svc-8 { background: #dce5dd; color: #5a7560; }
+.svc-8::after { background: #8aad8f; }
+.svc-8-head { background: #eef4ef; color: #5a7560; }
+
+.svc-9 { background: #f5e6c8; color: #7a6224; }
+.svc-9::after { background: #d4b06a; }
+.svc-9-head { background: #fcf4e6; color: #7a6224; }
+
+.svc-10 { background: #d8e3e9; color: #4a6878; }
+.svc-10::after { background: #7295b5; }
+.svc-10-head { background: #edf2f6; color: #4a6878; }
+
+.svc-11 { background: #e5dce8; color: #6a5878; }
+.svc-11::after { background: #a594c5; }
+.svc-11-head { background: #f3eff5; color: #6a5878; }
+
+/* ===== PROMO ===== */
+
+.jk-vidriera-promo {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--jk-border);
+    border-radius: 24px;
+    background: #fffaf3;
+    overflow: hidden;
 }
+
+.jk-vidriera-promo::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    right: -105px;
+    top: -65px;
+    border-radius: 50%;
+    background: var(--jk-coral);
+    opacity: .15;
+}
+
+.jk-vidriera-promo::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    left: -70px;
+    bottom: -55px;
+    border-radius: 50%;
+    background: var(--jk-accent);
+    opacity: .15;
+}
+
+.jk-vidriera-promo-content {
+    position: relative;
+    z-index: 2;
+    width: 78%;
+    text-align: center;
+}
+
+.jk-vidriera-promo-top {
+    font-size: clamp(9px, .7vw, 13px);
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--jk-text-secondary);
+}
+
+.jk-vidriera-promo-line {
+    width: 35px;
+    height: 1px;
+    margin: 15px auto;
+    background: var(--jk-border);
+}
+
+.jk-vidriera-promo-title {
+    font-family: 'Playfair Display', 'Nunito', serif;
+    font-size: clamp(22px, 1.9vw, 34px);
+    line-height: 1.05;
+    margin-bottom: 13px;
+}
+
+.jk-vidriera-promo-service {
+    font-size: clamp(13px, 1vw, 18px);
+    font-weight: 600;
+    color: var(--jk-text-secondary);
+}
+
+.jk-vidriera-promo-price {
+    margin-top: 15px;
+    font-family: 'Playfair Display', 'Nunito', serif;
+    font-size: clamp(30px, 3vw, 54px);
+    line-height: .9;
+    color: var(--jk-coral);
+    font-weight: 700;
+}
+
+.jk-vidriera-promo-sub {
+    margin-top: 8px;
+    font-size: clamp(10px, .75vw, 14px);
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--jk-text-secondary);
+}
+
+/* ===== FOOTER ===== */
+
+.jk-vidriera-footer {
+    position: absolute;
+    z-index: 3;
+    left: 4vw;
+    bottom: 1.3vh;
+    font-size: clamp(8px, .6vw, 11px);
+    color: #9c8b7e;
+    letter-spacing: .06em;
+}
+
+/* ===== VACIO (sin disponibilidad) ===== */
 
 .jk-vidriera-vacio {
     color: var(--jk-text-secondary);
     margin: 0;
     font-size: var(--jk-text-base);
-}
-
-/* ===== SERVICIOS ===== */
-
-.jk-vidriera-servicios-card {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: hidden;
-    padding: var(--jk-space-12) var(--jk-space-16);
-}
-
-.jk-vidriera-servicios {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-8);
-    overflow-y: auto;
-    min-height: 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--jk-border) transparent;
-}
-
-.jk-vidriera-servicio {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--jk-space-12);
-    padding: var(--jk-space-8) var(--jk-space-12);
-    background: var(--jk-surface);
-    border-radius: var(--jk-radius);
-    border-left: 4px solid var(--jk-accent);
-}
-
-.jk-vidriera-servicio-cuerpo {
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-2);
-    min-width: 0;
-}
-
-.jk-vidriera-servicio-nombre {
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-md);
-    font-weight: var(--jk-weight-semibold);
-}
-
-.jk-vidriera-servicio-descripcion {
-    color: var(--jk-text-secondary);
-    font-size: var(--jk-text-sm);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.jk-vidriera-servicio-duracion {
-    color: var(--jk-text-secondary);
-    font-size: var(--jk-text-sm);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--jk-space-8);
-}
-
-.jk-vidriera-servicio-precio {
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-xl);
-    font-weight: var(--jk-weight-bold);
-    color: var(--jk-accent);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-/* ===== OFERTA ===== */
-
-.jk-vidriera-oferta {
-    position: relative;
-    background: linear-gradient(135deg, var(--jk-warning-light) 0%, var(--jk-butter-light) 100%);
-    border: 2px solid var(--jk-warning);
-    border-radius: var(--jk-radius-xl);
-    padding: var(--jk-space-12) var(--jk-space-16);
-    box-shadow: var(--jk-shadow);
-    flex: 0 0 auto;
-    overflow: hidden;
-}
-
-.jk-vidriera-oferta::before {
-    content: "";
-    position: absolute;
-    right: -34px;
-    top: -34px;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: var(--jk-warning);
-    opacity: 0.12;
-    pointer-events: none;
-}
-
-.jk-vidriera-oferta-etiqueta {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--jk-space-8);
-    padding: var(--jk-space-4) var(--jk-space-12);
-    background: var(--jk-warning);
-    color: #fff;
-    border-radius: var(--jk-radius-full);
-    font-size: var(--jk-text-xs);
-    font-weight: var(--jk-weight-bold);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-bottom: var(--jk-space-12);
-}
-
-.jk-vidriera-oferta-titulo {
-    margin: 0;
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-xl);
-    font-weight: var(--jk-weight-bold);
-    color: var(--jk-text-primary);
-    line-height: 1.2;
-}
-
-.jk-vidriera-oferta-descripcion {
-    margin: var(--jk-space-8) 0 0 0;
-    color: var(--jk-text-secondary);
-    font-size: var(--jk-text-base);
-    line-height: 1.4;
-}
-
-/* ===== DISPONIBILIDAD SEMANAL (D-047/D-048) ===== */
-
-.jk-vidriera-semanal-card {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: hidden;
-    background: var(--jk-white);
-    border-color: var(--jk-border-light);
-    color: var(--jk-text-primary);
-    padding: var(--jk-space-12) var(--jk-space-16);
-}
-
-.jk-vidriera-semanal-card .jk-vidriera-seccion-head {
-    border-bottom-color: var(--jk-border-light);
-    margin-bottom: var(--jk-space-12);
-    padding-bottom: var(--jk-space-8);
-}
-
-.jk-vidriera-semanal-card .jk-vidriera-seccion-titulo {
-    color: var(--jk-text-primary);
-}
-
-.jk-vidriera-semanal-rango {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    background: var(--jk-teal-light);
-    color: var(--jk-teal);
-    border: 1px solid var(--jk-teal);
-    border-radius: 999px;
-    font-size: var(--jk-text-sm);
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.jk-vidriera-semanal-card .jk-vidriera-vacio {
-    color: var(--jk-text-secondary);
-}
-
-/* ===== PIZARRA SEMANAL (D-048): hoy + 6 dias, cards por servicio, sin scroll ===== */
-
-.jk-vidriera-pizarra {
-    position: relative;
-    min-height: 0;
-    flex: 1 1 auto;
-    overflow: hidden;
-}
-
-.jk-vidriera-pantalla {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.6s ease;
-    display: flex;
-}
-
-.jk-vidriera-pantalla.is-active {
-    opacity: 1;
-    visibility: visible;
-    position: relative;
-}
-
-/* ===== MATRIZ SEMANAL: filas = servicios, columnas = dias, celdas = horas ===== */
-
-.jk-vidriera-matriz {
-    flex: 1 1 auto;
-    width: 100%;
-    height: 100%;
-    border-collapse: separate;
-    border-spacing: 6px;
-    table-layout: fixed;
-}
-
-.jk-vidriera-matriz-serv-col {
-    width: 150px;
-    padding: 8px 14px;
-    text-align: left;
-    font-size: var(--jk-text-md);
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--jk-text-secondary);
-}
-
-.jk-vidriera-matriz-dia {
-    padding: 10px 4px;
+    padding: var(--jk-space-24);
     text-align: center;
-    background: var(--jk-surface);
-    border: 1px solid var(--jk-border);
-    border-radius: var(--jk-radius-sm);
-    vertical-align: middle;
 }
 
-.jk-vidriera-matriz-dia.is-today {
-    background: var(--jk-teal-light);
-    border-color: var(--jk-teal);
+/* ===== PANTALLAS LED ULTRA ANCHAS ===== */
+
+@media (min-aspect-ratio: 2 / 1) {
+    .screen {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+
+    .jk-vidriera-main {
+        grid-template-columns: minmax(0, 1fr) 15%;
+    }
+
+    .jk-vidriera-footer {
+        left: 5vw;
+    }
 }
 
-.jk-vidriera-matriz-dia-nombre {
-    display: block;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--jk-text-secondary);
-    font-size: var(--jk-text-md);
-}
+/* ===== PANTALLAS PEQUENAS ===== */
 
-.jk-vidriera-matriz-dia.is-today .jk-vidriera-matriz-dia-nombre {
-    color: var(--jk-teal);
-}
-
-.jk-vidriera-matriz-dia-numero {
-    display: block;
-    font-family: var(--jk-font-display);
-    font-size: 1.7rem;
-    line-height: 1.1;
-    font-weight: 800;
-    color: var(--jk-text-primary);
-}
-
-.jk-vidriera-matriz-serv {
-    padding: 12px 14px;
-    text-align: left;
-    font-weight: 700;
-    color: var(--jk-text-primary);
-    font-size: var(--jk-text-md);
-    vertical-align: middle;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.jk-vidriera-matriz-serv i {
-    color: var(--jk-accent);
-    margin-right: 6px;
-}
-
-.jk-vidriera-matriz-celda {
-    padding: 6px 4px;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid var(--jk-border);
-    border-radius: var(--jk-radius-sm);
-    font-size: var(--jk-text-base);
-    font-weight: 700;
-    overflow: hidden;
-}
-
-.jk-vidriera-matriz-horas {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    width: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-    padding: 2px;
-}
-
-.jk-vidriera-matriz-hora {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px 7px;
-    border-radius: var(--jk-radius-sm);
-    background: var(--jk-white);
-    font-size: 1.15rem;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
-    box-shadow: var(--jk-shadow-sm);
-    max-width: 100%;
-}
-
-.jk-vidriera-matriz-celda.st-disponible {
-    background: var(--jk-success-light);
-    color: var(--jk-success);
-    border-color: var(--jk-success);
-}
-
-.jk-vidriera-matriz-celda.st-ultimo {
-    background: var(--jk-warning-light);
-    color: var(--jk-warning);
-    border-color: var(--jk-warning);
-}
-
-.jk-vidriera-matriz-celda.st-sin {
-    background: var(--jk-bg);
-    color: var(--jk-text-tertiary);
-}
-
-.jk-vidriera-matriz-celda.is-today {
-    outline: 2px solid var(--jk-teal);
-    outline-offset: -2px;
-}
-
-.jk-vidriera-matriz-sin {
-    color: var(--jk-text-tertiary);
-    font-weight: 800;
-}
-
-.jk-vidriera-pantalla-indicador {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 0 0 0;
-    flex-shrink: 0;
-}
-
-.jk-vidriera-pantalla-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--jk-border);
-    transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.jk-vidriera-pantalla-dot.is-active {
-    background: var(--jk-accent);
-    transform: scale(1.3);
-}
-
-/* ===== RESPONSIVE (mantener sin scroll abajo) ===== */
-
-@media (max-width: 840px) {
-    .jk-vidriera {
-        height: auto;
-        min-height: 100vh;
+@media (max-width: 1000px) {
+    body {
         overflow: auto;
     }
 
-    .jk-vidriera-grid {
-        grid-template-columns: 1fr;
+    .screen {
+        height: auto;
+        min-height: 100vh;
     }
 
     .jk-vidriera-header {
-        flex-direction: column;
-        align-items: flex-start;
+        height: auto;
+        grid-template-columns: 1fr;
+        gap: var(--jk-space-16);
+        padding-bottom: 25px;
     }
 
-    body {
-        overflow: auto;
+    .jk-vidriera-week-label {
+        text-align: left;
+    }
+
+    .jk-vidriera-main {
+        height: auto;
+        grid-template-columns: 1fr;
+    }
+
+    .jk-vidriera-schedule {
+        min-height: 650px;
+    }
+
+    .jk-vidriera-promo {
+        min-height: 230px;
+    }
+
+    .jk-vidriera-footer {
+        position: relative;
+        left: 0;
+        bottom: auto;
+        margin-top: 15px;
     }
 }

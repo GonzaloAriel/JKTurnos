@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JKTurnos.Data;
 using JKTurnos.Models.Entities;
@@ -40,6 +41,61 @@ namespace JKTurnos.Services
                 return 690;
 
             return (int)dif.TotalMinutes;
+        }
+
+        // Dias laborables: parsea el string "1,2,3,4,5,6" a un HashSet<DayOfWeek>.
+        // Si es null o vacio, retorna Lun-Sab como default.
+        public HashSet<DayOfWeek> GetDiasLaborales()
+        {
+            var config = GetConfiguracion();
+            return ParsearDiasLaborales(config?.DiasLaborales);
+        }
+
+        private HashSet<DayOfWeek> ParsearDiasLaborales(string valor)
+        {
+            var defaultDias = new HashSet<DayOfWeek>
+            {
+                DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
+                DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday
+            };
+
+            if (string.IsNullOrWhiteSpace(valor))
+                return defaultDias;
+
+            var resultado = new HashSet<DayOfWeek>();
+            foreach (var parte in valor.Split(','))
+            {
+                var trimmed = parte.Trim();
+                int num;
+                if (int.TryParse(trimmed, out num) && num >= 1 && num <= 7)
+                {
+                    // 1=Lun=Monday..7=Dom=Sunday. Mapeo: (num % 7) + 1 == DayOfWeek value?
+                    // DayOfWeek: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+                    // Nuestro:  1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun
+                    // Mapeo: nuestro 1 -> C# 1 (Mon), 7 -> 0 (Sun)
+                    var dow = num == 7 ? DayOfWeek.Sunday : (DayOfWeek)num;
+                    resultado.Add(dow);
+                }
+            }
+
+            return resultado.Count > 0 ? resultado : defaultDias;
+        }
+
+        private string FormatearDiasLaborales(HashSet<DayOfWeek> dias)
+        {
+            if (dias == null || dias.Count == 0)
+                return "1,2,3,4,5,6";
+
+            // Orden: Lun(1)..Dom(7)
+            var partes = new List<string>();
+            for (int i = 1; i <= 7; i++)
+            {
+                var dow = i == 7 ? DayOfWeek.Sunday : (DayOfWeek)i;
+                if (dias.Contains(dow))
+                    partes.Add(i.ToString());
+            }
+
+            return partes.Count > 0 ? string.Join(",", partes) : "1,2,3,4,5,6";
         }
 
         // Datos del negocio (forma DatosNegocio). No toca las notificaciones:
@@ -86,7 +142,8 @@ namespace JKTurnos.Services
                 AuditService.Campo("LogoUrl", actual.LogoUrl, model.LogoUrl),
                 AuditService.Campo("AvatarUrl", actual.AvatarUrl, model.AvatarUrl),
                 AuditService.Campo("HoraApertura", actual.HoraApertura?.ToString(@"hh\:mm"), model.HoraApertura?.ToString(@"hh\:mm")),
-                AuditService.Campo("HoraCierre", actual.HoraCierre?.ToString(@"hh\:mm"), model.HoraCierre?.ToString(@"hh\:mm")));
+                AuditService.Campo("HoraCierre", actual.HoraCierre?.ToString(@"hh\:mm"), model.HoraCierre?.ToString(@"hh\:mm")),
+                AuditService.Campo("DiasLaborales", actual.DiasLaborales, model.DiasLaborales));
 
             actual.NombreComercial = model.NombreComercial;
             actual.Telefono = model.Telefono;
@@ -96,6 +153,7 @@ namespace JKTurnos.Services
             actual.AvatarUrl = model.AvatarUrl;
             actual.HoraApertura = model.HoraApertura;
             actual.HoraCierre = model.HoraCierre;
+            actual.DiasLaborales = model.DiasLaborales;
             _configRepo.Update(actual);
 
             new AuditService().Registrar(

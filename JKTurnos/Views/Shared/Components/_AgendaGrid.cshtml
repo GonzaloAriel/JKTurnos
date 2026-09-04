@@ -68,6 +68,17 @@
             { "ActionUrl", Url.Action("Create", "Recursos") }
         })
 }
+else if (Model.DiasLaborales != null && Model.DiasLaborales.Count > 0 && !Model.DiasLaborales.Contains(fecha.DayOfWeek))
+{
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "calendar-x" },
+            { "Title", "Este dia no es laborable" },
+            { "Description", "La configuracion del negocio indica que este dia no se trabaja. Selecciona un dia laborable en la agenda." },
+            { "ActionText", "Volver a la semana" },
+            { "ActionUrl", Url.Action("Agenda", "Turnos", new { vista = "semana" }) }
+        })
+}
 else
 {
     <div class="jk-agenda-grid-wrap" role="grid" aria-label="Grilla de agenda">

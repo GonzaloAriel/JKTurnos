@@ -18,5 +18,8 @@ namespace JKTurnos.Models.ViewModels
         public IEnumerable<BloqueoRecurso> Bloqueos { get; set; }
 
         public int? OpenRecursoId { get; set; }
+
+        // Dias laborables del tenant (para filtrar columnas en vista semanal).
+        public HashSet<DayOfWeek> DiasLaborales { get; set; }
     }
 }

@@ -298,7 +298,8 @@ namespace JKTurnos.Controllers
                 Fecha = fechaSeleccionada,
                 Vista = vistaNormalizada,
                 Recursos = _recursoService.GetAll(),
-                OpenRecursoId = openRecursoId
+                OpenRecursoId = openRecursoId,
+                DiasLaborales = new ConfiguracionService().GetDiasLaborales()
             };
 
             if (vistaNormalizada == "semana")

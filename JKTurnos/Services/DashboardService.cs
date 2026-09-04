@@ -157,10 +157,15 @@ namespace JKTurnos.Services
             var turnosSemana = _turnoService.GetTurnosEnRango(lunes, lunes.AddDays(7));
             var dayNames = new[] { "Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom" };
             var resultado = new List<BarraGrafico>();
+            var diasLaborales = _configService.GetDiasLaborales();
 
             for (int i = 0; i < 7; i++)
             {
                 var dia = lunes.AddDays(i);
+
+                if (!diasLaborales.Contains(dia.DayOfWeek))
+                    continue;
+
                 var cantidad = turnosSemana.Count(t =>
                     t.FechaHoraInicio.Date == dia.Date &&
                     (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado));

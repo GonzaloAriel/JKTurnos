@@ -78,6 +78,11 @@ namespace JKTurnos.Models.Entities
 
         public TimeSpan? HoraCierre { get; set; }
 
+        // Dias laborables separados por coma (1=Lun..7=Dom). Default "1,2,3,4,5,6".
+        // La agenda y la vidriera solo muestran estos dias; los demas no aparecen.
+        [StringLength(50)]
+        public string DiasLaborales { get; set; }
+
         [ForeignKey("TenantId")]
         public virtual Tenant Tenant { get; set; }
     }

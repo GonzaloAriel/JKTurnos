@@ -22,6 +22,27 @@
     var lunes = Model.Fecha.AddDays(diff);
     var dayNames = new[] { "Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom" };
 
+    // Dias laborables: mapear DayOfWeek a indice del array (0=Lun..6=Dom)
+    var diasLabIdx = new List<int>();
+    if (Model.DiasLaborales != null && Model.DiasLaborales.Count > 0)
+    {
+        for (int d = 0; d < 7; d++)
+        {
+            var dow = d == 6 ? DayOfWeek.Sunday : (DayOfWeek)(d + 1);
+            if (Model.DiasLaborales.Contains(dow))
+            {
+                diasLabIdx.Add(d);
+            }
+        }
+    }
+    if (diasLabIdx.Count == 0)
+    {
+        for (int d = 0; d < 7; d++)
+        {
+            diasLabIdx.Add(d);
+        }
+    }
+
     double pxPorHora = 48;
     double pxPorMinuto = pxPorHora / 60.0;
 
@@ -63,9 +84,10 @@
     }
 }
 
-<div class="jk-agenda-week" role="grid" aria-label="Grilla semanal">
-    @for (int i = 0; i < 7; i++)
+<div class="jk-agenda-week" role="grid" aria-label="Grilla semanal" style="grid-template-columns: repeat(@diasLabIdx.Count, minmax(160px, 1fr));">
+    @for (int idx = 0; idx < diasLabIdx.Count; idx++)
     {
+        int i = diasLabIdx[idx];
         var dia = lunes.AddDays(i);
         var lista = turnosPorDia[i];
         int n = lista.Count;
