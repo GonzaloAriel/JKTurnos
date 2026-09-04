@@ -15,6 +15,10 @@ namespace JKTurnos.Models.ViewModels
         public string Email { get; set; }
         public string Direccion { get; set; }
 
+        // Franja real de la jornada (M-01): rango de horarios de la vidriera.
+        public System.TimeSpan? JornadaDesde { get; set; }
+        public System.TimeSpan? JornadaHasta { get; set; }
+
         // Config de exhibicion (flags D-042: seccion presente SOLO si su flag).
         public bool MostrarServicios { get; set; }
         public bool MostrarPrecios { get; set; }
@@ -32,7 +36,8 @@ namespace JKTurnos.Models.ViewModels
         // Contenido principal: servicios activos del tenant.
         public List<VidrieraServicioVM> Servicios { get; set; } = new List<VidrieraServicioVM>();
 
-        // Posta 4: proximos slots libres de hoy, por recurso (si MostrarDisponibilidad).
-        public List<VidrieraDisponibilidadVM> Disponibilidad { get; set; } = new List<VidrieraDisponibilidadVM>();
+        // D-047/D-048: pizarra SEMANAL de disponibilidad (hoy + 6 dias) por servicio,
+        // partida en pantallas que rotan cada 10s para no desbordar el monitor.
+        public List<VidrieraPantallaVM> Pantallas { get; set; } = new List<VidrieraPantallaVM>();
     }
 }

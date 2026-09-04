@@ -18,6 +18,18 @@
     var turnos = Model.Turnos != null ? Model.Turnos.OrderBy(t => t.FechaHoraInicio).ToList() : new List<Turno>();
     var fecha = Model.Fecha;
 
+    Func<JKTurnos.Models.Entities.BloqueoRecurso, DateTime, DateTime, bool> FranjaBloqueada = (b, fini, ffin) =>
+    {
+        if (!b.HoraInicio.HasValue || !b.HoraFin.HasValue)
+            return true; // todo el dia: siempre ocupa.
+        if (b.HoraInicio.Value >= b.HoraFin.Value)
+            return true;
+        var diaBase = fecha.Date;
+        var bIni = diaBase.Add(b.HoraInicio.Value);
+        var bFin = diaBase.Add(b.HoraFin.Value);
+        return fini < bFin && ffin > bIni;
+    };
+
     var gridInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, 8, 0, 0);
     var gridFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, 19, 30, 0);
 
@@ -62,6 +74,31 @@ else
         {
             var turnosRec = turnos.Where(t => t.RecursoId == rec.Id).OrderBy(t => t.FechaHoraInicio).ToList();
 
+            // D-046: bloques de indisponibilidad visibles de este recurso en el dia.
+            var bloqueosRec = new List<JKTurnos.Models.Entities.BloqueoRecurso>();
+            if (Model.Bloqueos != null)
+            {
+                foreach (var b in Model.Bloqueos)
+                {
+                    if (b.RecursoId != rec.Id) { continue; }
+                    bool aplicaDia = false;
+                    switch (b.Tipo)
+                    {
+                        case JKTurnos.Models.Entities.TipoBloqueo.Unico:
+                            aplicaDia = b.FechaInicio.Date == fecha.Date;
+                            break;
+                        case JKTurnos.Models.Entities.TipoBloqueo.RangoFechas:
+                            var bFin = b.FechaFin.HasValue ? b.FechaFin.Value.Date : b.FechaInicio.Date;
+                            aplicaDia = fecha.Date >= b.FechaInicio.Date && fecha.Date <= bFin;
+                            break;
+                        default:
+                            aplicaDia = fecha.DayOfWeek == b.FechaInicio.DayOfWeek;
+                            break;
+                    }
+                    if (aplicaDia) { bloqueosRec.Add(b); }
+                }
+            }
+
             // Horarios libres: franjas de 30 min desocupadas, fusionadas en rangos continuos.
             var libres = new List<Tuple<DateTime, DateTime>>();
             DateTime franjaStart = gridInicio;
@@ -69,7 +106,8 @@ else
             while (franjaStart < gridFin)
             {
                 var franjaEnd = franjaStart.AddMinutes(30);
-                bool ocupada = turnosRec.Any(t => t.FechaHoraInicio < franjaEnd && t.FechaHoraFin > franjaStart);
+                bool ocupada = turnosRec.Any(t => t.FechaHoraInicio < franjaEnd && t.FechaHoraFin > franjaStart)
+                    || bloqueosRec.Any(b => FranjaBloqueada(b, franjaStart, franjaEnd));
                 if (!ocupada)
                 {
                     if (rangoStart == null)
@@ -137,6 +175,28 @@ else
                                 </div>
                             </div>
                         }
+                    }
+
+                    @if (bloqueosRec.Count > 0)
+                    {
+                        <div class="jk-bloqueo-mobile-list" role="list" aria-label="Bloqueos de disponibilidad">
+                            @foreach (var b in bloqueosRec)
+                            {
+                                string bLabel = !string.IsNullOrWhiteSpace(b.Descripcion) ? b.Descripcion : "No disponible";
+                                string bBand = "Todo el dia";
+                                if (b.HoraInicio.HasValue && b.HoraFin.HasValue)
+                                {
+                                    bBand = b.HoraInicio.Value.ToString("hh\\:mm") + " - " + b.HoraFin.Value.ToString("hh\\:mm");
+                                }
+                                <div class="jk-bloqueo-recurso-mobile" role="status" aria-label="Bloqueo: @bLabel">
+                                    <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                                    <div>
+                                        <div class="jk-bloqueo-recurso-mobile-band">@bBand</div>
+                                        <div class="jk-bloqueo-recurso-mobile-label">@bLabel</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
 
                     @if (libres.Count > 0)

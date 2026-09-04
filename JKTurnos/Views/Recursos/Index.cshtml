@@ -62,6 +62,24 @@
             </div>
         }
     </div>
+
+    if (User.IsInRole(JKTurnos.Models.Entities.Roles.Admin))
+    {
+        <div class="jk-card jk-card-compact jk-mt-16">
+            <div class="jk-flex jk-gap-12">
+                <i class="bi bi-calendar-x jk-muted"></i>
+                <div class="jk-flex-1">
+                    <strong>Bloqueos de disponibilidad</strong>
+                    <div class="jk-small jk-mt-4">
+                        Marca en gris los horarios en los que un recurso estará ocupado o no disponible en la agenda.
+                    </div>
+                    <a href="@Url.Action("Index", "Bloqueos")" class="jk-btn jk-btn-ghost jk-btn-sm jk-mt-8">
+                        <i class="bi bi-gear"></i> Gestionar bloqueos
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @helper EmptyContent() {

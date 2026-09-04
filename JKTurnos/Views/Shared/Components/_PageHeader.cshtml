@@ -16,6 +16,9 @@
     string primaryAction = ViewBag.PrimaryAction ?? "";
     string primaryActionLabel = ViewBag.PrimaryActionLabel ?? "";
     string primaryActionIcon = ViewBag.PrimaryActionIcon ?? "plus-lg";
+    string secondaryAction = ViewBag.SecondaryAction ?? "";
+    string secondaryActionLabel = ViewBag.SecondaryActionLabel ?? "";
+    string secondaryActionIcon = ViewBag.SecondaryActionIcon ?? "calendar-x";
 }
 
 <div class="jk-page-header">
@@ -30,6 +33,13 @@
         @if (!string.IsNullOrEmpty(primaryAction))
         {
             <div class="jk-page-header-actions">
+                @if (!string.IsNullOrEmpty(secondaryAction))
+                {
+                    <a href="@secondaryAction" class="jk-btn jk-btn-ghost">
+                        <i class="bi bi-@secondaryActionIcon"></i>
+                        @secondaryActionLabel
+                    </a>
+                }
                 <a href="@primaryAction" class="jk-btn jk-btn-primary">
                     <i class="bi bi-@primaryActionIcon"></i>
                     @primaryActionLabel

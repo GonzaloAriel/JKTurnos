@@ -166,6 +166,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PagosController.cs" />
     <Compile Include="Controllers\AvataresController.cs" />
+    <Compile Include="Controllers\BloqueosController.cs" />
     <Compile Include="Controllers\PagosSuscripcionController.cs" />
     <Compile Include="Controllers\RecursosController.cs" />
     <Compile Include="Controllers\ServiciosController.cs" />
@@ -247,6 +248,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\BaseEntity.cs" />
+    <Compile Include="Models\Entities\BloqueoRecurso.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
     <Compile Include="Models\Entities\EstadoTurno.cs" />
@@ -286,8 +288,12 @@
     <Compile Include="Models\ViewModels\RecordatorioSistema.cs" />
     <Compile Include="Models\ViewModels\VidrieraPublicaViewModel.cs" />
     <Compile Include="Models\ViewModels\VidrieraDisponibilidadVM.cs" />
+    <Compile Include="Models\ViewModels\VidrieraDisponibilidadSemanalVM.cs" />
+    <Compile Include="Models\ViewModels\VidrieraDisponibilidadDiaVM.cs" />
+    <Compile Include="Models\ViewModels\VidrieraPantallaVM.cs" />
     <Compile Include="Models\ViewModels\VidrieraServicioVM.cs" />
     <Compile Include="Models\ViewModels\VidrieraAdminViewModel.cs" />
+    <Compile Include="Models\ViewModels\BloqueoRecursoViewModel.cs" />
     <Compile Include="Models\ViewModels\UsuarioViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistrarPagoViewModel.cs" />
     <Compile Include="Models\ViewModels\AvatarPlataformaViewModel.cs" />
@@ -303,6 +309,7 @@
     <Compile Include="Services\AvatarPlataformaService.cs" />
     <Compile Include="Services\PagoSuscripcionService.cs" />
     <Compile Include="Services\RecursoService.cs" />
+    <Compile Include="Services\BloqueoRecursoService.cs" />
     <Compile Include="Services\RecursoServicioService.cs" />
     <Compile Include="Services\ServicioService.cs" />
     <Compile Include="Services\TenantService.cs" />
@@ -342,6 +349,7 @@
     <Content Include="Content\DesignSystem\jk-utilities.css" />
     <Content Include="Content\Pages\jk-busqueda.css" />
     <Content Include="Content\Pages\jk-agenda.css" />
+    <Content Include="Content\Pages\jk-bloqueos.css" />
     <Content Include="Content\Pages\jk-pagos.css" />
     <Content Include="Content\Pages\jk-dashboard-section.css" />
     <Content Include="Content\Pages\jk-ayuda.css" />
@@ -452,6 +460,10 @@
     <Content Include="Views\Recursos\Delete.cshtml" />
     <Content Include="Views\Recursos\Edit.cshtml" />
     <Content Include="Views\Recursos\Index.cshtml" />
+    <Content Include="Views\Bloqueos\Create.cshtml" />
+    <Content Include="Views\Bloqueos\Delete.cshtml" />
+    <Content Include="Views\Bloqueos\Edit.cshtml" />
+    <Content Include="Views\Bloqueos\Index.cshtml" />
     <Content Include="Views\Pagos\Index.cshtml" />
     <Content Include="Views\Dashboard\Index.cshtml" />
     <Content Include="Views\Ayuda\Index.cshtml" />

@@ -3,6 +3,12 @@
 @{
     Layout = "~/Views/Shared/_VidrieraLayout.cshtml";
     ViewBag.Title = Model.NombreNegocio;
+    int totalPantallas = Model.Pantallas.Count;
+
+    string fmtJornada(System.TimeSpan? ts)
+    {
+        return ts.HasValue ? ts.Value.ToString(@"hh\:mm") : "";
+    }
 }
 
 <header class="jk-vidriera-header">
@@ -74,41 +80,96 @@
 
 <div class="jk-vidriera-grid">
 
-    @if (Model.MostrarServicios)
+    @if (Model.MostrarDisponibilidad)
     {
-        <section class="jk-vidriera-seccion jk-vidriera-servicios-card">
+        <section class="jk-vidriera-seccion jk-vidriera-semanal-card">
             <header class="jk-vidriera-seccion-head">
-                <span class="jk-vidriera-seccion-icono"><i class="bi bi-list-ul"></i></span>
-                <h2 class="jk-vidriera-seccion-titulo">Servicios</h2>
+                <span class="jk-vidriera-seccion-icono jk-vidriera-seccion-icono-teal"><i class="bi bi-calendar-week"></i></span>
+                <h2 class="jk-vidriera-seccion-titulo">Disponibilidad semanal</h2>
+                <span class="jk-vidriera-semanal-rango">
+                    <i class="bi bi-clock"></i> @fmtJornada(Model.JornadaDesde) a @fmtJornada(Model.JornadaHasta)
+                </span>
             </header>
 
-            @if (Model.Servicios.Count == 0)
+            @if (Model.Pantallas.Count == 0)
             {
-                <p class="jk-vidriera-vacio">Aun no hay servicios publicados.</p>
+                <p class="jk-vidriera-vacio">Sin turnos disponibles.</p>
             }
             else
             {
-                <ul class="jk-vidriera-servicios">
-                    @foreach (var s in Model.Servicios)
+                <text>
+                <div class="jk-vidriera-pizarra" id="jkPizarra" data-pantallas="@totalPantallas">
+                    @for (int p = 0; p < totalPantallas; p++)
                     {
-                        <li class="jk-vidriera-servicio">
-                            <div class="jk-vidriera-servicio-cuerpo">
-                                <span class="jk-vidriera-servicio-nombre">@s.Nombre</span>
-                                @if (!string.IsNullOrWhiteSpace(s.Descripcion))
-                                {
-                                    <span class="jk-vidriera-servicio-descripcion">@s.Descripcion</span>
-                                }
-                                <span class="jk-vidriera-servicio-duracion">
-                                    <i class="bi bi-clock"></i> @s.DuracionMinutos min
-                                </span>
-                            </div>
-                            @if (s.MostrarPrecio)
-                            {
-                                <span class="jk-vidriera-servicio-precio">$@s.Precio.ToString("0.##")</span>
-                            }
-                        </li>
+                        var pantalla = Model.Pantallas[p];
+                        var diasRef = pantalla.Servicios.FirstOrDefault()?.Dias
+                            ?? new List<JKTurnos.Models.ViewModels.VidrieraDisponibilidadDiaVM>();
+
+                        <div class="jk-vidriera-pantalla@(p == 0 ? " is-active" : "")" data-pantalla="@p">
+                            <table class="jk-vidriera-matriz">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="jk-vidriera-matriz-serv-col">Servicio</th>
+                                        @for (int dIdx = 0; dIdx < diasRef.Count; dIdx++)
+                                        {
+                                            var dd = diasRef[dIdx];
+                                            <th scope="col" class="jk-vidriera-matriz-dia@(dd.EsHoy ? " is-today" : "")">
+                                                <span class="jk-vidriera-matriz-dia-nombre">@dd.NombreDia</span>
+                                                <span class="jk-vidriera-matriz-dia-numero">@dd.DiaDelMes</span>
+                                            </th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var srv in pantalla.Servicios)
+                                    {
+                                        <tr>
+                                            <th scope="row" class="jk-vidriera-matriz-serv">
+                                                <i class="bi bi-scissors"></i>
+                                                <span>@srv.ServicioNombre</span>
+                                            </th>
+                                            @for (int dIdx = 0; dIdx < diasRef.Count; dIdx++)
+                                            {
+                                                var ds = srv.Dias[dIdx];
+                                                string estadoClase = "st-sin";
+                                                if (ds.CantidadSlots >= 2) { estadoClase = "st-disponible"; }
+                                                else if (ds.CantidadSlots == 1) { estadoClase = "st-ultimo"; }
+
+                                                var diaClase = diasRef[dIdx].EsHoy ? " is-today" : "";
+                                                <td class="jk-vidriera-matriz-celda @estadoClase@(diaClase)">
+                                                    @if (ds.SinDisponibilidad)
+                                                    {
+                                                        <span class="jk-vidriera-matriz-sin">--</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="jk-vidriera-matriz-horas">
+                                                            @foreach (var r in ds.Rangos)
+                                                            {
+                                                                <span class="jk-vidriera-matriz-hora">@r</span>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     }
-                </ul>
+                </div>
+
+                @if (totalPantallas > 1)
+                {
+                    <div class="jk-vidriera-pantalla-indicador">
+                        @for (int p = 0; p < totalPantallas; p++)
+                        {
+                            <span class="jk-vidriera-pantalla-dot@(p == 0 ? " is-active" : "")" data-dot="@p"></span>
+                        }
+                    </div>
+                }
+                </text>
             }
         </section>
     }
@@ -130,37 +191,37 @@
             </section>
         }
 
-        @if (Model.MostrarDisponibilidad)
+        @if (Model.MostrarServicios)
         {
-            <section class="jk-vidriera-seccion jk-vidriera-disponibilidad-card">
+            <section class="jk-vidriera-seccion jk-vidriera-servicios-card">
                 <header class="jk-vidriera-seccion-head">
-                    <span class="jk-vidriera-seccion-icono jk-vidriera-seccion-icono-teal"><i class="bi bi-calendar-check"></i></span>
-                    <h2 class="jk-vidriera-seccion-titulo">Disponibilidad de hoy</h2>
+                    <span class="jk-vidriera-seccion-icono"><i class="bi bi-list-ul"></i></span>
+                    <h2 class="jk-vidriera-seccion-titulo">Servicios</h2>
                 </header>
 
-                @if (Model.Disponibilidad.Count == 0)
+                @if (Model.Servicios.Count == 0)
                 {
-                    <p class="jk-vidriera-vacio">Sin turnos disponibles hoy.</p>
+                    <p class="jk-vidriera-vacio">Aun no hay servicios publicados.</p>
                 }
                 else
                 {
-                    <ul class="jk-vidriera-disponibilidad">
-                        @foreach (var d in Model.Disponibilidad)
+                    <ul class="jk-vidriera-servicios">
+                        @foreach (var s in Model.Servicios)
                         {
-                            <li class="jk-vidriera-disponibilidad-recurso">
-                                <span class="jk-vidriera-disponibilidad-recurso-nombre"><i class="bi bi-people"></i> @d.RecursoNombre</span>
-                                @if (d.SinDisponibilidad)
+                            <li class="jk-vidriera-servicio">
+                                <div class="jk-vidriera-servicio-cuerpo">
+                                    <span class="jk-vidriera-servicio-nombre">@s.Nombre</span>
+                                    @if (!string.IsNullOrWhiteSpace(s.Descripcion))
+                                    {
+                                        <span class="jk-vidriera-servicio-descripcion">@s.Descripcion</span>
+                                    }
+                                    <span class="jk-vidriera-servicio-duracion">
+                                        <i class="bi bi-clock"></i> @s.DuracionMinutos min
+                                    </span>
+                                </div>
+                                @if (s.MostrarPrecio)
                                 {
-                                    <p class="jk-vidriera-vacio">Sin turnos disponibles hoy.</p>
-                                }
-                                else
-                                {
-                                    <div class="jk-vidriera-disponibilidad-slots">
-                                        @foreach (var slot in d.SlotsLibres)
-                                        {
-                                            <span class="jk-vidriera-disponibilidad-slot">@slot</span>
-                                        }
-                                    </div>
+                                    <span class="jk-vidriera-servicio-precio">$@s.Precio.ToString("0.##")</span>
                                 }
                             </li>
                         }
@@ -172,3 +233,37 @@
     </div>
 
 </div>
+
+@section scripts {
+    <script>
+        (function () {
+            var pizarra = document.getElementById('jkPizarra');
+            if (!pizarra) return;
+
+            var total = parseInt(pizarra.getAttribute('data-pantallas') || '1', 10);
+            if (total <= 1) return;
+
+            var actual = 0;
+            var pantallas = pizarra.querySelectorAll('.jk-vidriera-pantalla');
+            var dots = document.querySelectorAll('.jk-vidriera-pantalla-dot');
+            var intervalo = 10000; // 10 segundos
+
+            function mostrar(idx) {
+                if (idx < 0) idx = total - 1;
+                if (idx >= total) idx = 0;
+
+                pantallas.forEach(function (p) { p.classList.remove('is-active'); });
+                dots.forEach(function (d) { d.classList.remove('is-active'); });
+
+                var el = pantallas[idx];
+                if (el) el.classList.add('is-active');
+                var dot = dots[idx];
+                if (dot) dot.classList.add('is-active');
+
+                actual = idx;
+            }
+
+            setInterval(function () { mostrar(actual + 1); }, intervalo);
+        })();
+    </script>
+}

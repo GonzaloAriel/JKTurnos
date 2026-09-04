@@ -12,21 +12,20 @@ namespace JKTurnos.Services
     // desglose por tipo de pago y variacion mensual.
     public class DashboardService
     {
-        // Jornada laboral estandar de la Agenda (D-012): 08:00 - 19:30
-        private const int MinutosJornada = 690;
-
         private static readonly string[] MesesCortos =
             { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
 
         private readonly TurnoService _turnoService;
         private readonly PagoService _pagoService;
         private readonly ClienteService _clienteService;
+        private readonly ConfiguracionService _configService;
 
         public DashboardService()
         {
             _turnoService = new TurnoService();
             _pagoService = new PagoService();
             _clienteService = new ClienteService();
+            _configService = new ConfiguracionService();
         }
 
         public DashboardViewModel GetDashboard(DateTime hoy)
@@ -146,7 +145,8 @@ namespace JKTurnos.Services
             if (minutosOcupados <= 0)
                 return 0;
 
-            return (int)Math.Min(100, (minutosOcupados / (double)MinutosJornada) * 100);
+            // D-046 / M-01 (Concepto B): denominador = Franja Formal (default 690 min).
+            return (int)Math.Min(100, (minutosOcupados / (double)_configService.GetMinutosJornada()) * 100);
         }
 
         private List<BarraGrafico> CalcularOcupacionSemana(DateTime hoyDate)

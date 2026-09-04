@@ -78,9 +78,9 @@
                 <span>Servicios</span>
             </a>
             <a href="@Url.Action("Index", "Recursos")"
-               class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Recursos" ? "active" : "")"
+               class="jk-nav-item @((ViewContext.RouteData.Values["controller"].ToString() == "Recursos" || ViewContext.RouteData.Values["controller"].ToString() == "Bloqueos") ? "active" : "")"
                data-sidebar-item
-               @(ViewContext.RouteData.Values["controller"].ToString() == "Recursos" ? "aria-current=\"page\"" : "")>
+               @((ViewContext.RouteData.Values["controller"].ToString() == "Recursos" || ViewContext.RouteData.Values["controller"].ToString() == "Bloqueos") ? "aria-current=\"page\"" : "")>
                 <i class="bi bi-person-badge"></i>
                 <span>Recursos</span>
             </a>

@@ -55,7 +55,27 @@ namespace JKTurnos.Services
                     .OrderBy(s => s.Nombre)
                     .ToList();
 
-                // 5. Armar viewmodel publico.
+                // 5. Franja real de la jornada (M-01): HoraApertura/HoraCierre con
+                // fallback 08:00-19:30 (valor historico D-012). Se muestra como el
+                // "rango de horarios" y acota los slots libres de la semana.
+                var apertura = config != null && config.HoraApertura.HasValue
+                    ? config.HoraApertura.Value
+                    : TimeSpan.FromHours(8);
+                var cierre = config != null && config.HoraCierre.HasValue
+                    ? config.HoraCierre.Value
+                    : TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+
+                if (cierre <= apertura)
+                {
+                    apertura = TimeSpan.FromHours(8);
+                    cierre = TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+                }
+
+                // 6. Armar viewmodel publico.
+                var disponibles = vidriera.MostrarDisponibilidad
+                    ? AgruparEnPantallas(GetDisponibilidadSemanalInContext(ctx, tenantId, apertura, cierre))
+                    : new List<VidrieraPantallaVM>();
+
                 return new VidrieraPublicaViewModel
                 {
                     Slug = vidriera.Slug,
@@ -72,6 +92,8 @@ namespace JKTurnos.Services
                     Telefono = config?.Telefono,
                     Email = config?.Email,
                     Direccion = config?.Direccion,
+                    JornadaDesde = apertura,
+                    JornadaHasta = cierre,
                     MostrarPrecios = vidriera.MostrarPrecios,
                     MostrarDisponibilidad = vidriera.MostrarDisponibilidad,
                     MostrarServicios = vidriera.MostrarServicios,
@@ -90,87 +112,305 @@ namespace JKTurnos.Services
                         DuracionMinutos = s.DuracionMinutos,
                         MostrarPrecio = vidriera.MostrarPrecios
                     }).ToList(),
-                    // Posta 4: disponibilidad real solo si el tenant la habilita.
-                    Disponibilidad = vidriera.MostrarDisponibilidad
-                        ? GetAvailableSlotsInContext(ctx, tenantId)
-                        : new List<VidrieraDisponibilidadVM>()
+                    // D-047: disponibilidad real SEMANAL solo si el tenant la habilita.
+                    Pantallas = disponibles
                 };
             }
         }
 
         /// <summary>
-        /// Posta 4 / diseno seccion 13: proximos slots libres de HOY, por recurso.
-        /// Jornada fija 08:00-19:30 (D-012, hasta M-01); franjas de 30 min.
-        /// Regla de ocupacion IDENTICA a TurnoService.ValidarDisponibilidad: una
-        /// franja esta ocupada si se solapa con un turno del recurso en estado NO
-        /// Cancelado (D-040/D-042: el Cancelado libera su slot). Aislamiento por
-        /// TenantId (solo consulta del mismo tenant del slug).
+        /// D-047 / M-13 (Vidriera, posta semanal): MATRIZ de disponibilidad para los
+        /// proximos 7 dias (hoy + 6), POR RECURSO, dentro de la jornada REAL del
+        /// tenant (HoraApertura/HoraCierre, M-01; fallback 08:00-19:30). Franjas de
+        /// 30 min. Regla de ocupacion igual a TurnoService.ValidarDisponibilidad: una
+        /// franja esta ocupada si se solapa con un turno NO Cancelado (D-040) O con un
+        /// BloqueoRecurso activo (D-046/M-01, mismo criterio Solapa). Aislamiento por
+        /// TenantId (solo consulta el tenant del slug). Los dias/hojas pasadas no
+        /// generan slots.
         /// </summary>
-        public List<VidrieraDisponibilidadVM> GetAvailableSlots(int tenantId)
+        public List<VidrieraPantallaVM> GetDisponibilidadSemanal(int tenantId)
         {
             using (var ctx = new JKContext())
             {
-                return GetAvailableSlotsInContext(ctx, tenantId);
+                var config = ctx.ConfiguracionesTenant
+                    .FirstOrDefault(c => c.TenantId == tenantId && c.IsActive);
+                var apertura = config != null && config.HoraApertura.HasValue
+                    ? config.HoraApertura.Value
+                    : TimeSpan.FromHours(8);
+                var cierre = config != null && config.HoraCierre.HasValue
+                    ? config.HoraCierre.Value
+                    : TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+                if (cierre <= apertura)
+                {
+                    apertura = TimeSpan.FromHours(8);
+                    cierre = TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+                }
+
+                var servicios = GetDisponibilidadSemanalInContext(ctx, tenantId, apertura, cierre);
+                return AgruparEnPantallas(servicios);
             }
         }
 
-        private List<VidrieraDisponibilidadVM> GetAvailableSlotsInContext(JKContext ctx, int tenantId)
-        {
-            var hoy = DateTime.Today;
-            var jornadaInicio = hoy.AddHours(8);          // 08:00
-            var jornadaFin = hoy.AddHours(19).AddMinutes(30); // 19:30
+        // D-048: parte la lista de servicios (filas) en pantallas de N servicios,
+        // para que la pizarra nunca desborde el alto del monitor (sin scroll).
+        // Si la lista ya fuera un solo servicio, una sola pantalla.
+        public const int ServiciosPorPantalla = 5;
 
-            var recursos = ctx.Recursos
-                .Where(r => r.TenantId == tenantId && r.IsActive)
-                .OrderBy(r => r.Nombre)
+        private List<VidrieraPantallaVM> AgruparEnPantallas(List<VidrieraDisponibilidadSemanalVM> servicios)
+        {
+            var pantallas = new List<VidrieraPantallaVM>();
+            if (servicios == null || servicios.Count == 0)
+                return pantallas;
+
+            int n = ServiciosPorPantalla;
+            for (int i = 0; i < servicios.Count; i += n)
+            {
+                var grupo = servicios.Skip(i).Take(n).ToList();
+                pantallas.Add(new VidrieraPantallaVM { Servicios = grupo });
+            }
+            return pantallas;
+        }
+
+        private List<VidrieraDisponibilidadSemanalVM> GetDisponibilidadSemanalInContext(
+            JKContext ctx, int tenantId, TimeSpan apertura, TimeSpan cierre)
+        {
+            // Filas = SERVICIO. Los servicios agregan la disponibilidad de TODOS
+            // sus recursos asociados (RecursoServicio): un slot es libre si algun
+            // recurso del servicio lo tiene libre (union, sin repetir horas).
+            var servicios = ctx.Servicios
+                .Where(s => s.TenantId == tenantId && s.IsActive)
+                .OrderBy(s => s.Nombre)
                 .ToList();
 
-            if (recursos.Count == 0)
-                return new List<VidrieraDisponibilidadVM>();
+            if (servicios.Count == 0)
+                return new List<VidrieraDisponibilidadSemanalVM>();
 
-            // Turnos del dia del tenant (con su estado para resolver el codigo).
+            var recursosActivos = ctx.Recursos
+                .Where(r => r.TenantId == tenantId && r.IsActive)
+                .ToList();
+
+            // servicioId -> recursos activos asociados.
+            var recursosPorServicio = new Dictionary<int, List<Recurso>>();
+            var relaciones = ctx.Set<RecursoServicio>()
+                .Where(rs => rs.TenantId == tenantId)
+                .ToList()
+                .GroupBy(rs => rs.ServicioId);
+            foreach (var g in relaciones)
+            {
+                var ids = g.Select(rs => rs.RecursoId).Distinct();
+                recursosPorServicio[g.Key] = recursosActivos
+                    .Where(r => ids.Contains(r.Id))
+                    .ToList();
+            }
+
+            // Ventana: hoy + proximos 6 dias (extremo fin exclusivo).
+            var hoy = DateTime.Today;
+            var inicioVentana = hoy;
+            var finVentana = hoy.AddDays(7);
+
+            // Turnos del tenant dentro de la ventana (para resolver solapamiento por slot).
             var turnos = ctx.Turnos
                 .Where(t => t.TenantId == tenantId
-                            && t.FechaHoraInicio < jornadaFin
-                            && t.FechaHoraFin > jornadaInicio)
+                            && t.FechaHoraInicio < finVentana
+                            && t.FechaHoraFin > inicioVentana)
                 .Include(t => t.EstadoTurno)
                 .ToList();
 
-            // Franja inicial: desde ahora (ceil al multiplo de 30) o desde la
-            // apertura si es mas temprano; nunca mostrar horas ya pasadas.
-            var ahora = DateTime.Now;
-            int proxFranja = ((ahora.Hour * 60 + ahora.Minute + 29) / 30) * 30;
-            var inicio = hoy.AddMinutes(proxFranja);
-            if (inicio < jornadaInicio)
-                inicio = jornadaInicio;
+            // Bloqueos del tenant dentro de la ventana (mismo criterio que la agenda).
+            var bloqueos = ctx.BloqueosRecurso
+                .Where(b => b.TenantId == tenantId
+                            && b.FechaInicio < finVentana)
+                .ToList()
+                .Where(b => CoincideVentana(b, inicioVentana, finVentana))
+                .ToList();
 
-            var resultado = new List<VidrieraDisponibilidadVM>();
+            // Por recurso: turnos NO Cancelados y bloqueos activos.
+            var turnosPorRecurso = turnos
+                .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
+                .GroupBy(t => t.RecursoId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+            var bloqueosPorRecurso = bloqueos
+                .GroupBy(b => b.RecursoId)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            foreach (var rec in recursos)
+            var dayNames = new[] { "LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM" };
+
+            var resultado = new List<VidrieraDisponibilidadSemanalVM>();
+
+            foreach (var servicio in servicios)
             {
-                var turnosRec = turnos
-                    .Where(t => t.RecursoId == rec.Id && (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado))
-                    .ToList();
+                List<Recurso> recursosServicio;
+                if (!recursosPorServicio.TryGetValue(servicio.Id, out recursosServicio) || recursosServicio.Count == 0)
+                    recursosServicio = new List<Recurso>();
 
-                var libres = new List<string>();
-                var franjaStart = inicio;
-                while (franjaStart < jornadaFin)
+                var dias = new List<VidrieraDisponibilidadDiaVM>();
+
+                for (int i = 0; i < 7; i++)
                 {
-                    var franjaEnd = franjaStart.AddMinutes(30);
-                    bool ocupada = turnosRec.Any(t => t.FechaHoraInicio < franjaEnd && t.FechaHoraFin > franjaStart);
-                    if (!ocupada)
-                        libres.Add(franjaStart.ToString("HH:mm"));
-                    franjaStart = franjaEnd;
+                    var dia = hoy.AddDays(i);
+                    bool esHoy = i == 0;
+
+                    // Union de inicios libres (relativos al dia) de todos los recursos
+                    // del servicio. Se ordena y se agrupan los consecutivos en rangos.
+                    var libres = new SortedSet<TimeSpan>();
+
+                    foreach (var rec in recursosServicio)
+                    {
+                        List<Turno> turnosRec;
+                        turnosPorRecurso.TryGetValue(rec.Id, out turnosRec);
+                        turnosRec = turnosRec ?? new List<Turno>();
+
+                        List<BloqueoRecurso> bloqueosRec;
+                        bloqueosPorRecurso.TryGetValue(rec.Id, out bloqueosRec);
+                        bloqueosRec = bloqueosRec ?? new List<BloqueoRecurso>();
+
+                        var franjaStart = dia.Add(apertura);
+                        var franjaFin = dia.Add(cierre);
+
+                        while (franjaStart < franjaFin)
+                        {
+                            var slotEnd = franjaStart.AddMinutes(30);
+                            var slotRel = franjaStart - dia.Date;
+
+                            // Slot pasado (hoy): no se ofrece.
+                            bool pasado = slotEnd <= DateTime.Now;
+
+                            if (!pasado)
+                            {
+                                bool ocupadaPorTurno = turnosRec.Any(t => t.FechaHoraInicio < slotEnd && t.FechaHoraFin > franjaStart);
+                                bool ocupadaPorBloqueo = false;
+                                foreach (var b in bloqueosRec)
+                                {
+                                    if (BloqueoSolapaSlot(b, dia, franjaStart, slotEnd))
+                                    {
+                                        ocupadaPorBloqueo = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!ocupadaPorTurno && !ocupadaPorBloqueo)
+                                    libres.Add(slotRel);
+                            }
+
+                            franjaStart = slotEnd;
+                        }
+                    }
+
+                    // Convertir los inicios ordenados a rangos continuos ("09-11", "14").
+                    var rangos = ConstruirRangos(libres);
+
+                    dias.Add(new VidrieraDisponibilidadDiaVM
+                    {
+                        Fecha = dia,
+                        NombreDia = dayNames[((int)dia.DayOfWeek + 6) % 7],
+                        DiaDelMes = dia.Day,
+                        EsHoy = esHoy,
+                        CantidadSlots = libres.Count,
+                        Rangos = rangos
+                    });
                 }
 
-                resultado.Add(new VidrieraDisponibilidadVM
+                resultado.Add(new VidrieraDisponibilidadSemanalVM
                 {
-                    RecursoNombre = rec.Nombre,
-                    SlotsLibres = libres
+                    ServicioNombre = servicio.Nombre,
+                    Dias = dias
                 });
             }
 
             return resultado;
+        }
+
+        // Convierte un conjunto ordenado de inicios (TimeSpan relativos al dia, paso
+        // de 30 min) en rangos legibles: los consecutivos se funden en "HH:mm-HH:mm"
+        // y un slot suelto se muestra como "HH:mm".
+        private List<string> ConstruirRangos(SortedSet<TimeSpan> libres)
+        {
+            var rangos = new List<string>();
+            if (libres.Count == 0)
+                return rangos;
+
+            var lista = libres.ToList();
+            var inicio = lista[0];
+            var prox = inicio.Add(TimeSpan.FromMinutes(30));
+
+            foreach (var s in lista)
+            {
+                if (s > prox)
+                {
+                    // Hay un hueco: cierro el rango actual y abro uno nuevo.
+                    rangos.Add(FormatearRango(inicio, prox));
+                    inicio = s;
+                }
+                prox = s.Add(TimeSpan.FromMinutes(30));
+            }
+            rangos.Add(FormatearRango(inicio, prox));
+
+            return rangos;
+        }
+
+        private string FormatearRango(TimeSpan inicio, TimeSpan fin)
+        {
+            string sIni = DateTime.Today.Add(inicio).ToString("HH:mm");
+            string sFin = DateTime.Today.Add(fin).ToString("HH:mm");
+            if (fin - inicio <= TimeSpan.FromMinutes(30))
+                return sIni; // slot unico
+            return sIni + "-" + sFin;
+        }
+
+        // True si un BloqueoRecurso dado se solapa con la ventana [inicioVentana, finVentana).
+        private bool CoincideVentana(BloqueoRecurso b, DateTime inicioVentana, DateTime finVentana)
+        {
+            switch (b.Tipo)
+            {
+                case TipoBloqueo.Unico:
+                    var d = b.FechaInicio.Date;
+                    return d >= inicioVentana && d < finVentana;
+
+                case TipoBloqueo.RangoFechas:
+                    var rIni = b.FechaInicio.Date;
+                    var rFin = (b.FechaFin ?? b.FechaInicio).Date.AddDays(1);
+                    return rIni < finVentana && rFin > inicioVentana;
+
+                case TipoBloqueo.RecurrenteSemanal:
+                default:
+                    for (var f = inicioVentana; f < finVentana; f = f.AddDays(1))
+                        if (f.DayOfWeek == b.FechaInicio.DayOfWeek)
+                            return true;
+                    return false;
+            }
+        }
+
+        // True si el bloqueo cubre [dia + franjaStart, dia + franjaEnd) el dia dado.
+        // Mismo criterio que BloqueoRecursoService.Solapa (misma fuente de verdad).
+        private bool BloqueoSolapaSlot(BloqueoRecurso b, DateTime dia, DateTime franjaStart, DateTime franjaEnd)
+        {
+            bool coincideFecha;
+            switch (b.Tipo)
+            {
+                case TipoBloqueo.Unico:
+                    coincideFecha = b.FechaInicio.Date == dia.Date;
+                    break;
+                case TipoBloqueo.RangoFechas:
+                    var diaFin = b.FechaFin.HasValue ? b.FechaFin.Value.Date : b.FechaInicio.Date;
+                    coincideFecha = dia.Date >= b.FechaInicio.Date && dia.Date <= diaFin;
+                    break;
+                case TipoBloqueo.RecurrenteSemanal:
+                default:
+                    coincideFecha = dia.DayOfWeek == b.FechaInicio.DayOfWeek;
+                    break;
+            }
+
+            if (!coincideFecha)
+                return false;
+
+            // Sin franja horaria (o invertida): cubre el dia completo.
+            if (!b.HoraInicio.HasValue || !b.HoraFin.HasValue || b.HoraInicio.Value >= b.HoraFin.Value)
+                return true;
+
+            var bloqueoStart = dia.Date.Add(b.HoraInicio.Value);
+            var bloqueoEnd = dia.Date.Add(b.HoraFin.Value);
+
+            return franjaStart < bloqueoEnd && franjaEnd > bloqueoStart;
         }
 
         // ===== Posta 5: gestion (panel de administracion del tenant) =====

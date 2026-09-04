@@ -1,0 +1,34 @@
+@model JKTurnos.Models.Entities.BloqueoRecurso
+@using JKTurnos.Models.Entities
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-bloqueos.css" rel="stylesheet" />
+}
+
+@{
+    ViewBag.Title = "Eliminar Bloqueo";
+    ViewBag.Subtitle = "Confirma la baja del bloqueo de disponibilidad";
+}
+
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
+
+<div class="jk-card jk-mt-24">
+    <p>Estas seguro que deseas eliminar el bloqueo de disponibilidad del recurso
+        <strong>#@Model.RecursoId</strong> (tipo <span>@Model.Tipo</span>, fecha
+        <strong>@Model.FechaInicio.ToString("dd/MM/yyyy")</strong>)?</p>
+
+    @using (Html.BeginForm("Delete", "Bloqueos", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.Id)
+
+        <div class="jk-flex jk-gap-12 jk-mt-16">
+            <button type="submit" class="jk-btn jk-btn-danger">
+                <i class="bi bi-trash"></i> Si, eliminar
+            </button>
+            <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+                Cancelar
+            </a>
+        </div>
+    }
+</div>

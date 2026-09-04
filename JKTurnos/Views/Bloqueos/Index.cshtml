@@ -1,0 +1,138 @@
+@using JKTurnos.Models.Entities
+@model List<JKTurnos.Models.Entities.BloqueoRecurso>
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-bloqueos.css" rel="stylesheet" />
+}
+
+@helper TipoTexto(TipoBloqueo tipo, BloqueoRecurso b) {
+    switch (tipo)
+    {
+        case TipoBloqueo.Unico:
+            <text>Unico: @b.FechaInicio.ToString("dd/MM/yyyy")</text>
+            break;
+        case TipoBloqueo.RangoFechas:
+            <text>Rango: @b.FechaInicio.ToString("dd/MM/yyyy") a @(b.FechaFin.HasValue ? b.FechaFin.Value.ToString("dd/MM/yyyy") : "-")</text>
+            break;
+        default:
+            <text>Semanal: @b.FechaInicio.DayOfWeek</text>
+            break;
+    }
+}
+
+@helper FranjaTexto(BloqueoRecurso b) {
+    if (b.HoraInicio.HasValue && b.HoraFin.HasValue)
+    {
+        <text>@b.HoraInicio.Value.ToString("hh\\:mm") - @b.HoraFin.Value.ToString("hh\\:mm")</text>
+    }
+    else
+    {
+        <text>Todo el dia</text>
+    }
+}
+
+@helper WarningBanner() {
+    if (TempData["BloqueoWarning"] != null)
+    {
+        <div class="jk-bloqueo-warning">
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+            <span>@TempData["BloqueoWarning"]</span>
+        </div>
+    }
+}
+
+@helper ListContent() {
+    @WarningBanner()
+    var nombres = ViewBag.NombresRecursos as System.Collections.Generic.Dictionary<int, string> ?? new System.Collections.Generic.Dictionary<int, string>();
+    <div class="jk-hide-mobile">
+        <div class="jk-table-wrap">
+            <table class="jk-table">
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Tipo</th>
+                        <th>Franja</th>
+                        <th>Descripcion</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string nombre = nombres.ContainsKey(item.RecursoId) ? nombres[item.RecursoId] : ("Recurso #" + item.RecursoId);
+                        <tr>
+                            <td>@nombre</td>
+                            <td>@TipoTexto(item.Tipo, item)</td>
+                            <td>@FranjaTexto(item)</td>
+                            <td>@item.Descripcion</td>
+                            <td>
+                                @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                                    new ViewDataDictionary {
+                                        { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                                        { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                                        { "ItemName", "bloqueo del recurso " + nombre },
+                                        { "Compact", false }
+                                    })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
+        @foreach (var item in Model)
+        {
+            string nombre = nombres.ContainsKey(item.RecursoId) ? nombres[item.RecursoId] : ("Recurso #" + item.RecursoId);
+            <div class="jk-card jk-card-compact">
+                <div class="jk-flex-between">
+                    <strong>@nombre</strong>
+                    @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
+                        new ViewDataDictionary {
+                            { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
+                            { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
+                            { "ItemName", "bloqueo del recurso " + nombre },
+                            { "Compact", true }
+                        })
+                </div>
+                <div class="jk-mt-8 jk-small">
+                    <i class="bi bi-calendar-x"></i> @TipoTexto(item.Tipo, item)
+                </div>
+                <div class="jk-small jk-mt-4">
+                    <i class="bi bi-clock"></i> @FranjaTexto(item)
+                </div>
+                @if (!string.IsNullOrEmpty(item.Descripcion))
+                {
+                    <div class="jk-small jk-mt-4">@item.Descripcion</div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@helper EmptyContent() {
+    @WarningBanner()
+    @Html.Partial("~/Views/Shared/Components/_EmptyState.cshtml",
+        new ViewDataDictionary {
+            { "Icon", "calendar-x" },
+            { "Title", "No tienes bloqueos de disponibilidad" },
+            { "Description", "Define cuando un recurso no estara disponible (por ejemplo, la Dra. Mariana no atiende los miercoles)." },
+            { "ActionText", "Crear Bloqueo" },
+            { "ActionUrl", Url.Action("Create") }
+        })
+}
+
+@{
+    ViewBag.Title = "Bloqueos de Disponibilidad";
+    ViewBag.Subtitle = "Define cuando un recurso no estara disponible";
+    ViewBag.PrimaryAction = Url.Action("Create");
+    ViewBag.PrimaryActionLabel = "Nuevo Bloqueo";
+    ViewBag.SecondaryAction = Url.Action("Index", "Recursos");
+    ViewBag.SecondaryActionLabel = "Volver a Recursos";
+    ViewBag.SecondaryActionIcon = "arrow-left";
+
+    ViewBag.PageContent = Model.Any() ? ListContent() : EmptyContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_CrudPage.cshtml")

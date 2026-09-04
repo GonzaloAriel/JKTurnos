@@ -27,6 +27,7 @@ namespace JKTurnos.Data
         public DbSet<Auditoria> Auditorias { get; set; }
         public DbSet<AvatarPlataforma> AvataresPlataforma { get; set; }
         public DbSet<VidrieraPublica> VidrieraPublicas { get; set; }
+        public DbSet<BloqueoRecurso> BloqueosRecurso { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -75,6 +76,21 @@ namespace JKTurnos.Data
             modelBuilder.Entity<VidrieraPublica>()
                 .HasIndex(x => x.TenantId)
                 .IsUnique();
+
+            // D-046 / M-01: BloqueoRecurso (recurso no disponible). Relacion con Recurso
+            // sin cascada de borrado. Indice compuesto para el filtro por tenant/recurso
+            // y el barrido por tipo en la disponibilidad.
+            modelBuilder.Entity<BloqueoRecurso>()
+                .HasRequired(b => b.Recurso)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<BloqueoRecurso>()
+                .Property(b => b.Descripcion)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<BloqueoRecurso>()
+                .HasIndex(b => new { b.TenantId, b.RecursoId, b.Tipo });
         }
     }
 }

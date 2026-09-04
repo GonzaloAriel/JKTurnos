@@ -14,6 +14,9 @@ namespace JKTurnos.Models.ViewModels
 
         public IEnumerable<Turno> Turnos { get; set; }
 
+        // D-046 / M-01: bloques de indisponibilidad (grises) activos en la fecha/vista.
+        public IEnumerable<BloqueoRecurso> Bloqueos { get; set; }
+
         public int? OpenRecursoId { get; set; }
     }
 }

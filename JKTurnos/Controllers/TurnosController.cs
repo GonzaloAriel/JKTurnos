@@ -307,6 +307,7 @@ namespace JKTurnos.Controllers
                 var lunes = fechaSeleccionada.AddDays(diff);
                 var domingo = lunes.AddDays(6);
 
+                model.Bloqueos = new BloqueoRecursoService().GetEnRango(lunes, domingo);
                 // El turno cancelado libera su slot en la Agenda (D-042): el
                 // timeblock desaparece y la grilla/horarios libres lo tratan como
                 // disponible. El Index de Turnos SÍ conserva el cancelado como registro.
@@ -331,6 +332,7 @@ namespace JKTurnos.Controllers
             {
                 // Ver nota en la rama "semana": el turno cancelado libera su slot
                 // en la Agenda (D-042); el Index conserva el cancelado como registro.
+                model.Bloqueos = new BloqueoRecursoService().GetEnRango(fechaSeleccionada, fechaSeleccionada);
                 model.Turnos = _turnoService.GetTurnosDelDia(fechaSeleccionada)
                     .Where(t => t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado)
                     .ToList();

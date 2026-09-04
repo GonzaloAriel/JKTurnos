@@ -74,6 +74,30 @@
         Si la imagen no aparece, verifica que sea una URL directa y no un enlace a una pagina web.
     </div>
 
+    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
+
+    <div class="jk-form-group">
+        <label class="jk-label">Franja formal (horario de trabajo)</label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="jk-form-group">
+                    <label class="jk-label" for="HoraApertura">Hora de apertura</label>
+                    @Html.TextBoxFor(m => m.HoraApertura, "{0:hh\\:mm}", new { @class = "jk-input", type = "time", id = "HoraApertura" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="jk-form-group">
+                    <label class="jk-label" for="HoraCierre">Hora de cierre</label>
+                    @Html.TextBoxFor(m => m.HoraCierre, "{0:hh\\:mm}", new { @class = "jk-input", type = "time", id = "HoraCierre" })
+                </div>
+            </div>
+        </div>
+        <small class="jk-small text-secondary">
+            Este horario es informativo y no impide dar un turno mas alla del rango.
+            Sirve para que los clientes y recursos conozcan las formalidades del negocio.
+        </small>
+    </div>
+
 }
 
 

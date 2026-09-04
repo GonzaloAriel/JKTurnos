@@ -1,0 +1,122 @@
+@model JKTurnos.Models.ViewModels.BloqueoRecursoViewModel
+@using JKTurnos.Models.Entities
+
+@section PageStyles {
+    <link href="~/Content/Pages/jk-bloqueos.css" rel="stylesheet" />
+}
+
+@helper FormContent() {
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="RecursoId">Recurso</label>
+        @Html.DropDownListFor(m => m.RecursoId, Model.Recursos, "Selecciona un recurso", new { @class = "jk-input" })
+        @Html.ValidationMessageFor(m => m.RecursoId, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Tipo)">Tipo de bloqueo</label>
+        <p class="jk-small text-secondary jk-mt-4">Elige como se repite esta indisponibilidad.</p>
+        @Html.EnumDropDownListFor(m => m.Tipo, new { @class = "jk-input", id = "TipoBloqueoSelect" })
+        @Html.ValidationMessageFor(m => m.Tipo, "", new { @class = "jk-field-error" })
+    </div>
+
+    <div class="row" id="campoFechaInicio">
+        <div class="col-md-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.FechaInicio)" id="labelFechaInicio">Fecha</label>
+                @Html.TextBoxFor(m => m.FechaInicio, "{0:yyyy-MM-dd}", new { @class = "jk-input", type = "date" })
+                @Html.ValidationMessageFor(m => m.FechaInicio, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
+        <div class="col-md-6" id="campoFechaFin" style="display: none;">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.FechaFin)">Fecha fin</label>
+                @Html.TextBoxFor(m => m.FechaFin, "{0:yyyy-MM-dd}", new { @class = "jk-input", type = "date" })
+                @Html.ValidationMessageFor(m => m.FechaFin, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label">
+            @Html.CheckBoxFor(m => m.TodoElDia, new { @class = "jk-checkbox" })
+            Todo el dia
+        </label>
+        <p class="jk-small text-secondary jk-mt-4">Si esta desmarcado, indica la franja horaria del bloqueo dentro del dia.</p>
+    </div>
+
+    <div class="row" id="campoFranja">
+        <div class="col-md-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.HoraInicio)">Hora inicio</label>
+                @Html.TextBoxFor(m => m.HoraInicio, "{0:hh\\:mm}", new { @class = "jk-input", type = "time" })
+                @Html.ValidationMessageFor(m => m.HoraInicio, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="jk-form-group">
+                <label class="jk-label" for="@Html.IdFor(m => m.HoraFin)">Hora fin</label>
+                @Html.TextBoxFor(m => m.HoraFin, "{0:hh\\:mm}", new { @class = "jk-input", type = "time" })
+                @Html.ValidationMessageFor(m => m.HoraFin, "", new { @class = "jk-field-error" })
+            </div>
+        </div>
+    </div>
+
+    <div class="jk-form-group">
+        <label class="jk-label" for="@Html.IdFor(m => m.Descripcion)">Descripcion (opcional)</label>
+        @Html.TextAreaFor(m => m.Descripcion, new { @class = "jk-textarea", placeholder = "Motivo de la indisponibilidad (ej. vacaciones, feriado)", rows = 3 })
+        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "jk-field-error" })
+    </div>
+}
+
+@{
+    ViewBag.Title = "Editar bloqueo de disponibilidad";
+    ViewBag.Subtitle = "Actualiza la indisponibilidad del recurso";
+    ViewBag.SubmitText = "Actualizar";
+    ViewBag.CancelUrl = Url.Action("Index");
+
+    ViewBag.FormContent = FormContent();
+}
+
+@Html.Partial("~/Views/Shared/Components/_FormLayout.cshtml")
+
+@section scripts {
+<script>
+    (function () {
+        function actualizar() {
+            var tipo = document.getElementById('TipoBloqueoSelect');
+            var campoFin = document.getElementById('campoFechaFin');
+            var labelIni = document.getElementById('labelFechaInicio');
+            var tipoVal = tipo ? parseInt(tipo.value, 10) : 0;
+
+            if (campoFin) {
+                campoFin.style.display = (tipoVal === 1) ? '' : 'none';
+            }
+            if (labelIni) {
+                if (tipoVal === 1) { labelIni.textContent = 'Desde'; }
+                else if (tipoVal === 2) { labelIni.textContent = 'Dia de referencia (semanal)'; }
+                else { labelIni.textContent = 'Fecha'; }
+            }
+        }
+
+        function onTodoElDia() {
+            var checks = document.querySelectorAll('[name="TodoElDia"]');
+            var marcado = false;
+            checks.forEach(function (c) { if (c.checked) marcado = true; });
+
+            var campoFranja = document.getElementById('campoFranja');
+            if (campoFranja) campoFranja.style.display = marcado ? 'none' : '';
+        }
+
+        var tipoSelect = document.getElementById('TipoBloqueoSelect');
+        if (tipoSelect) tipoSelect.addEventListener('change', actualizar);
+
+        var checks = document.querySelectorAll('[name="TodoElDia"]');
+        checks.forEach(function (c) { c.addEventListener('change', onTodoElDia); });
+
+        actualizar();
+        onTodoElDia();
+    })();
+</script>
+}

@@ -204,6 +204,9 @@
         agenda.addEventListener('click', function (e) {
             if (dragJustEnded) { dragJustEnded = false; return; }
 
+            // D-046 / M-01: los Bloques de disponibilidad (grises) no son gestionables.
+            if (e.target.closest('.jk-bloqueo-recurso, .jk-bloqueo-recurso-mobile')) return;
+
             var pagoBtn = e.target.closest('.jk-agenda-time-block-pago');
             if (pagoBtn) {
                 e.preventDefault();
@@ -554,6 +557,9 @@
 
         agenda.addEventListener('click', function (e) {
             if (dragJustEnded) { dragJustEnded = false; return; }
+
+            // D-046 / M-01: los Bloques de disponibilidad (grises) no son gestionables.
+            if (e.target.closest('.jk-bloqueo-recurso, .jk-bloqueo-recurso-mobile')) return;
 
             var weekBlock = e.target.closest('.jk-agenda-week-block');
             if (weekBlock) return;

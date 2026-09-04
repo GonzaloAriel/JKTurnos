@@ -165,7 +165,12 @@ namespace JKTurnos.Services
             if (turnoExcluirId.HasValue)
                 query = query.Where(x => x.Id != turnoExcluirId.Value);
 
-            return !query.Any();
+            if (query.Any())
+                return false;
+
+            // D-046 / M-01 (Concepto A): un BloqueoRecurso es una segunda fuente de
+            // ocupacion. No existe exclusion de bloqueo al crear/editar un turno.
+            return !new BloqueoRecursoService().EstaBloqueado(recursoId, inicio, fin);
         }
 
         public void Crear(Turno turno)

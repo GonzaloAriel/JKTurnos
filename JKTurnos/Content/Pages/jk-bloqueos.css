@@ -1,0 +1,39 @@
+/* JKTurnos - Bloqueos de Disponibilidad (D-046 / M-01) */
+
+.jk-bloqueo-tipo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, #6b7280 12%, transparent);
+    color: #4b5563;
+    font-size: var(--jk-text-xs, 12px);
+    font-weight: var(--jk-weight-semibold, 600);
+    white-space: nowrap;
+}
+
+.jk-bloqueo-estado-todo-dia {
+    color: #6b7280;
+    font-size: var(--jk-text-xs, 12px);
+}
+
+.jk-bloqueo-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--jk-space-8, 8px);
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    background: color-mix(in srgb, #f59e0b 12%, transparent);
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+    border-radius: var(--jk-radius, 8px);
+    color: #92400e;
+    font-size: var(--jk-text-sm, 14px);
+}
+
+.jk-bloqueo-warning > i {
+    margin-top: 2px;
+    color: #b45309;
+}
+

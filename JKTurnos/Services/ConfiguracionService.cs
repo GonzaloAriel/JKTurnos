@@ -24,11 +24,45 @@ namespace JKTurnos.Services
             return _configRepo.GetAll().FirstOrDefault();
         }
 
+        // D-046 / M-01 (Concepto B): minutos de la Franja Formal (HoraCierre - HoraApertura).
+        // Informativo y no bloqueante. Si no esta configurada (o es invalida) cae a
+        // 08:00 - 19:30 = 690 min (valor historico del KPI de ocupacion).
+        public int GetMinutosJornada()
+        {
+            var config = GetConfiguracion();
+
+            if (config == null || !config.HoraApertura.HasValue || !config.HoraCierre.HasValue)
+                return 690;
+
+            var dif = config.HoraCierre.Value - config.HoraApertura.Value;
+
+            if (dif <= TimeSpan.Zero)
+                return 690;
+
+            return (int)dif.TotalMinutes;
+        }
+
         // Datos del negocio (forma DatosNegocio). No toca las notificaciones:
         // se editan en su propia seccion (NotificacionesEditar).
         public void UpdateDatosNegocio(ConfiguracionTenant model)
         {
             model.NombreComercial = (model.NombreComercial ?? "").Trim();
+
+            // D-046 / M-01 (Concepto B): normaliza la Franja Formal. Si cae o esta
+            // incompleta se deja null (la logica usara 08:00 - 19:30 por defecto).
+            if (model.HoraApertura.HasValue && model.HoraCierre.HasValue)
+            {
+                if (model.HoraCierre.Value <= model.HoraApertura.Value)
+                {
+                    model.HoraApertura = null;
+                    model.HoraCierre = null;
+                }
+            }
+            else
+            {
+                model.HoraApertura = null;
+                model.HoraCierre = null;
+            }
 
             var actual = _configRepo.GetAll().FirstOrDefault();
 
@@ -50,7 +84,9 @@ namespace JKTurnos.Services
                 AuditService.Campo("Email", actual.Email, model.Email),
                 AuditService.Campo("Direccion", actual.Direccion, model.Direccion),
                 AuditService.Campo("LogoUrl", actual.LogoUrl, model.LogoUrl),
-                AuditService.Campo("AvatarUrl", actual.AvatarUrl, model.AvatarUrl));
+                AuditService.Campo("AvatarUrl", actual.AvatarUrl, model.AvatarUrl),
+                AuditService.Campo("HoraApertura", actual.HoraApertura?.ToString(@"hh\:mm"), model.HoraApertura?.ToString(@"hh\:mm")),
+                AuditService.Campo("HoraCierre", actual.HoraCierre?.ToString(@"hh\:mm"), model.HoraCierre?.ToString(@"hh\:mm")));
 
             actual.NombreComercial = model.NombreComercial;
             actual.Telefono = model.Telefono;
@@ -58,6 +94,8 @@ namespace JKTurnos.Services
             actual.Direccion = model.Direccion;
             actual.LogoUrl = model.LogoUrl;
             actual.AvatarUrl = model.AvatarUrl;
+            actual.HoraApertura = model.HoraApertura;
+            actual.HoraCierre = model.HoraCierre;
             _configRepo.Update(actual);
 
             new AuditService().Registrar(

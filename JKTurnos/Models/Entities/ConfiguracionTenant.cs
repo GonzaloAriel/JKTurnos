@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace JKTurnos.Models.Entities
@@ -68,6 +69,14 @@ namespace JKTurnos.Models.Entities
         // (otro turno, otro dia, otro mes o configuracion resuelta).
         [Column(TypeName = "nvarchar(max)")]
         public string RecordatoriosOcultos { get; set; }
+
+        // D-046 / M-01 (Concepto B - Franja Formal): horario de trabajo INFORMATIVO
+        // y NO bloqueante. Nullable para que la auto-migracion aditiva no rompa filas
+        // existentes; la logica usa 08:00 - 19:30 (690 min) como fallback cuando son
+        // null. El Admin siempre puede dar turnos fuera de este rango.
+        public TimeSpan? HoraApertura { get; set; }
+
+        public TimeSpan? HoraCierre { get; set; }
 
         [ForeignKey("TenantId")]
         public virtual Tenant Tenant { get; set; }

@@ -209,15 +209,15 @@ body {
     flex: 1 1 auto;
     min-height: 0;
     display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    gap: var(--jk-space-20);
+    grid-template-columns: 3fr 1fr;
+    gap: var(--jk-space-16);
 }
 
 .jk-vidriera-side {
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--jk-space-20);
+    gap: var(--jk-space-12);
     overflow: hidden;
 }
 
@@ -279,8 +279,10 @@ body {
 /* ===== SERVICIOS ===== */
 
 .jk-vidriera-servicios-card {
+    flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
+    padding: var(--jk-space-12) var(--jk-space-16);
 }
 
 .jk-vidriera-servicios {
@@ -300,8 +302,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--jk-space-16);
-    padding: var(--jk-space-12) var(--jk-space-12);
+    gap: var(--jk-space-12);
+    padding: var(--jk-space-8) var(--jk-space-12);
     background: var(--jk-surface);
     border-radius: var(--jk-radius);
     border-left: 4px solid var(--jk-accent);
@@ -352,7 +354,7 @@ body {
     background: linear-gradient(135deg, var(--jk-warning-light) 0%, var(--jk-butter-light) 100%);
     border: 2px solid var(--jk-warning);
     border-radius: var(--jk-radius-xl);
-    padding: var(--jk-space-16) var(--jk-space-20);
+    padding: var(--jk-space-12) var(--jk-space-16);
     box-shadow: var(--jk-shadow);
     flex: 0 0 auto;
     overflow: hidden;
@@ -402,63 +404,224 @@ body {
     line-height: 1.4;
 }
 
-/* ===== DISPONIBILIDAD ===== */
+/* ===== DISPONIBILIDAD SEMANAL (D-047/D-048) ===== */
 
-.jk-vidriera-disponibilidad-card {
+.jk-vidriera-semanal-card {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
+    background: var(--jk-white);
+    border-color: var(--jk-border-light);
+    color: var(--jk-text-primary);
+    padding: var(--jk-space-12) var(--jk-space-16);
 }
 
-.jk-vidriera-disponibilidad {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-16);
-    overflow-y: auto;
-    min-height: 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--jk-border) transparent;
+.jk-vidriera-semanal-card .jk-vidriera-seccion-head {
+    border-bottom-color: var(--jk-border-light);
+    margin-bottom: var(--jk-space-12);
+    padding-bottom: var(--jk-space-8);
 }
 
-.jk-vidriera-disponibilidad-recurso {
-    display: flex;
-    flex-direction: column;
-    gap: var(--jk-space-8);
+.jk-vidriera-semanal-card .jk-vidriera-seccion-titulo {
+    color: var(--jk-text-primary);
 }
 
-.jk-vidriera-disponibilidad-recurso-nombre {
-    font-family: var(--jk-font-display);
-    font-size: var(--jk-text-base);
-    font-weight: var(--jk-weight-semibold);
-    color: var(--jk-teal);
-    display: flex;
-    align-items: center;
-    gap: var(--jk-space-8);
-}
-
-.jk-vidriera-disponibilidad-recurso-nombre i {
-    color: var(--jk-teal);
-}
-
-.jk-vidriera-disponibilidad-slots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--jk-space-8);
-}
-
-.jk-vidriera-disponibilidad-slot {
+.jk-vidriera-semanal-rango {
+    margin-left: auto;
     display: inline-flex;
     align-items: center;
-    padding: var(--jk-space-8) var(--jk-space-16);
-    border: 1px solid var(--jk-teal);
-    border-radius: var(--jk-radius-full);
+    gap: 6px;
+    padding: 4px 12px;
     background: var(--jk-teal-light);
-    font-size: var(--jk-text-base);
-    font-weight: var(--jk-weight-bold);
     color: var(--jk-teal);
+    border: 1px solid var(--jk-teal);
+    border-radius: 999px;
+    font-size: var(--jk-text-sm);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.jk-vidriera-semanal-card .jk-vidriera-vacio {
+    color: var(--jk-text-secondary);
+}
+
+/* ===== PIZARRA SEMANAL (D-048): hoy + 6 dias, cards por servicio, sin scroll ===== */
+
+.jk-vidriera-pizarra {
+    position: relative;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.jk-vidriera-pantalla {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease;
+    display: flex;
+}
+
+.jk-vidriera-pantalla.is-active {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+}
+
+/* ===== MATRIZ SEMANAL: filas = servicios, columnas = dias, celdas = horas ===== */
+
+.jk-vidriera-matriz {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    border-collapse: separate;
+    border-spacing: 6px;
+    table-layout: fixed;
+}
+
+.jk-vidriera-matriz-serv-col {
+    width: 150px;
+    padding: 8px 14px;
+    text-align: left;
+    font-size: var(--jk-text-md);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--jk-text-secondary);
+}
+
+.jk-vidriera-matriz-dia {
+    padding: 10px 4px;
+    text-align: center;
+    background: var(--jk-surface);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-sm);
+    vertical-align: middle;
+}
+
+.jk-vidriera-matriz-dia.is-today {
+    background: var(--jk-teal-light);
+    border-color: var(--jk-teal);
+}
+
+.jk-vidriera-matriz-dia-nombre {
+    display: block;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--jk-text-secondary);
+    font-size: var(--jk-text-md);
+}
+
+.jk-vidriera-matriz-dia.is-today .jk-vidriera-matriz-dia-nombre {
+    color: var(--jk-teal);
+}
+
+.jk-vidriera-matriz-dia-numero {
+    display: block;
+    font-family: var(--jk-font-display);
+    font-size: 1.7rem;
+    line-height: 1.1;
+    font-weight: 800;
+    color: var(--jk-text-primary);
+}
+
+.jk-vidriera-matriz-serv {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--jk-text-primary);
+    font-size: var(--jk-text-md);
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jk-vidriera-matriz-serv i {
+    color: var(--jk-accent);
+    margin-right: 6px;
+}
+
+.jk-vidriera-matriz-celda {
+    padding: 8px 4px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-sm);
+    font-size: var(--jk-text-base);
+    font-weight: 700;
+}
+
+.jk-vidriera-matriz-horas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.jk-vidriera-matriz-hora {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: var(--jk-radius-sm);
+    background: var(--jk-white);
+    font-size: var(--jk-text-base);
+    font-weight: 800;
+    white-space: nowrap;
+    min-width: 44px;
+}
+
+.jk-vidriera-matriz-celda.st-disponible {
+    background: var(--jk-success-light);
+    color: var(--jk-success);
+    border-color: var(--jk-success);
+}
+
+.jk-vidriera-matriz-celda.st-ultimo {
+    background: var(--jk-warning-light);
+    color: var(--jk-warning);
+    border-color: var(--jk-warning);
+}
+
+.jk-vidriera-matriz-celda.st-sin {
+    background: var(--jk-bg);
+    color: var(--jk-text-tertiary);
+}
+
+.jk-vidriera-matriz-celda.is-today {
+    outline: 2px solid var(--jk-teal);
+    outline-offset: -2px;
+}
+
+.jk-vidriera-matriz-sin {
+    color: var(--jk-text-tertiary);
+    font-weight: 800;
+}
+
+.jk-vidriera-pantalla-indicador {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0 0 0;
+    flex-shrink: 0;
+}
+
+.jk-vidriera-pantalla-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--jk-border);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.jk-vidriera-pantalla-dot.is-active {
+    background: var(--jk-accent);
+    transform: scale(1.3);
 }
 
 /* ===== RESPONSIVE (mantener sin scroll abajo) ===== */

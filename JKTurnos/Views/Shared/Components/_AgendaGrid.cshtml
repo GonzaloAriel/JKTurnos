@@ -116,8 +116,7 @@ else
 
             @* Time blocks (overlay: se superponen a las celdas de su columna) *@
             @foreach (var t in turnos)
-            {
-                int colIdx;
+            {                int colIdx;
                 if (!columnaRecurso.TryGetValue(t.RecursoId, out colIdx))
                 {
                     continue;
@@ -189,6 +188,70 @@ else
                         <span class="jk-agenda-time-block-service">@servicioNombre</span>
                     </div>
                 </div>
+            }
+
+            @* Bloqueos de disponibilidad (D-046, grises, overlay) *@
+            @if (Model.Bloqueos != null)
+            {
+                foreach (var b in Model.Bloqueos)
+                {
+                    bool aplicaDia = false;
+                    switch (b.Tipo)
+                    {
+                        case JKTurnos.Models.Entities.TipoBloqueo.Unico:
+                            aplicaDia = b.FechaInicio.Date == fecha.Date;
+                            break;
+                        case JKTurnos.Models.Entities.TipoBloqueo.RangoFechas:
+                            var rFechaFin = b.FechaFin.HasValue ? b.FechaFin.Value.Date : b.FechaInicio.Date;
+                            aplicaDia = fecha.Date >= b.FechaInicio.Date && fecha.Date <= rFechaFin;
+                            break;
+                        default:
+                            aplicaDia = fecha.DayOfWeek == b.FechaInicio.DayOfWeek;
+                            break;
+                    }
+                    if (!aplicaDia) { continue; }
+
+                    int colIdx;
+                    if (!columnaRecurso.TryGetValue(b.RecursoId, out colIdx)) { continue; }
+
+                    DateTime bInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, gridInicio.Hour, gridInicio.Minute, 0);
+                    DateTime bFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, gridFin.Hour, gridFin.Minute, 0);
+
+                    if (b.HoraInicio.HasValue && b.HoraFin.HasValue)
+                    {
+                        var diaBase = fecha.Date;
+                        bInicio = diaBase.Add(b.HoraInicio.Value);
+                        bFin = diaBase.Add(b.HoraFin.Value);
+                    }
+
+                    if (bInicio < gridInicio) { bInicio = gridInicio; }
+                    if (bFin > gridFin) { bFin = gridFin; }
+                    if (bInicio >= gridFin || bFin <= bInicio) { continue; }
+
+                    int bFranjaInicio = (int)Math.Floor((bInicio - gridInicio).TotalMinutes / franjaMinutos);
+                    int bFranjaSpan = Math.Max(1, (int)Math.Ceiling((bFin - bInicio).TotalMinutes / franjaMinutos));
+                    if (bFranjaInicio >= filasFranja) { continue; }
+                    if (bFranjaInicio + bFranjaSpan > filasFranja) { bFranjaSpan = filasFranja - bFranjaInicio; }
+
+                    int bGridRowStart = bFranjaInicio + 2;
+                    int bGridRowEnd = bGridRowStart + bFranjaSpan;
+                    int bGridColumn = colIdx + 2;
+
+                    string bDesc = !string.IsNullOrWhiteSpace(b.Descripcion) ? b.Descripcion : "No disponible";
+
+                    <div class="jk-bloqueo-recurso"
+                         role="status"
+                         data-bloqueo-id="@b.Id"
+                         data-recurso-id="@b.RecursoId"
+                         style="grid-column: @bGridColumn; grid-row: @bGridRowStart / @bGridRowEnd;"
+                         aria-label="Bloqueo: @bDesc">
+                        <div class="jk-bloqueo-recurso-band">
+                            <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                            <span class="jk-bloqueo-recurso-hour">@bInicio.ToString("HH:mm") - @bFin.ToString("HH:mm")</span>
+                        </div>
+                        <div class="jk-bloqueo-recurso-label">No disponible</div>
+                    </div>
+                }
             }
 
         </div>

@@ -168,6 +168,59 @@
                     }
                 }
 
+                @* Bloqueos de disponibilidad (D-046, grises) *@
+                @if (Model.Bloqueos != null)
+                {
+                    foreach (var b in Model.Bloqueos)
+                    {
+                        bool aplicaDia = false;
+                        switch (b.Tipo)
+                        {
+                            case JKTurnos.Models.Entities.TipoBloqueo.Unico:
+                                aplicaDia = b.FechaInicio.Date == dia.Date;
+                                break;
+                            case JKTurnos.Models.Entities.TipoBloqueo.RangoFechas:
+                                var rFechaFin = b.FechaFin.HasValue ? b.FechaFin.Value.Date : b.FechaInicio.Date;
+                                aplicaDia = dia.Date >= b.FechaInicio.Date && dia.Date <= rFechaFin;
+                                break;
+                            default:
+                                aplicaDia = dia.DayOfWeek == b.FechaInicio.DayOfWeek;
+                                break;
+                        }
+                        if (!aplicaDia) { continue; }
+
+                        var bInicio = new DateTime(dia.Year, dia.Month, dia.Day, inicioDia.Hour, inicioDia.Minute, 0);
+                        var bFin = new DateTime(dia.Year, dia.Month, dia.Day, finDia.Hour, finDia.Minute, 0);
+
+                        if (b.HoraInicio.HasValue && b.HoraFin.HasValue)
+                        {
+                            var diaBase = dia.Date;
+                            bInicio = diaBase.Add(b.HoraInicio.Value);
+                            bFin = diaBase.Add(b.HoraFin.Value);
+                        }
+
+                        if (bInicio < inicioDia) { bInicio = inicioDia; }
+                        if (bFin > finDia) { bFin = finDia; }
+                        if (bInicio >= finDia || bFin <= bInicio) { continue; }
+
+                        double bTop = (bInicio - inicioDia).TotalMinutes * pxPorMinuto;
+                        double bHeight = Math.Max(20, (bFin - bInicio).TotalMinutes * pxPorMinuto);
+
+                        string bDesc = !string.IsNullOrWhiteSpace(b.Descripcion) ? b.Descripcion : "No disponible";
+
+                        <div class="jk-bloqueo-recurso jk-bloqueo-recurso-week"
+                             role="status"
+                             data-bloqueo-id="@b.Id"
+                             data-recurso-id="@b.RecursoId"
+                             style="top: @bTop.ToString("0.##")px; height: @bHeight.ToString("0.##")px;"
+                             aria-label="Bloqueo: @bDesc">
+                            <div class="jk-bloqueo-recurso-band">
+                                <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    }
+                }
+
                 @if (esHoy)
                 {
                     var ahora = DateTime.Now;
