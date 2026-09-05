@@ -1,0 +1,55 @@
+@*
+    JKTurnos - Bienvenida primer ingreso (M-15)
+    Modal centrado que aparece una sola vez, cuando un usuario tenant
+    realiza su primer login exitoso. El controller setea
+    TempData["PrimerIngreso"] antes del redirect; leerlo aqui lo consume
+    (no via Peek), asi la bienvenida no vuelve a mostrarse.
+*@
+
+@if (TempData["PrimerIngreso"] != null)
+{
+    <div class="jk-welcome-backdrop" id="jk-welcome-backdrop">
+        <div class="jk-welcome-modal" role="dialog" aria-modal="true" aria-labelledby="jk-welcome-title">
+            <button type="button" class="jk-welcome-close" id="jk-welcome-close" aria-label="Cerrar bienvenida">
+                <i class="bi bi-x"></i>
+            </button>
+
+            <div class="jk-welcome-emoji" aria-hidden="true"><i class="bi bi-balloon-heart"></i></div>
+
+            <h2 class="jk-welcome-title" id="jk-welcome-title">
+                Bienvenido a JKTurnos<span class="jk-welcome-accent">!</span>
+            </h2>
+
+            <p class="jk-welcome-text">
+                Estamos felices de tenerte aca. Ya podes crear tus servicios,
+                tus recursos y empezar a cargar los turnos de tu negocio.
+                Arranquemos!!<span class="jk-welcome-accent">!</span>
+            </p>
+
+            <button type="button" class="jk-btn jk-btn-primary jk-btn-lg jk-welcome-start" id="jk-welcome-start">
+                Empezar a usar JKTurnos <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var backdrop = document.getElementById('jk-welcome-backdrop');
+            var modal = document.querySelector('#jk-welcome-backdrop .jk-welcome-modal');
+            var cerrar = function () {
+                if (backdrop) backdrop.classList.remove('is-open');
+            };
+            var inicio = document.getElementById('jk-welcome-start');
+            var cerrarBtn = document.getElementById('jk-welcome-close');
+
+            if (inicio) inicio.addEventListener('click', cerrar);
+            if (cerrarBtn) cerrarBtn.addEventListener('click', cerrar);
+            if (modal) modal.addEventListener('click', function (e) { e.stopPropagation(); });
+            if (backdrop) backdrop.addEventListener('click', cerrar);
+
+            requestAnimationFrame(function () {
+                if (backdrop) backdrop.classList.add('is-open');
+            });
+        })();
+    </script>
+}

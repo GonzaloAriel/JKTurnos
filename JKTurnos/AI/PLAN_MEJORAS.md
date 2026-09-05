@@ -85,6 +85,19 @@ AVANCE (2026-09-01): EN PROGRESO. Backend + frontend implementados:
 ### M-09 CONFIGURACION PROGRESIVA + ONBOARDING  [PRIORIDAD MEDIA - Fase 4]
 - Wizard inicial que guie el alta (logo, horarios, servicio, recurso) sin obligar.
 - Riesgo: BAJO-MEDIO.
+- Estado: EN PROGRESO (2026-09-05). Avance: checklist de primeros pasos en el
+  Command Center ("Poner en marcha tu negocio") reemplaza la seccion "Acciones
+  sugeridas". `HomeService.BuildSetupChecklist` detecta 5 pasos (recurso,
+  servicio, horarios, logo, datos); `HomeController.Index` filtra por rol
+  (`!IsAdmin` solo recurso/servicio). Card visible solo si `SetupPendientes > 0`.
+  Pendiente confirmacion TEAM LEAD.
+
+### M-15 BIENVENIDA AL PRIMER INGRESO  [NUEVA - registrar]
+- Mensaje flotante centrado y entusiasta cuando un usuario tenant loguea por
+  PRIMERA vez; se muestra UNA sola vez. Deteccion por auditoria (sin migracion:
+  `A_Login` previo inexistente, D-049) + `TempData["PrimerIngreso"]` consumido en
+  el primer render. Excluye AdminGlobal. Implementado 2026-09-05, pendiente
+  confirmacion TEAM LEAD.
 
 ## Otras mejoras (diferibles)
 

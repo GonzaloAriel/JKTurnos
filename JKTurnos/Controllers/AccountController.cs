@@ -31,7 +31,8 @@ namespace JKTurnos.Controllers
 
             var user = _authService.Login(
                 model.Email,
-                model.Password);
+                model.Password,
+                out var esPrimerIngreso);
 
             if (user == null)
             {
@@ -41,6 +42,10 @@ namespace JKTurnos.Controllers
 
             if (user.Role == Roles.AdminGlobal)
                 return RedirectToAction("Index", "AdminGlobalDashboard");
+
+            // M-15: bienvenida solo en el primer ingreso del usuario tenant.
+            if (esPrimerIngreso)
+                TempData["PrimerIngreso"] = true;
 
             return RedirectToAction("Index", "Home");
         }

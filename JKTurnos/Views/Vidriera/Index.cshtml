@@ -141,7 +141,10 @@
                 @for (int dIdx = 0; dIdx < diasRef.Count; dIdx++)
                 {
                     var dd = diasRef[dIdx];
-                    <div class="day">@dd.NombreDia</div>
+                    <div class="day">
+                        <span class="day-name">@dd.NombreDia</span>
+                        <span class="day-num">@dd.DiaDelMes</span>
+                    </div>
 
                     for (int sIdx = 0; sIdx < totalServicios; sIdx++)
                     {

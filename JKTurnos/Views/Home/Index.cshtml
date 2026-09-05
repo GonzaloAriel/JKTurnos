@@ -173,56 +173,56 @@
         </div>
     </div>
 
-    <!-- ===== 5. ACCIONES SUGERIDAS ===== -->
-    <div class="home-section">
-        <div class="section-header">
-            <h2 class="section-title">Acciones sugeridas</h2>
+    <!-- ===== 5. PUESTA EN MARCHA (M-09: configuracion progresiva) ===== -->
+    @if (Model.SetupSteps != null && Model.SetupPendientes > 0)
+    {
+        var totalPasos = Model.SetupSteps.Count;
+        var completos = totalPasos - Model.SetupPendientes;
+        var porcentaje = (int)Math.Round((completos / (double)totalPasos) * 100);
+
+        <div class="home-section jk-onboarding-card">
+            <div class="onboarding-header">
+                <div>
+                    <h2 class="onboarding-title">Poner en marcha tu negocio</h2>
+                    <p class="onboarding-subtitle">
+                        Completaste @completos de @totalPasos. Sigue estos pasos y listo, podes configurarlos cuando quieras.
+                    </p>
+                </div>
+                <div class="onboarding-progress" role="progressbar" aria-valuenow="@porcentaje" aria-valuemin="0" aria-valuemax="100">
+                    <span>@porcentaje%</span>
+                    <div class="onboarding-progress-track">
+                        <div class="onboarding-progress-fill" style="width: @porcentaje%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="onboarding-list">
+                @foreach (var paso in Model.SetupSteps)
+                {
+                    <a href="@paso.Url" class="onboarding-step @(paso.Completo ? "is-complete" : "")">
+                        <span class="onboarding-step-check">
+                            @if (paso.Completo)
+                            {
+                                <i class="bi bi-check-lg"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-@paso.Icono"></i>
+                            }
+                        </span>
+                        <span class="onboarding-step-content">
+                            <span class="onboarding-step-title">@paso.Titulo</span>
+                            <span class="onboarding-step-desc">@paso.Descripcion</span>
+                        </span>
+                        @if (!paso.Completo)
+                        {
+                            <i class="bi bi-arrow-right onboarding-step-arrow" aria-hidden="true"></i>
+                        }
+                    </a>
+                }
+            </div>
         </div>
-        <p class="suggestion-intro">
-            Ayudame a conocer mejor tu negocio para asistirte mejor.
-        </p>
-
-        <div class="suggestion-grid">
-            <div class="suggestion-card">
-                <div class="suggestion-icon suggestion-icon-blue">
-                    <i class="bi bi-shop"></i>
-                </div>
-                <div class="suggestion-content">
-                    <div class="suggestion-title">Completa tu negocio</div>
-                    <div class="suggestion-desc">Configura logo, direccion y datos de contacto.</div>
-                    <a href="#" class="suggestion-action">
-                        Configurar <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="suggestion-card">
-                <div class="suggestion-icon suggestion-icon-green">
-                    <i class="bi bi-scissors"></i>
-                </div>
-                <div class="suggestion-content">
-                    <div class="suggestion-title">Agrega servicios</div>
-                    <div class="suggestion-desc">Define que ofreces y cuanto tiempo dura cada uno.</div>
-                    <a href="@Url.Action("Create", "Servicios")" class="suggestion-action">
-                        Agregar <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="suggestion-card">
-                <div class="suggestion-icon suggestion-icon-green">
-                    <i class="bi bi-plus-circle"></i>
-                </div>
-                <div class="suggestion-content">
-                    <div class="suggestion-title">Crear recurso</div>
-                    <div class="suggestion-desc">Agrega un espacio, sala o profesional a tu negocio.</div>
-                    <a href="@Url.Action("Create", "Recursos")" class="suggestion-action">
-                        Crear <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    }
 
     <!-- ===== 6. ACTIVIDAD RECIENTE ===== -->
     <div class="home-section">

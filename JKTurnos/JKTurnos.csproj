@@ -505,9 +505,11 @@
     <Content Include="Views\Avatares\Crear.cshtml" />
     <Content Include="Views\Avatares\Editar.cshtml" />
     <Content Include="Views\Avatares\Eliminar.cshtml" />
+    <Content Include="Views\Shared\Components\_BienvenidaPrimerIngreso.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Img\Loguin\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

@@ -257,14 +257,26 @@ body {
 
 .jk-vidriera-schedule .day {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: #f5ecdf;
     border-right: 1px solid var(--jk-border);
     border-bottom: 1px solid var(--jk-border);
-    font-size: clamp(13px, 1vw, 19px);
     font-weight: 800;
+    line-height: 1.1;
+}
+
+.jk-vidriera-schedule .day-name {
+    font-size: clamp(10px, 0.85vw, 16px);
     letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.jk-vidriera-schedule .day-num {
+    font-size: clamp(15px, 1.35vw, 26px);
+    letter-spacing: .02em;
+    margin-top: 2px;
 }
 
 .jk-vidriera-schedule .day:last-of-type {

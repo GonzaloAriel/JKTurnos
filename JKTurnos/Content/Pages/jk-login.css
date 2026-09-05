@@ -45,17 +45,10 @@
     margin-bottom: var(--jk-space-64);
 }
 
-.jk-login-logo i {
-    font-size: 1.4rem;
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    background: var(--jk-surface);
-    color: var(--jk-accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--jk-shadow);
+.jk-login-logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 .jk-login-title {

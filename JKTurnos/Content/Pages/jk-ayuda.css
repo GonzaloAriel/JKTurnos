@@ -18,6 +18,15 @@
     padding-top: var(--jk-space-16);
 }
 
+.jk-faq-group {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--jk-text-tertiary);
+    margin: var(--jk-space-24) 0 var(--jk-space-8);
+}
+
 .jk-faq-item {
     border: 1px solid var(--jk-border);
     border-radius: var(--jk-radius);

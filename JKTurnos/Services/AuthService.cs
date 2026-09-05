@@ -25,8 +25,10 @@ namespace JKTurnos.Services
         /// la respuesta pero HttpContext.User no se actualiza hasta la
         /// proxima request.
         /// </summary>
-        public User Login(string email, string password)
+        public User Login(string email, string password, out bool esPrimerIngreso)
         {
+            esPrimerIngreso = false;
+
             var user = _context.Users
                 .FirstOrDefault(x => x.Email == email);
 
@@ -51,6 +53,12 @@ namespace JKTurnos.Services
                     new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
                     return null;
                 }
+            }
+
+            if (user.Role != Roles.AdminGlobal)
+            {
+                esPrimerIngreso = !_context.Auditorias
+                    .Any(a => a.UsuarioId == user.Id && a.Accion == AuditService.A_Login);
             }
 
             new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, true);

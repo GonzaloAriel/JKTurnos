@@ -74,6 +74,8 @@ Vista movil de Agenda P1 (acordeon por Recurso + horarios libres + filtro de rec
 
 Referencia de la proxima etapa (Fase 3 del roadmap, Docs/02): Agenda, Turnos y Calendario. Time Blocks de Agenda con datos reales implementados y verificados visualmente (2026-08-11).
 
+Cierre de sesion 2026-09-05: primeros pasos de UI (login con logo Sol.png + favicon, FAQ/Ayuda por rol, animacion de acordeon movil en Agenda), M-09 checklist de primeros pasos en Command Center (IMPLEMENTADO, pendiente confirmacion), M-15 bienvenida al primer ingreso (IMPLEMENTADO, pendiente confirmacion, D-049) y numero de dia en la grilla de la Vidriera. Detalle en AI/SESION_20260905_CONTEXTO.md.
+
 ## Plan activo
 
 Estado del ciclo: IMPLEMENTACION

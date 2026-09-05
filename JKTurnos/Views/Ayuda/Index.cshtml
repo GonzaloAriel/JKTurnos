@@ -73,97 +73,298 @@
         </div>
         <div class="jk-faq-list">
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Como creo un turno?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    Entra a "Mi Agenda" y usa el boton "Nuevo Turno". Elegi el cliente, el servicio, el recurso y la fecha y hora.
-                    El sistema valida que el recurso este disponible en ese horario. Si no hay estados configurados, se asigna
-                    "Pendiente" por defecto.
-                </div>
-            </details>
+            @if (!User.IsInRole(RolesConst.AdminGlobal))
+            {
+                <h4 class="jk-faq-group">Operacion diaria</h4>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Como registro una seña o un pago?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    Abri el detalle del turno desde la Agenda (seccion Pagos). Podes registrar una seña una sola vez, un pago
-                    parcial o el pago total. El estado economico se calcula automaticamente desde los pagos registrados.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que es el Command Center y que muestra?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Es la pantalla principal al ingresar. Resume tu dia: saludo contextual, acciones rapidas (Nuevo turno,
+                        Agenda, Clientes), el carril "Mi dia" con los turnos del dia por recurso y KPIs de hoy (turnos,
+                        ingresos proyectados, ocupacion y clientes).
+                    </div>
+                </details>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Como envio el recordatorio por WhatsApp?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    En el detalle del turno, el boton "Recordar por WhatsApp" abre WhatsApp con el mensaje prellenado. Solo
-                    aparece si el cliente tiene telefono cargado. Para turnos del dia se usa la plantilla de confirmacion del
-                    dia; para turnos futuros, la plantilla general.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como creo un turno?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Entra a "Mi Agenda" y usa el boton "Nuevo Turno". Elegi el cliente, el servicio, el recurso y la fecha
+                        y hora. El sistema valida que el recurso este disponible en ese horario. Si no hay estados configurados,
+                        se asigna "Pendiente" por defecto.
+                    </div>
+                </details>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Como envio el recordatorio por email?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    Primero activa el envio en Configuracion, Recordatorio por email (SMTP) y carga servidor, puerto y usuario.
-                    Luego el boton "Enviar recordatorio por email" aparece en el detalle del turno cuando el cliente tiene email.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como muevo un turno con arrastrar y soltar?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        En "Mi Agenda" (vistas dia o semana, filtra por recurso) agarra el bloque de un turno pendiente o en
+                        curso y arrastralo a la celda que quieras. En la vista dia se ajusta en bloques de 30 minutos; en la
+                        semana se ubica por posicion horaria conservando el mismo recurso. El sistema valida la disponibilidad y
+                        no deja moverlo al pasado. Tambien podes usar "Mover turno" desde el detalle del turno para indicar
+                        recurso, fecha y hora.
+                    </div>
+                </details>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Que diferencia hay entre la plantilla general y la del dia?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    La plantilla general se usa para recordar turnos futuros. La de confirmacion del dia se usa cuando el turno
-                    es hoy. Asi configuras cada mensaje una sola vez sin modificarlos segun el caso. Si la del dia esta vacia,
-                    se usa la general.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que representan los colores de los bloques de la Agenda?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        El color del bloque identifica al RECURSO (quien atiende o el espacio/equipo), nunca al estado del turno.
+                        Dos turnos del mismo recurso comparten color aunque esten en estados diferentes. El estado se indica con
+                        sus propias etiquetas.
+                    </div>
+                </details>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Que son los recordatorios de la campanita?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    La campanita muestra lo que requiere tu atencion: el proximo turno, turnos sin confirmar, saldo por cobrar,
-                    clientes sin contacto y la configuracion pendiente. Se calculan al momento y desaparecen cuando se resuelven.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Cual es la diferencia entre estado operativo y estado economico?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Son dos lecturas independientes de un turno. El operativo es el ciclo: Pendiente, En curso, Finalizado o
+                        Cancelado. El economico se calcula de los pagos: Sin seña, Seña pagada, Pago parcial o Pago completo.
+                        Un turno puede estar Finalizado y aun asi tener saldo pendiente.
+                    </div>
+                </details>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Como agrego un servicio o un recurso?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    Desde las secciones Servicios y Recursos. Un servicio define nombre, precio y duracion. Un recurso es quien
-                    atiende o el espacio/equipo que se usa. El servicio debe estar vinculado a al menos un recurso para poder
-                    agendar.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como registro una seña o un pago?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Abri el detalle del turno desde la Agenda (seccion Pagos). Podes registrar una seña una sola vez, un pago
+                        parcial o el pago total. El estado economico se calcula automaticamente desde los pagos registrados.
+                    </div>
+                </details>
 
-            <details class="jk-faq-item">
-                <summary>
-                    <span>Como cambio mi contrasena?</span>
-                    <i class="bi bi-chevron-down jk-faq-chevron"></i>
-                </summary>
-                <div class="jk-faq-body">
-                    Desde el pie del menu, usa "Cambiar contrasena" (disponible para Administrador y Administrador Global).
-                    Ingresa tu contrasena actual y la nueva.
-                </div>
-            </details>
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como agrego un servicio o un recurso?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Desde las secciones Servicios y Recursos. Un servicio define nombre, precio y duracion. Un recurso es
+                        quien atiende o el espacio/equipo que se usa. El servicio debe estar vinculado a al menos un recurso para
+                        poder agendar.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como vinculo un servicio con un recurso?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Entra a Servicios o Recursos, edita el item y en la seccion de vinculos selecciona los recursos o
+                        servicios relacionados. Al crear un turno el recurso es obligatorio y el servicio opcional; si el recurso
+                        tiene un solo servicio vinculado, se preselecciona solo.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que puedo buscar con la Busqueda global?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        La Busqueda del sistema te deja encontrar clientes, servicios, recursos y turnos escribiendo parte del
+                        nombre o dato. Los resultados se agrupan por tipo y al tocarlos te llevan al detalle.
+                    </div>
+                </details>
+            }
+
+            @if (!User.IsInRole(RolesConst.AdminGlobal))
+            {
+                <h4 class="jk-faq-group">Recordatorios</h4>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como envio el recordatorio por WhatsApp?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        En el detalle del turno, el boton "Recordar por WhatsApp" abre WhatsApp con el mensaje prellenado. Solo
+                        aparece si el cliente tiene telefono cargado. Para turnos del dia se usa la plantilla de confirmacion del
+                        dia; para turnos futuros, la plantilla general.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como envio el recordatorio por email?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Primero activa el envio en Configuracion, Recordatorio por email (SMTP) y carga servidor, puerto y
+                        usuario. Luego el boton "Enviar recordatorio por email" aparece en el detalle del turno cuando el cliente
+                        tiene email.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que diferencia hay entre la plantilla general y la del dia?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        La plantilla general se usa para recordar turnos futuros. La de confirmacion del dia se usa cuando el
+                        turno es hoy. Asi configuras cada mensaje una sola vez sin modificarlos segun el caso. Si la del dia esta
+                        vacia, se usa la general.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que son los recordatorios de la campanita?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        La campanita muestra lo que requiere tu atencion: el proximo turno, turnos sin confirmar, saldo por
+                        cobrar, clientes sin contacto y la configuracion pendiente. Se calculan al momento y desaparecen cuando
+                        se resuelven.
+                    </div>
+                </details>
+            }
+
+            @if (User.IsInRole(RolesConst.Admin))
+            {
+                <h4 class="jk-faq-group">Configuracion del negocio</h4>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que muestra el Dashboard?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Es el panel de analisis del mes, en seccion aparte del Command Center: KPIs (turnos, ingresos por pagos,
+                        ocupacion de hoy, clientes), ocupacion semanal, ingresos del dia, evolucion de ingresos en 12 meses,
+                        ingresos por recurso, proximos turnos, turnos sin confirmar, ranking de servicios y saldo pendiente.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como bloqueo la disponibilidad de un recurso?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Desde la seccion Recursos abri los Bloqueos del recurso. Crea un bloqueo por fecha o rango y el sistema
+                        trata ese espacio como no disponible al validar turnos. Asi reservas franjas para descanso, mantenimiento
+                        o cierre de la agenda.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como cambio el logo o avatar de mi negocio?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        En Configuracion, Negocio, Datos del negocio. Podes elegir un avatar predefinido de la plataforma o
+                        cargar un logo propio por URL. El logo o avatar se muestra en el menu lateral, en el Command Center y
+                        como marca de tu vidriera publica.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que registra la seccion Auditoria?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Guarda el historial de eventos importantes del negocio: altas, ediciones y bajas de turnos, clientes,
+                        servicios y recursos, cambios de configuracion, pagos y accesos. Sirve para ver que paso, cuando y quien
+                        lo hizo.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como configuro y publico mi Vidriera publica?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        En Configuracion, Vidriera. Elegi un slug (el identificador unico de tu pagina publica), completa titulo,
+                        descripcion, mensaje y oferta, y elige que secciones mostrar (servicios, precios, disponibilidad).
+                        Guarda y tu pagina queda publicada en /vidriera/tu-slug, lista para compartir.
+                    </div>
+                </details>
+            }
+
+            @if (User.IsInRole(RolesConst.Admin) || User.IsInRole(RolesConst.AdminGlobal))
+            {
+                <h4 class="jk-faq-group">Roles</h4>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que puede hacer cada rol?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        AdminGlobal administra la plataforma: tenants, avatares, pagos de suscripcion y el tablero global.
+                        Admin administra su negocio: configuracion, usuarios, auditoria, vidriera y dashboard. User opera el dia
+                        a dia: agenda, turnos, clientes, servicios, recursos y pagos, sin acciones administrativas.
+                    </div>
+                </details>
+            }
+
+            @if (User.IsInRole(RolesConst.AdminGlobal))
+            {
+                <h4 class="jk-faq-group">Plataforma</h4>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como gestiono las suscripciones y pagos de plataforma?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        En Pagos Plataforma cargas los pagos de cada tenant: plan, monto, fecha y observacion. Cada pago
+                        recalcula el vencimiento de la suscripcion (desde el vencimiento vigente si no vencio; desde hoy si
+                        vencio). El estado del tenant (Activo, Por vencer, Vencido, En gracia, Suspendido o Sin plan) se calcula
+                        solo y se ve en la grilla de Tenants.
+                    </div>
+                </details>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Que es el Dashboard Global?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Es la vista de AdminGlobal con el resumen de toda la plataforma: cantidad de tenants por estado (activos,
+                        vencidos, suspendidos, sin plan). Te da el pulso general para saber que negocios requieren atencion.
+                    </div>
+                </details>
+            }
+
+            @if (User.IsInRole(RolesConst.Admin) || User.IsInRole(RolesConst.AdminGlobal))
+            {
+                <h4 class="jk-faq-group">Cuenta</h4>
+
+                <details class="jk-faq-item">
+                    <summary>
+                        <span>Como cambio mi contrasena?</span>
+                        <i class="bi bi-chevron-down jk-faq-chevron"></i>
+                    </summary>
+                    <div class="jk-faq-body">
+                        Desde el pie del menu, usa "Cambiar contrasena" (disponible para Administrador y Administrador Global).
+                        Ingresa tu contrasena actual y la nueva.
+                    </div>
+                </details>
+            }
 
         </div>
     </div>

@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>@ViewBag.Title - JKTurnos</title>
+    <link rel="icon" type="image/png" href="~/Img/Loguin/Sol.png">
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -64,6 +65,8 @@
         </div>
         <div class="jk-drawer-body" id="drawer-turno-global-body"></div>
     </div>
+
+    @Html.Partial("~/Views/Shared/Components/_BienvenidaPrimerIngreso.cshtml")
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

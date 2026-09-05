@@ -1053,4 +1053,43 @@
         });
     }
 
+    /*
+     * Mobile accordion animation (_AgendaMobile)
+     * Los acordeones por Recurso usan <details>/<summary> nativos, que no
+     * animan el despliegue por si solos. Este enhacement agrega un despliegue
+     * suave tipo acordeon/pergamino: al abrir crece la altura del cuerpo desde
+     * 0 hasta su alto natural; al cerrar se colapsa. El cuerpo mantiene su
+     * comportamiento nativo sin JS (falta de soporte de `toggle` = sin animacion,
+     * pero el acordeon sigue funcionando igual).
+     */
+    function initMobileAccordion() {
+        var resources = document.querySelectorAll('.jk-agenda-mobile-resource');
+
+        resources.forEach(function (details) {
+            var body = details.querySelector('.jk-agenda-mobile-resource-body');
+            if (!body) return;
+
+            body.style.transition = 'height var(--jk-transition-slow, 0.3s ease), opacity var(--jk-transition, 0.2s ease)';
+            body.style.overflow = 'hidden';
+
+            details.addEventListener('toggle', function () {
+                if (details.open) {
+                    body.style.height = '0px';
+                    body.style.opacity = '0';
+                    void body.offsetHeight;
+                    body.style.height = body.scrollHeight + 'px';
+                    body.style.opacity = '1';
+                    setTimeout(function () { body.style.height = 'auto'; }, 320);
+                } else {
+                    body.style.height = body.scrollHeight + 'px';
+                    void body.offsetHeight;
+                    body.style.height = '0px';
+                    body.style.opacity = '0';
+                }
+            });
+        });
+    }
+
+    initMobileAccordion();
+
 })();
