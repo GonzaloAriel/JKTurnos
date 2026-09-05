@@ -22,7 +22,12 @@ namespace JKTurnos.Controllers
         {
             var vm = _service.GetVidrieraPublica(slug);
             if (vm == null)
-                return HttpNotFound();
+            {
+                // Posta 8: vista dedicada "no disponible" en vez de 404 generico.
+                // No se distingue entre slug inexistente y deshabilitado (seguridad).
+                ViewBag.Motivo = "no-disponible";
+                return View("NoDisponible");
+            }
 
             return View(vm);
         }

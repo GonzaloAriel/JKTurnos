@@ -224,3 +224,15 @@
     </div>
 
 </div>
+
+@section scripts {
+    <script>
+        (function () {
+            // Posta 6: refresh periodico cada 5 minutos (300s).
+            // La pagina es de monitor (overflow:hidden), el flash de recarga es aceptable.
+            setInterval(function () {
+                location.reload();
+            }, 300000);
+        })();
+    </script>
+}

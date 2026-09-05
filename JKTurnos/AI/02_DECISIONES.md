@@ -720,3 +720,19 @@ Al tomar una decision nueva, agregar una ficha con el ID siguiente y actualizar 
 Al reemplazar una decision, marcar la ficha anterior como REEMPLAZADA por D-XXX y agregar la nueva.
 
 Registrar bajo confirmacion del TEAM LEAD.
+
+### D-047
+
+Fecha: 2026-09-04
+
+Decision: La Posta 7 de M-13 (originalmente "modo monitor interactivo" con rotacion por bloques) se REDEFINE y SEPARA de la vidriera como un modulo independiente: **Digital Signage / Pantalla de Contenido**.
+
+La vidriera (M-13) se cierra con las postas 6 (refresh periodico) y 8 (seguridad/vista no disponible) como funcionalidad completa. La Posta 7 NO se implementa dentro de M-13.
+
+Motivo: la Posta 7 original plantea una pantalla de rotacion donde el admin sube imagenes, configura secuencias, edita contenido promocional custom. Esto es un sistema de gestion de contenido (CMS basico para digital signage) que requiere: upload de imagenes, editor de bloques, configuracion de tiempos de rotacion, CRUD de contenido. Es un modulo nuevo e independiente, no una extension de la vidriera. La vidriera muestra datos reales del sistema (disponibilidad, servicios, horarios); el digital signage muestra contenido creativo del admin. Son productos distintos.
+
+Consecuencias: M-13 queda COMPLETA (postas 0-6, 8). El modulo Digital Signage queda registrado como futuro pendiente. No requiere cambios en la vidriera existente ni en su modelo de datos.
+
+Reemplaza a: la Posta 7 original dentro de M-13 (D-042).
+
+Estado: VIGENTE (registrado, pendiente de implementacion futura)

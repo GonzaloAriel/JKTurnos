@@ -80,7 +80,9 @@ Estado del ciclo: IMPLEMENTACION
 
 Registrar aqui unicamente el paso en curso. Actualizar bajo confirmacion del TEAM LEAD.
 
-Siguiente paso: AG-10 (modulo Avatares de Plataforma, pendiente confirmacion TEAM LEAD). Ver detalle abajo en "Ciclo AG".
+Siguiente paso: pendiente definicion del TEAM LEAD.
+
+M-13 VIDRIERA PUBLICA: COMPLETA (postas 0-6 y 8, 2026-09-04). Vista publica `/vidriera/{slug}` con disponibilidad semanal real, panel de gestion, refresh periodico (5 min) y vista "no disponible" dedicada. Posta 7 (Digital Signage / Pantalla de Contenido) redefinida como modulo separado futuro (D-047): requiere CMS basico para que el admin suba imagenes, configure secuencias de rotacion y gestione contenido promocional custom. No es extension de la vidriera.
 
 Ciclo AG (2026-08-26): postas AG-0..AG-5 y AG-7 implementadas, AG-6 EXCLUIDA (D-038), AG-8 y AG-9 IMPLEMENTADAS. AG-8: PagosSuscripcionController reescrito (Index con filtros tenant/rango fechas + Registrar con model binding via RegistrarPagoViewModel + _FormLayout). Boton "Registrar pago" en grilla Tenants/Index. Vista dedicada Configuracion/Suscripcion (card estado suscripcion + historial de pagos). Sidebar "Pagos Plataforma" en grupo Sistema. AG-9: Dashboard Admin Global minimo (shell con contadores de tenants por estado). AG-10: Avatares de Plataforma — entidad AvatarPlataforma (global), CRUD AdminGlobal, selector de avatares en Configuracion/DatosNegocio, avatar priorizado en BaseController (AvatarUrl > LogoUrl > icono), sidebar subtit
 
