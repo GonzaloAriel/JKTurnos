@@ -43,7 +43,13 @@
 @Html.Partial("~/Views/Shared/Components/_Toast.cshtml", new ViewDataDictionary { { "Id", toastId } })
 
 <div class="jk-drawer-backdrop" id="@(drawerId)-backdrop"></div>
-<aside class="jk-drawer" id="@drawerId" role="dialog" aria-modal="true" aria-labelledby="@(drawerId)-title" aria-hidden="true">
+<aside class="jk-drawer" id="@drawerId" role="dialog" aria-modal="true" aria-labelledby="@(drawerId)-title" aria-hidden="true"
+       data-jk-quick-drawer-recurso
+       data-container-id="@containerId"
+       data-select-id="@selectId"
+       data-toast-id="@toastId"
+       data-toast-message="@toastMessage"
+       data-post-url="@postUrl">
     <div class="jk-drawer-header">
         <h3 class="jk-drawer-title" id="@(drawerId)-title">Nuevo recurso reservable</h3>
         <button type="button" class="jk-drawer-close" data-jk-close-drawer="@drawerId" aria-label="Cerrar">
@@ -90,28 +96,32 @@
     (function () {
         'use strict';
 
-        var drawerId = '@drawerId';
-        var containerId = '@containerId';
-        var selectId = '@selectId';
-        var toastMessage = '@toastMessage';
-        var postUrl = '@postUrl';
+        var drawer = document.querySelector('[data-jk-quick-drawer-recurso]');
+        if (!drawer) return;
+        var drawerId = drawer.id;
+        var containerId = drawer.getAttribute('data-container-id') || '';
+        var selectId = drawer.getAttribute('data-select-id') || '';
+        var toastMessage = drawer.getAttribute('data-toast-message') || '';
+        var postUrl = drawer.getAttribute('data-post-url') || '';
+        var toastId = drawer.getAttribute('data-toast-id') || '';
 
         if (window['jk-drawer-recurso-init:' + drawerId]) return;
         window['jk-drawer-recurso-init:' + drawerId] = true;
 
-        var drawer = document.getElementById(drawerId);
         var backdrop = document.getElementById(drawerId + '-backdrop');
         var form = drawer ? drawer.querySelector('[data-jk-drawer-form]') : null;
         if (!drawer || !backdrop || !form) return;
 
-        var toastContainer = document.getElementById('@toastId');
+        var toastContainer = document.getElementById(toastId);
 
         function showToast(message, type) {
             if (!toastContainer) return;
             var toast = document.createElement('div');
             toast.className = 'jk-toast jk-toast-' + (type || 'success');
-            var icon = type === 'error' ? 'bi-x-circle' : (type === 'info' ? 'bi-info-circle' : 'bi-check-circle');
-            toast.innerHTML = '<i class="bi ' + icon + '"></i>' + message;
+            var icon = document.createElement('i');
+            icon.className = 'bi ' + (type === 'error' ? 'bi-x-circle' : (type === 'info' ? 'bi-info-circle' : 'bi-check-circle'));
+            toast.appendChild(icon);
+            toast.appendChild(document.createTextNode(' ' + message));
             toastContainer.appendChild(toast);
             setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 4000);
         }

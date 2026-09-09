@@ -15,6 +15,7 @@ namespace JKTurnos.Services
         public const string A_Crear = "Crear";
         public const string A_Editar = "Editar";
         public const string A_Eliminar = "Eliminar";
+        public const string A_Restaurar = "Restaurar";
         public const string A_CambiarEstado = "CambiarEstado";
         public const string A_Pago = "Pago";
         public const string A_Anular = "Anular";

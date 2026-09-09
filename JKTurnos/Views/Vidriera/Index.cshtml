@@ -45,7 +45,7 @@
             {
                 <a class="jk-vidriera-marca" href="~/vidriera/@Model.Slug">
                     <img class="jk-vidriera-logo" src="@Model.LogoUrl" alt="@Model.NombreNegocio"
-                         style="width:clamp(60px,5vw,88px);height:clamp(60px,5vw,88px);border-radius:50%;object-fit:cover;" />
+                         style="height:clamp(60px,5vw,88px);width:auto;max-width:200px;object-fit:contain;" />
                 </a>
             }
             else
@@ -198,7 +198,7 @@
                     @if (!string.IsNullOrWhiteSpace(Model.OfertaTitulo))
                     {
                         <div class="jk-vidriera-promo-title">
-                            @Html.Raw(Model.OfertaTitulo.Replace("\n", "<br>"))
+                            @Model.OfertaTitulo
                         </div>
                     }
 

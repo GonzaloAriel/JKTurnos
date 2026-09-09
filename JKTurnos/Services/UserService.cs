@@ -53,14 +53,22 @@ namespace JKTurnos.Services
 
         public List<User> GetAll(int? tenantId = null)
         {
-            var query = _repo.GetAll();
-
+            // M-11: fail-closed. Solo AdminGlobal puede ver usuarios de otros tenants.
+            // Admin siempre ve solo su tenant; cualquier otro rol queda sin acceso.
             if (CurrentRole == Roles.Admin)
-                query = query.Where(u => u.TenantId == CurrentTenantId);
-            else if (tenantId.HasValue)
-                query = query.Where(u => u.TenantId == tenantId.Value);
+                return _repo.GetAll().Where(u => u.TenantId == CurrentTenantId)
+                    .OrderBy(u => u.Nombre).ToList();
 
-            return query.OrderBy(u => u.Nombre).ToList();
+            if (CurrentRole == Roles.AdminGlobal)
+            {
+                var query = _repo.GetAll();
+                if (tenantId.HasValue)
+                    query = query.Where(u => u.TenantId == tenantId.Value);
+                return query.OrderBy(u => u.Nombre).ToList();
+            }
+
+            return _repo.GetAll().Where(u => u.TenantId == CurrentTenantId)
+                .OrderBy(u => u.Nombre).ToList();
         }
 
         public User GetById(int id)
@@ -81,8 +89,7 @@ namespace JKTurnos.Services
             if (string.IsNullOrWhiteSpace(user.Email))
                 throw new ArgumentException("El email es obligatorio.");
 
-            if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("El password es obligatorio.");
+            PasswordPolicy.Validar(password);
 
             user.Email = user.Email.Trim();
 
@@ -96,7 +103,9 @@ namespace JKTurnos.Services
                 if (user.TenantId <= 0)
                     throw new ArgumentException("Debe indicar un tenant.");
 
-                if (user.Role != Roles.Admin && user.Role != Roles.User && user.Role != Roles.AdminGlobal)
+                // L-3: separacion de deberes. Un AdminGlobal NO puede crear otro
+                // AdminGlobal (evita clonar el power). Solo Admin/User via UI.
+                if (user.Role != Roles.Admin && user.Role != Roles.User)
                     throw new ArgumentException("Rol invalido.");
             }
             else
@@ -147,7 +156,12 @@ namespace JKTurnos.Services
                 if (user.TenantId <= 0)
                     throw new ArgumentException("Debe indicar un tenant.");
 
-                if (user.Role != Roles.Admin && user.Role != Roles.User && user.Role != Roles.AdminGlobal)
+                // L-3: separacion de deberes. Un AdminGlobal NO puede promover a otro
+                // AdminGlobal (ni a si mismo, ni clonar el power). Solo Admin/User.
+                if (existente.Role == Roles.AdminGlobal)
+                    throw new UnauthorizedAccessException("No puede modificar un Administrador Global.");
+
+                if (user.Role != Roles.Admin && user.Role != Roles.User)
                     throw new ArgumentException("Rol invalido.");
 
                 existente.Nombre = user.Nombre;
@@ -160,7 +174,10 @@ namespace JKTurnos.Services
                 throw new InvalidOperationException("Ya existe un usuario con ese email.");
 
             if (!string.IsNullOrWhiteSpace(password))
+            {
+                PasswordPolicy.Validar(password);
                 existente.PasswordHash = PasswordHasher.Hash(password);
+            }
 
             _repo.Update(existente);
 
@@ -189,6 +206,10 @@ namespace JKTurnos.Services
             if (CurrentRole == Roles.Admin && user.Role == Roles.AdminGlobal)
                 throw new UnauthorizedAccessException("No puede eliminar un Administrador Global.");
 
+            // L-3: un AdminGlobal tampoco puede eliminar a otro AdminGlobal.
+            if (CurrentRole == Roles.AdminGlobal && user.Role == Roles.AdminGlobal)
+                throw new UnauthorizedAccessException("No puede eliminar un Administrador Global.");
+
             if (id == CurrentUserId)
                 throw new InvalidOperationException("No puedes eliminar tu propia cuenta.");
 
@@ -211,13 +232,15 @@ namespace JKTurnos.Services
             if (string.IsNullOrWhiteSpace(newPassword))
                 throw new ArgumentException("El password es obligatorio.");
 
+            PasswordPolicy.Validar(newPassword);
+
             user.PasswordHash = PasswordHasher.Hash(newPassword);
             _repo.Update(user);
 
             new AuditService().Registrar(
                 AuditService.A_ResetPassword,
                 AuditService.E_Usuario,
-                "Restablecio la contrasena de " + (user.Nombre ?? user.Email),
+                "Restablecio la contraseña de " + (user.Nombre ?? user.Email),
                 user.Id);
         }
 
@@ -230,10 +253,12 @@ namespace JKTurnos.Services
 
             if (string.IsNullOrEmpty(user.PasswordHash) ||
                 !PasswordHasher.Verify(currentPassword ?? "", user.PasswordHash))
-                throw new ArgumentException("La contrasena actual es incorrecta.");
+                throw new ArgumentException("La contraseña actual es incorrecta.");
 
             if (string.IsNullOrWhiteSpace(newPassword))
-                throw new ArgumentException("El nuevo password es obligatorio.");
+                throw new ArgumentException("La nueva contraseña es obligatoria.");
+
+            PasswordPolicy.Validar(newPassword);
 
             user.PasswordHash = PasswordHasher.Hash(newPassword);
             _repo.Update(user);
@@ -241,7 +266,7 @@ namespace JKTurnos.Services
             new AuditService().Registrar(
                 AuditService.A_ResetPassword,
                 AuditService.E_Usuario,
-                "Cambio su propia contrasena",
+                "Cambio su propia contraseña",
                 user.Id);
         }
     }

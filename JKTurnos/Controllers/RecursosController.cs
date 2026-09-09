@@ -25,7 +25,8 @@ namespace JKTurnos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult QuickCreate(Recurso model)
+        public ActionResult QuickCreate(
+            [Bind(Exclude = "Id,TenantId,CreatedAt,UpdatedAt,IsActive")] Recurso model)
         {
             if (!ModelState.IsValid)
             {
@@ -47,11 +48,16 @@ namespace JKTurnos.Controllers
             });
         }
 
-        public ActionResult Index(string busqueda = null, TipoRecurso? tipo = null)
+        public ActionResult Index(string busqueda = null, TipoRecurso? tipo = null, bool incluirEliminados = false)
         {
-            var recursos = _service.GetFiltrados(busqueda, tipo);
+            // Ver eliminados es exclusivo del Admin del tenant.
+            if (!IsAdmin)
+                incluirEliminados = false;
+
+            var recursos = _service.GetFiltrados(busqueda, tipo, incluirEliminados);
             ViewBag.Busqueda = busqueda;
             ViewBag.Tipo = tipo;
+            ViewBag.IncluirEliminados = incluirEliminados;
             ViewBag.Tipos = Enum.GetValues(typeof(TipoRecurso))
                 .Cast<TipoRecurso>()
                 .Select(t => new SelectListItem
@@ -89,6 +95,7 @@ namespace JKTurnos.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult Edit(int id)
         {
             var recurso = _service.GetById(id);
@@ -105,6 +112,7 @@ namespace JKTurnos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult Edit(RecursoViewModel model)
         {
             if (!ModelState.IsValid)
@@ -120,6 +128,7 @@ namespace JKTurnos.Controllers
         }
 // ... (Delete methods remain the same)
 
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult Delete(int id)
         {
             var recurso = _service.GetById(id);
@@ -129,9 +138,27 @@ namespace JKTurnos.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult DeleteConfirmed(int id)
         {
             _service.Delete(id);
+            return RedirectToAction("Index");
+        }
+
+        // POST: Recursos/Restaurar/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
+        public ActionResult Restaurar(int id)
+        {
+            try
+            {
+                _service.Restaurar(id);
+            }
+            catch (ArgumentException)
+            {
+            }
+
             return RedirectToAction("Index");
         }
     }

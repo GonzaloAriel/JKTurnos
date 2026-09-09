@@ -14,6 +14,13 @@
     var turnos = Model.Turnos != null ? Model.Turnos.ToList() : new List<Turno>();
     var fecha = Model.Fecha;
 
+    // D-050 / M-01: rangos de atencion del dia (claves = dias laborables).
+    List<RangoAtencion> rangosDia = null;
+    if (Model.HorarioAtencion != null)
+    {
+        Model.HorarioAtencion.TryGetValue(fecha.DayOfWeek, out rangosDia);
+    }
+
     var gridInicio = new DateTime(fecha.Year, fecha.Month, fecha.Day, 8, 0, 0);
     var gridFin = new DateTime(fecha.Year, fecha.Month, fecha.Day, 19, 30, 0);
 
@@ -37,6 +44,33 @@
         }
     }
 
+    // El rango visible de la grilla abarca tambien el horario de atencion del
+    // dia (para que las celdas EN horario existan y sean clickeables).
+    if (rangosDia != null)
+    {
+        foreach (var r in rangosDia)
+        {
+            TimeSpan ini, fin;
+            if (!TimeSpan.TryParse(r.Inicio, out ini) || !TimeSpan.TryParse(r.Fin, out fin))
+            {
+                continue;
+            }
+
+            var iniAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day, ini.Hours, ini.Minutes >= 30 ? 30 : 0, 0);
+            if (iniAjustado < gridInicio)
+            {
+                gridInicio = iniAjustado;
+            }
+
+            int finMin = fin.Minutes > 30 ? 60 : (fin.Minutes > 0 ? 30 : 0);
+            var finAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day, fin.Hours, 0, 0).AddMinutes(finMin);
+            if (finAjustado > gridFin)
+            {
+                gridFin = finAjustado;
+            }
+        }
+    }
+
     int franjaMinutos = 30;
 
     var horas = new List<DateTime>();
@@ -55,6 +89,25 @@
     {
         columnaRecurso[recursos[i].Id] = i;
     }
+
+    // D-050 / M-01: la celda (inicio de franja de 30 min) esta fuera de horario
+    // si no cae dentro de ningun rango de atencion del dia.
+    Func<DateTime, bool> EnHorario = (slot) =>
+    {
+        if (rangosDia == null || rangosDia.Count == 0)
+            return false;
+        foreach (var r in rangosDia)
+        {
+            TimeSpan ini, fin;
+            if (!TimeSpan.TryParse(r.Inicio, out ini) || !TimeSpan.TryParse(r.Fin, out fin))
+            {
+                continue;
+            }
+            if (slot.TimeOfDay >= ini && slot.TimeOfDay < fin)
+                return true;
+        }
+        return false;
+    };
 }
 
 @if (recursos.Count == 0)
@@ -114,14 +167,11 @@ else
                 for (int i = 0; i < recursos.Count; i++)
                 {
                     var rec = recursos[i];
-                    if (hour.Minute == 0)
-                    {
-                        @:<div class="jk-agenda-cell jk-agenda-cell-hour-start" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@horaTexto" aria-label="@rec.Nombre @horaTexto"></div>
-                    }
-                    else
-                    {
-                        @:<div class="jk-agenda-cell" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@horaTexto" aria-label="@rec.Nombre @horaTexto"></div>
-                    }
+                    var fueraHorario = !EnHorario(hour);
+                    var cellClase = "jk-agenda-cell"
+                        + (hour.Minute == 0 ? " jk-agenda-cell-hour-start" : "")
+                        + (fueraHorario ? " jk-agenda-cell-closed" : "");
+                    @:<div class="@cellClase" data-recurso-id="@rec.Id" style="grid-row: @fila; grid-column: @(i + 2);" role="gridcell" data-hour="@horaTexto"@(fueraHorario ? " data-outside-hours=\"true\"" : "") aria-label="@rec.Nombre @horaTexto"></div>
                 }
             }
 

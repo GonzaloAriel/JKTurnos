@@ -36,7 +36,8 @@ namespace JKTurnos.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError("", "Credenciales incorrectas o cuenta desactivada. Contacte al administrador.");
+                // C-2: Se devuelve el mismo mensaje para no revelar si el email existe.
+                ModelState.AddModelError("", "Credenciales incorrectas o cuenta desactivada. Tras 5 intentos fallidos se bloquea el ingreso por 15 minutos.");
                 return View(model);
             }
 
@@ -50,6 +51,8 @@ namespace JKTurnos.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Logout()
         {
             new Services.AuditService().Registrar(

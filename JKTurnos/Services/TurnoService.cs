@@ -46,9 +46,9 @@ namespace JKTurnos.Services
                         .FirstOrDefault(x => x.Id == id);
         }
 
-        public List<Turno> GetFiltrados(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null, List<string> estados = null)
+        public List<Turno> GetFiltrados(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null, List<string> estados = null, bool incluirEliminados = false)
         {
-            var query = _repo.GetAll()
+            var query = (incluirEliminados ? _repo.GetAllIncluyendoInactivos() : _repo.GetAll())
                              .Include(t => t.Cliente)
                              .Include(t => t.Servicio)
                              .Include(t => t.Recurso)
@@ -77,9 +77,13 @@ namespace JKTurnos.Services
 
                 if (codigos.Count > 0)
                 {
+                    // Los turnos eliminados (baja logica) siempre aparecen cuando
+                    // el Admin pide "ver eliminados"; el filtro de estado aplica
+                    // solo a los turnos activos.
                     query = query.Where(t =>
-                        t.EstadoTurno != null &&
-                        codigos.Contains(t.EstadoTurno.Codigo));
+                        !t.IsActive ||
+                        (t.EstadoTurno != null &&
+                         codigos.Contains(t.EstadoTurno.Codigo)));
                 }
             }
 

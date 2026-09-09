@@ -27,8 +27,8 @@
 }
 
 .jk-btn:focus-visible {
-    outline: 2px solid var(--jk-accent);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--jk-accent) 15%, transparent);
 }
 
 .jk-btn:active {
@@ -51,6 +51,7 @@
 .jk-btn-primary:hover {
     background: var(--jk-accent-hover);
     border-color: var(--jk-accent-hover);
+    color: var(--jk-white);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -64,6 +65,7 @@
 .jk-btn-secondary:hover {
     background: var(--jk-bg);
     border-color: var(--jk-text-secondary);
+    color: var(--jk-text-primary);
 }
 
 .jk-btn-ghost {
@@ -85,6 +87,7 @@
 
 .jk-btn-danger:hover {
     background: color-mix(in srgb, var(--jk-danger) 85%, black);
+    color: var(--jk-white);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -97,6 +100,7 @@
 
 .jk-btn-success:hover {
     background: color-mix(in srgb, var(--jk-success) 85%, black);
+    color: var(--jk-white);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -190,6 +194,7 @@
 .jk-btn-whatsapp:hover {
     background: #1eb857;
     border-color: #1eb857;
+    color: var(--jk-white);
     transform: translateY(-1px);
     box-shadow: var(--jk-shadow);
 }
@@ -495,6 +500,38 @@
 .jk-card-hover:hover {
     box-shadow: var(--jk-shadow);
     border-color: var(--jk-border);
+}
+
+/* ================================================================
+   CARDS - ACCENT (borde lateral de color para distinguir secciones)
+   ================================================================ */
+
+.jk-card-accent {
+    border-left: 4px solid var(--jk-accent);
+}
+
+.jk-card-accent-accent {
+    border-left-color: var(--jk-accent);
+}
+
+.jk-card-accent-coral {
+    border-left-color: var(--jk-coral);
+}
+
+.jk-card-accent-butter {
+    border-left-color: var(--jk-butter);
+}
+
+.jk-card-accent-teal {
+    border-left-color: var(--jk-teal);
+}
+
+.jk-card-accent-warning {
+    border-left-color: var(--jk-warning);
+}
+
+.jk-card-accent-danger {
+    border-left-color: var(--jk-danger);
 }
 
 .jk-card-compact {
@@ -1245,7 +1282,7 @@
     padding: var(--jk-space-8) var(--jk-space-12) var(--jk-space-8) 36px;
     border-radius: var(--jk-radius);
     border: 1px solid var(--jk-border);
-    background: var(--jk-bg);
+    background: var(--jk-surface);
     font-size: var(--jk-text-base);
     font-family: inherit;
     color: var(--jk-text-primary);

@@ -20,10 +20,15 @@ namespace JKTurnos.Controllers
         }
 
         // GET: Clientes
-        public ActionResult Index(string busqueda = null)
+        public ActionResult Index(string busqueda = null, bool incluirEliminados = false)
         {
-            var clientes = _service.GetFiltrados(busqueda);
+            // Ver eliminados es exclusivo del Admin del tenant.
+            if (!IsAdmin)
+                incluirEliminados = false;
+
+            var clientes = _service.GetFiltrados(busqueda, incluirEliminados);
             ViewBag.Busqueda = busqueda;
+            ViewBag.IncluirEliminados = incluirEliminados;
             return View(clientes);
         }
 
@@ -87,7 +92,8 @@ namespace JKTurnos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult QuickCreate(Cliente model)
+        public ActionResult QuickCreate(
+            [Bind(Exclude = "Id,TenantId,CreatedAt,UpdatedAt,IsActive")] Cliente model)
         {
             if (!ModelState.IsValid)
             {
@@ -111,7 +117,8 @@ namespace JKTurnos.Controllers
         // POST: Clientes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Cliente model)
+        public ActionResult Create(
+            [Bind(Exclude = "Id,TenantId,CreatedAt,UpdatedAt,IsActive")] Cliente model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -135,17 +142,31 @@ namespace JKTurnos.Controllers
         // POST: Clientes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Cliente model)
+        public ActionResult Edit(int id, Cliente model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            _service.Update(model);
+            var existente = _service.GetById(id);
+
+            if (existente == null)
+                return HttpNotFound();
+
+            // Aplicar sobre la entidad real SOLO los campos editables del form.
+            // Telefono/Email/Direccion vacios quedan null (se limpian correctamente)
+            // y se preservan Notas/TenantId/CreatedAt/IsActive (sin overbinding).
+            existente.Nombre = (model.Nombre ?? "").Trim();
+            existente.Telefono = string.IsNullOrWhiteSpace(model.Telefono) ? null : model.Telefono.Trim();
+            existente.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim();
+            existente.Direccion = string.IsNullOrWhiteSpace(model.Direccion) ? null : model.Direccion.Trim();
+
+            _service.Update(existente);
 
             return RedirectToAction("Index");
         }
 
         // GET: Clientes/Delete/5
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult Delete(int id)
         {
             var cliente = _service.GetById(id);
@@ -159,9 +180,27 @@ namespace JKTurnos.Controllers
         // POST: Clientes/DeleteConfirmed/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult DeleteConfirmed(int id)
         {
             _service.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+
+        // POST: Clientes/Restaurar/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
+        public ActionResult Restaurar(int id)
+        {
+            try
+            {
+                _service.Restaurar(id);
+            }
+            catch (ArgumentException)
+            {
+            }
 
             return RedirectToAction("Index");
         }

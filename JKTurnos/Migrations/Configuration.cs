@@ -45,7 +45,7 @@ namespace JKTurnos.Migrations
                 {
                     Nombre = "Administrador",
                     Email = adminEmail,
-                    PasswordHash = PasswordHasher.Hash("123456"),
+                    PasswordHash = PasswordHasher.Hash("JkTurnos2026!@#"),
                     Role = Roles.Admin,
                     TenantId = tenant.Id,
                     CreatedAt = DateTime.Now,
@@ -62,7 +62,7 @@ namespace JKTurnos.Migrations
                 {
                     Nombre = "Administrador Global",
                     Email = globalEmail,
-                    PasswordHash = PasswordHasher.Hash("123456"),
+                    PasswordHash = PasswordHasher.Hash("JkTurnos2026!@#"),
                     Role = Roles.AdminGlobal,
                     TenantId = 0,
                     CreatedAt = DateTime.Now,
@@ -85,6 +85,7 @@ namespace JKTurnos.Migrations
                     EmailTemplate = NotificacionService.DefaultEmailTemplate,
                     SmtpHabilitado = false,
                     DiasLaborales = "1,2,3,4,5,6",
+                    HorarioAtencion = HorarioAtencionHelper.DefaultJson(),
                     IsActive = true,
                     CreatedAt = DateTime.Now
                 });

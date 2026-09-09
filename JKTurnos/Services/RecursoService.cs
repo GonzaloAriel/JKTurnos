@@ -22,9 +22,11 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
-        public List<Recurso> GetFiltrados(string busqueda = null, TipoRecurso? tipo = null)
+        public List<Recurso> GetFiltrados(string busqueda = null, TipoRecurso? tipo = null, bool incluirEliminados = false)
         {
-            var query = _repo.GetAll();
+            var query = incluirEliminados
+                ? _repo.GetAllIncluyendoInactivos()
+                : _repo.GetAll();
 
             if (tipo.HasValue)
                 query = query.Where(r => r.Tipo == tipo.Value);
@@ -88,6 +90,24 @@ namespace JKTurnos.Services
                 AuditService.A_Eliminar,
                 AuditService.E_Recurso,
                 recurso != null ? "Elimino el recurso " + recurso.Nombre : "Elimino el recurso #" + id,
+                id);
+        }
+
+        // Restaura un recurso dado de baja (IsActive = true). Solo Admin.
+        public void Restaurar(int id)
+        {
+            var recurso = _repo.GetAllIncluyendoInactivos()
+                .FirstOrDefault(x => x.Id == id);
+
+            if (recurso == null)
+                throw new ArgumentException("Recurso no encontrado.");
+
+            _repo.Restore(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Restaurar,
+                AuditService.E_Recurso,
+                "Restauro el recurso " + recurso.Nombre,
                 id);
         }
 

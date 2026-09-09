@@ -145,8 +145,9 @@ namespace JKTurnos.Services
             if (minutosOcupados <= 0)
                 return 0;
 
-            // D-046 / M-01 (Concepto B): denominador = Franja Formal (default 690 min).
-            return (int)Math.Min(100, (minutosOcupados / (double)_configService.GetMinutosJornada()) * 100);
+            // D-046 / M-01 / D-050 (Concepto B): denominador = horas de atencion del dia
+            // (por dia; default 690 min).
+            return (int)Math.Min(100, (minutosOcupados / (double)_configService.GetMinutosJornada(hoyDate)) * 100);
         }
 
         private List<BarraGrafico> CalcularOcupacionSemana(DateTime hoyDate)

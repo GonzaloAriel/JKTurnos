@@ -77,73 +77,67 @@
     <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
 
     <div class="jk-form-group">
-        <label class="jk-label">Franja formal (horario de trabajo)</label>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="jk-form-group">
-                    <label class="jk-label" for="HoraApertura">Hora de apertura</label>
-                    @Html.TextBoxFor(m => m.HoraApertura, "{0:hh\\:mm}", new { @class = "jk-input", type = "time", id = "HoraApertura" })
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="jk-form-group">
-                    <label class="jk-label" for="HoraCierre">Hora de cierre</label>
-                    @Html.TextBoxFor(m => m.HoraCierre, "{0:hh\\:mm}", new { @class = "jk-input", type = "time", id = "HoraCierre" })
-                </div>
-            </div>
-        </div>
-        <small class="jk-small text-secondary">
-            Este horario es informativo y no impide dar un turno mas alla del rango.
-            Sirve para que los clientes y recursos conozcan las formalidades del negocio.
-        </small>
-    </div>
-
-    <hr class="jk-mt-16 jk-mb-16" style="border:none;border-top:1px solid var(--jk-border-light);" />
-
-    <div class="jk-form-group">
-        <label class="jk-label">Dias laborales</label>
         @{
-            var diasActuales = new HashSet<int>();
-            if (!string.IsNullOrWhiteSpace(Model.DiasLaborales))
+            // D-050: horario efectivo por dia (JSON -> legacy -> default Lun-Sab 08:00-19:30).
+            // Se renderiza pre-cargado (como el viejo prefill 08:00/19:30) pero no se
+            // persiste hasta que el usuario guarda la forma.
+            var horarioDias = JKTurnos.Services.HorarioAtencionHelper.ResolverLista(Model);
+            var horarioJson = JKTurnos.Services.HorarioAtencionHelper.Serializar(horarioDias);
+            var diasNombreHorario = new[] { "Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom" };
+            var rangosPorDia = new System.Collections.Generic.Dictionary<int, System.Collections.Generic.List<JKTurnos.Models.Entities.RangoAtencion>>();
+            foreach (var hd in horarioDias)
             {
-                foreach (var p in Model.DiasLaborales.Split(','))
-                {
-                    int n;
-                    if (int.TryParse(p.Trim(), out n) && n >= 1 && n <= 7)
-                    {
-                        diasActuales.Add(n);
-                    }
-                }
-            }
-            if (diasActuales.Count == 0)
-            {
-                diasActuales = new HashSet<int> { 1, 2, 3, 4, 5, 6 };
+                rangosPorDia[hd.Dia] = hd.Rangos ?? new System.Collections.Generic.List<JKTurnos.Models.Entities.RangoAtencion>();
             }
         }
-        @Html.HiddenFor(m => m.DiasLaborales, new { id = "DiasLaboralesHidden" })
-        <div style="display:flex;flex-wrap:wrap;gap:var(--jk-space-12);">
-            @foreach (var dia in new[] {
-                new { Num = 1, Label = "Lun" },
-                new { Num = 2, Label = "Mar" },
-                new { Num = 3, Label = "Mie" },
-                new { Num = 4, Label = "Jue" },
-                new { Num = 5, Label = "Vie" },
-                new { Num = 6, Label = "Sab" },
-                new { Num = 7, Label = "Dom" }
-            })
+
+        <label class="jk-label">Horarios de atencion por dia</label>
+        <div id="jkHorarioEditor" class="jk-horario-editor">
+            @for (int n = 1; n <= 7; n++)
             {
-                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--jk-surface);border:1px solid var(--jk-border-light);border-radius:var(--jk-radius-full);cursor:pointer;font-size:var(--jk-text-sm);font-weight:600;user-select:none;transition:background var(--jk-transition-fast),border-color var(--jk-transition-fast);">
-                    <input type="checkbox" class="jk-dia-check" value="@dia.Num"
-                           @(diasActuales.Contains(dia.Num) ? "checked" : "")
-                           style="accent-color:var(--jk-accent);" />
-                    @dia.Label
-                </label>
+                var tiene = rangosPorDia.ContainsKey(n) && rangosPorDia[n].Count > 0;
+                var rangos = tiene
+                    ? rangosPorDia[n]
+                    : new System.Collections.Generic.List<JKTurnos.Models.Entities.RangoAtencion>
+                    {
+                        new JKTurnos.Models.Entities.RangoAtencion { Inicio = "", Fin = "" }
+                    };
+                var rangosStyle = tiene ? "" : "display:none";
+
+                <div class="jk-horario-dia" data-dia="@n">
+                    <div class="jk-horario-dia-head">
+                        <label class="jk-horario-dia-label">
+                            <input type="checkbox" class="jk-horario-check" @(tiene ? "checked" : "")
+                                   style="accent-color:var(--jk-accent);" />
+                            <span class="jk-horario-dia-nombre">@diasNombreHorario[n - 1]</span>
+                        </label>
+                    </div>
+                    <div class="jk-horario-rangos" style="@rangosStyle">
+                        @foreach (var r in rangos)
+                        {
+                            <div class="jk-horario-rango-row">
+                                <input type="time" class="jk-input jk-horario-inicio" value="@r.Inicio" aria-label="Inicio" />
+                                <span class="jk-horario-sep">a</span>
+                                <input type="time" class="jk-input jk-horario-fin" value="@r.Fin" aria-label="Fin" />
+                                <button type="button" class="jk-btn jk-btn-icon jk-horario-remove" title="Quitar franja" aria-label="Quitar franja">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        }
+                        <button type="button" class="jk-btn jk-btn-ghost jk-btn-sm jk-horario-add">+ Agregar franja</button>
+                    </div>
+                </div>
             }
         </div>
         <small class="jk-small text-secondary">
-            Solo se mostraran los dias seleccionados en la agenda y en la vidriera publica.
+            Elegi en que dias y franjas horarias recibis atencion. Soporta turno
+            partido (ej: de 8 a 12 y de 17 a 20). Este horario es informativo y no
+            impide dar un turno mas alla del rango: se usa en la agenda, la vidriera
+            publica y el calculo de ocupacion del dia.
         </small>
     </div>
+
+    <input type="hidden" name="HorarioAtencion" id="HorarioAtencionHidden" value="@horarioJson" />
 
 }
 
@@ -190,19 +184,102 @@
     })();
 
     (function () {
-        var hidden = document.getElementById('DiasLaboralesHidden');
-        var checks = document.querySelectorAll('.jk-dia-check');
+        var hidden = document.getElementById('HorarioAtencionHidden');
+        var editor = document.getElementById('jkHorarioEditor');
 
-        function syncDias() {
-            var seleccionados = [];
-            checks.forEach(function (cb) {
-                if (cb.checked) seleccionados.push(cb.value);
-            });
-            hidden.value = seleccionados.join(',');
+        function rebuild() {
+            var out = [];
+            var dias = editor.querySelectorAll('.jk-horario-dia');
+            for (var i = 0; i < dias.length; i++) {
+                var dayBox = dias[i];
+                var check = dayBox.querySelector('.jk-horario-check');
+                if (!check.checked) continue;
+
+                var rangos = [];
+                var rows = dayBox.querySelectorAll('.jk-horario-rango-row');
+                for (var j = 0; j < rows.length; j++) {
+                    var ini = rows[j].querySelector('.jk-horario-inicio').value;
+                    var fin = rows[j].querySelector('.jk-horario-fin').value;
+                    if (ini && fin) rangos.push({ Inicio: ini, Fin: fin });
+                }
+
+                if (rangos.length > 0) {
+                    out.push({ Dia: parseInt(dayBox.getAttribute('data-dia'), 10), Rangos: rangos });
+                }
+            }
+            hidden.value = JSON.stringify(out);
         }
 
-        checks.forEach(function (cb) {
-            cb.addEventListener('change', syncDias);
-        });
+        function attachRow(row, diaBox) {
+            var inis = row.querySelectorAll('.jk-horario-inicio, .jk-horario-fin');
+            for (var i = 0; i < inis.length; i++) {
+                inis[i].addEventListener('change', rebuild);
+                inis[i].addEventListener('input', rebuild);
+            }
+            row.querySelector('.jk-horario-remove').addEventListener('click', function () {
+                row.remove();
+                if (diaBox.querySelectorAll('.jk-horario-rango-row').length === 0) {
+                    addRango(diaBox);
+                }
+                rebuild();
+            });
+        }
+
+        function addRango(diaBox) {
+            var container = diaBox.querySelector('.jk-horario-rangos');
+            var row = document.createElement('div');
+            row.className = 'jk-horario-rango-row';
+            row.innerHTML =
+                '<input type="time" class="jk-input jk-horario-inicio" aria-label="Inicio" />' +
+                '<span class="jk-horario-sep">a</span>' +
+                '<input type="time" class="jk-input jk-horario-fin" aria-label="Fin" />' +
+                '<button type="button" class="jk-btn jk-btn-icon jk-horario-remove" title="Quitar franja" aria-label="Quitar franja"><i class="bi bi-x"></i></button>';
+            container.insertBefore(row, container.querySelector('.jk-horario-add'));
+            attachRow(row, diaBox);
+            rebuild();
+        }
+
+        function toggleDay(diaBox) {
+            var check = diaBox.querySelector('.jk-horario-check');
+            var container = diaBox.querySelector('.jk-horario-rangos');
+            if (check.checked) {
+                container.style.display = '';
+                if (container.querySelectorAll('.jk-horario-rango-row').length === 0) {
+                    addRango(diaBox);
+                }
+            } else {
+                container.style.display = 'none';
+            }
+            rebuild();
+        }
+
+        var dias = editor.querySelectorAll('.jk-horario-dia');
+        for (var i = 0; i < dias.length; i++) {
+            (function (diaBox) {
+                diaBox.querySelector('.jk-horario-check').addEventListener('change', function () {
+                    toggleDay(diaBox);
+                });
+                diaBox.querySelector('.jk-horario-add').addEventListener('click', function () {
+                    addRango(diaBox);
+                    toggleDay(diaBox);
+                });
+                var rows = diaBox.querySelectorAll('.jk-horario-rango-row');
+                for (var k = 0; k < rows.length; k++) {
+                    attachRow(rows[k], diaBox);
+                }
+            })(dias[i]);
+        }
     })();
 </script>
+
+<style>
+    .jk-horario-editor { display: flex; flex-direction: column; gap: 12px; }
+    .jk-horario-dia { border: 1px solid var(--jk-border-light); border-radius: 8px; overflow: hidden; background: var(--jk-surface); }
+    .jk-horario-dia-head { padding: 10px 14px; border-bottom: 1px solid var(--jk-border-light); }
+    .jk-horario-dia-label { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: var(--jk-text-sm); user-select: none; }
+    .jk-horario-rangos { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .jk-horario-rango-row { display: flex; align-items: center; gap: 8px; }
+    .jk-horario-rango-row .jk-input { flex: 1; min-width: 0; }
+    .jk-horario-sep { color: var(--jk-text-secondary); font-size: var(--jk-text-sm); }
+    .jk-horario-dia:not(:has(.jk-horario-check:checked)) { opacity: 0.55; }
+</style>

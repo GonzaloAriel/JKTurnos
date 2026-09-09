@@ -238,8 +238,10 @@
         if (!container) return;
         var toast = document.createElement('div');
         toast.className = 'jk-toast jk-toast-' + type;
-        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-            + '"></i> ' + message;
+        var icon = document.createElement('i');
+        icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+        toast.appendChild(icon);
+        toast.appendChild(document.createTextNode(' ' + message));
         container.appendChild(toast);
         setTimeout(function () { toast.remove(); }, 4000);
     }
@@ -314,8 +316,10 @@
         if (!toastContainer) return;
         var toast = document.createElement('div');
         toast.className = 'jk-toast jk-toast-' + type;
-        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-            + '"></i> ' + message;
+        var icon = document.createElement('i');
+        icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+        toast.appendChild(icon);
+        toast.appendChild(document.createTextNode(' ' + message));
         toastContainer.appendChild(toast);
         setTimeout(function () { toast.remove(); }, 4000);
     }
@@ -454,6 +458,49 @@
 })();
 
 /*
+ * Menu de usuario en el topbar: al hacer click sobre la referencia del
+ * usuario despliega un panel con la opcion "Cerrar Sesion". Mismo patron
+ * que el dropdown de notificaciones (click afuera o Escape para cerrar).
+ */
+(function () {
+    'use strict';
+
+    var container = document.getElementById('topbar-user-menu');
+    if (!container) return;
+
+    var toggle = document.getElementById('topbar-user-toggle');
+    var panel = document.getElementById('topbar-user-panel');
+
+    function setOpen(open) {
+        panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        container.classList.toggle('is-open', open);
+    }
+
+    function isOpen() {
+        return panel.getAttribute('aria-hidden') === 'false';
+    }
+
+    toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(!isOpen());
+    });
+
+    document.addEventListener('click', function (e) {
+        if (isOpen() && !container.contains(e.target)) {
+            setOpen(false);
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            if (isOpen()) setOpen(false);
+        }
+    });
+})();
+
+/*
  * M-02: Busqueda global del topbar.
  * El input vive dentro de un formulario GET. Enter submita el formulario
  * y navega a /Busqueda/Index?termino=x. El dropdown es un extra opcional
@@ -484,21 +531,33 @@
             closeResults();
             return;
         }
-        resultsEl.innerHTML = items.map(function (it, i) {
+        resultsEl.innerHTML = '';
+        items.forEach(function (it, i) {
             var icon = it.tipo === 'cliente' ? 'bi-person'
                 : it.tipo === 'turno' ? 'bi-calendar-check'
                 : it.tipo === 'servicio' ? 'bi-scissors'
                 : 'bi-person-gear';
-            var label = it.label || '';
-            var sub = it.sub ? '<span class="jk-autocomplete-sub">' + it.sub + '</span>' : '';
-            return '<a href="' + (it.url || '#') + '" class="jk-autocomplete-item" data-index="' + i + '"'
-                + ' data-item-tipo="' + (it.tipo || '') + '"'
-                + ' data-item-id="' + (it.id != null ? it.id : '') + '">'
-                + '<i class="bi ' + icon + '"></i>'
-                + '<span class="jk-autocomplete-label">' + label + '</span>'
-                + sub
-                + '</a>';
-        }).join('');
+            var a = document.createElement('a');
+            a.className = 'jk-autocomplete-item';
+            a.href = it.url || '#';
+            a.setAttribute('data-index', i);
+            a.setAttribute('data-item-tipo', it.tipo || '');
+            a.setAttribute('data-item-id', it.id != null ? it.id : '');
+            var iconEl = document.createElement('i');
+            iconEl.className = 'bi ' + icon;
+            a.appendChild(iconEl);
+            var labelSpan = document.createElement('span');
+            labelSpan.className = 'jk-autocomplete-label';
+            labelSpan.textContent = it.label || '';
+            a.appendChild(labelSpan);
+            if (it.sub) {
+                var subSpan = document.createElement('span');
+                subSpan.className = 'jk-autocomplete-sub';
+                subSpan.textContent = it.sub;
+                a.appendChild(subSpan);
+            }
+            resultsEl.appendChild(a);
+        });
         resultsEl.setAttribute('aria-hidden', 'false');
         highlightIndex = -1;
     }
@@ -510,7 +569,15 @@
             return;
         }
 
-        fetch(url + '?termino=' + encodeURIComponent(term), { credentials: 'same-origin' })
+        var token = wrapper.querySelector('input[name="__RequestVerificationToken"]');
+        var body = '__RequestVerificationToken=' + encodeURIComponent(token ? token.value : '') +
+                   '&termino=' + encodeURIComponent(term);
+        fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: body
+        })
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 items = Array.isArray(data) ? data : [];

@@ -240,6 +240,16 @@
     text-align: center;
 }
 
+button.jk-nav-item {
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    font-weight: var(--jk-weight-medium);
+}
+
 .jk-nav-item:hover {
     background: var(--jk-bg);
     color: var(--jk-text-primary);
@@ -495,6 +505,7 @@ body.jk-drawer-open {
 }
 
 .jk-topbar-user {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--jk-space-10);
@@ -506,6 +517,105 @@ body.jk-drawer-open {
     font-size: var(--jk-text-sm);
     font-weight: var(--jk-weight-semibold);
     color: var(--jk-text-primary);
+}
+
+.jk-topbar-user-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-10);
+    padding: var(--jk-space-4) var(--jk-space-8);
+    background: none;
+    border: none;
+    border-radius: var(--jk-radius-sm);
+    color: var(--jk-text-primary);
+    cursor: pointer;
+    transition: background var(--jk-transition-fast);
+}
+
+.jk-topbar-user-toggle:hover {
+    background: var(--jk-bg);
+}
+
+.jk-topbar-user-caret {
+    font-size: 0.75rem;
+    color: var(--jk-text-secondary);
+    transition: transform var(--jk-transition-fast);
+}
+
+.jk-topbar-user.is-open .jk-topbar-user-caret {
+    transform: rotate(180deg);
+}
+
+/* ===== TOPBAR USER PANEL (dropdown) ===== */
+
+.jk-user-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    max-width: calc(100vw - var(--jk-space-32));
+    background: var(--jk-surface);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-lg);
+    box-shadow: var(--jk-shadow-lg);
+    z-index: var(--jk-z-topbar);
+    overflow: hidden;
+    display: none;
+}
+
+.jk-user-panel[aria-hidden="false"] {
+    display: block;
+}
+
+.jk-user-panel-header {
+    padding: var(--jk-space-12) var(--jk-space-16);
+    border-bottom: 1px solid var(--jk-border);
+}
+
+.jk-user-panel-name {
+    font-size: var(--jk-text-sm);
+    font-weight: var(--jk-weight-semibold);
+    color: var(--jk-text-primary);
+}
+
+.jk-user-panel-menu {
+    padding: var(--jk-space-8);
+}
+
+.jk-user-panel-form {
+    margin: 0;
+    padding: 0;
+}
+
+.jk-user-panel-item {
+    display: flex;
+    align-items: center;
+    gap: var(--jk-space-12);
+    width: 100%;
+    padding: var(--jk-space-8) var(--jk-space-12);
+    border: none;
+    background: none;
+    border-radius: var(--jk-radius);
+    font-size: var(--jk-text-base);
+    color: var(--jk-text-primary);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--jk-transition-fast), color var(--jk-transition-fast);
+}
+
+.jk-user-panel-logout {
+    color: var(--jk-danger);
+}
+
+.jk-user-panel-item:hover {
+    background: var(--jk-bg);
+    color: var(--jk-text-primary);
+}
+
+.jk-user-panel-logout:hover {
+    background: var(--jk-danger-light);
+    color: var(--jk-danger);
 }
 
 @media (max-width: 767.98px) {

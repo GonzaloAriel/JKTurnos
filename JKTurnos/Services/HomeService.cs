@@ -36,8 +36,9 @@ namespace JKTurnos.Services
             var minutosOcupados = activos
                 .Sum(t => (t.FechaHoraFin - t.FechaHoraInicio).TotalMinutes);
 
-            // D-012 / D-046: ocupacion = minutos ocupados / Franja Formal (default 690 min).
-            int minutosJornada = _configService.GetMinutosJornada();
+            // D-012 / D-046 / D-050: ocupacion = minutos ocupados / horas de atencion
+            // del dia (por dia; default 690 min).
+            int minutosJornada = _configService.GetMinutosJornada(fecha);
 
             var ocupacion = minutosOcupados <= 0
                 ? 0
@@ -65,9 +66,7 @@ namespace JKTurnos.Services
             var tieneServicio = _servicioService.GetAll().Count > 0;
 
             var tieneHorarios = config != null
-                && config.HoraApertura.HasValue
-                && config.HoraCierre.HasValue
-                && !string.IsNullOrWhiteSpace(config.DiasLaborales);
+                && !string.IsNullOrWhiteSpace(config.HorarioAtencion);
 
             var tieneLogo = config != null
                 && (!string.IsNullOrWhiteSpace(config.LogoUrl)

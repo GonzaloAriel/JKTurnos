@@ -16,6 +16,8 @@ namespace JKTurnos.Controllers
             _service = new BusquedaService();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult Buscar(string termino = null)
         {
             var items = _service.Buscar(termino, 10)
@@ -53,7 +55,7 @@ namespace JKTurnos.Controllers
                 .Where(x => x.url != null)
                 .ToList();
 
-            return Json(items, JsonRequestBehavior.AllowGet);
+            return Json(items);
         }
 
         public ActionResult Index(string termino = null)

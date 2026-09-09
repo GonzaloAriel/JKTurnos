@@ -74,17 +74,19 @@ namespace JKTurnos.Services
 
         // Listado de pagos (modulo Pagos): filtros por rango de fecha del pago
         // (D-029) y busqueda por cliente/recurso.
-        public List<Pago> GetFiltrados(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null, int? turnoId = null)
+        public List<Pago> GetFiltrados(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null, int? turnoId = null, bool incluirEliminados = false)
         {
-            var query = _repo.GetAll()
+            var query = (incluirEliminados ? _repo.GetAllIncluyendoInactivos() : _repo.GetAll())
                 .Include(p => p.Turno.Cliente)
                 .Include(p => p.Turno.Servicio)
                 .Include(p => p.Turno.Recurso)
                 .Include(p => p.Turno.EstadoTurno);
 
             // D-042: los pagos de turnos cancelados no se listan ni se buscan,
-            // para no registrar pagos sobre un turno cancelado.
+            // para no registrar pagos sobre un turno cancelado. Cuando el Admin
+            // pide "ver anulados", los pagos anulados siempre se muestran.
             query = query.Where(p =>
+                !p.IsActive ||
                 p.Turno.EstadoTurno == null ||
                 p.Turno.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado);
 

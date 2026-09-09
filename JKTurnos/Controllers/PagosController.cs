@@ -19,9 +19,13 @@ namespace JKTurnos.Controllers
             _pagoService = new PagoService();
         }
 
-        public ActionResult Index(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null, int? turnoId = null)
+        public ActionResult Index(DateTime? fechaDesde = null, DateTime? fechaHasta = null, string busqueda = null, int? turnoId = null, bool incluirEliminados = false)
         {
-            var pagos = _pagoService.GetFiltrados(fechaDesde, fechaHasta, busqueda, turnoId);
+            // Ver anulados es exclusivo del Admin del tenant.
+            if (!IsAdmin)
+                incluirEliminados = false;
+
+            var pagos = _pagoService.GetFiltrados(fechaDesde, fechaHasta, busqueda, turnoId, incluirEliminados);
             var nombresUsuarios = _pagoService.GetNombresUsuarios(pagos.Select(p => p.UsuarioId));
 
             ViewBag.FechaDesde = fechaDesde;
@@ -29,6 +33,7 @@ namespace JKTurnos.Controllers
             ViewBag.Busqueda = busqueda;
             ViewBag.NombresUsuarios = nombresUsuarios;
             ViewBag.TurnoId = turnoId;
+            ViewBag.IncluirEliminados = incluirEliminados;
 
             if (turnoId.HasValue)
             {
@@ -40,6 +45,8 @@ namespace JKTurnos.Controllers
 
         // Autocomplete del registro de pagos (D-030): busca por cliente/recurso,
         // devuelve top 20. Escala a cualquier volumen de turnos.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult BuscarTurnos(string termino = null)
         {
             var turnos = _pagoService.BuscarTurnos(termino, 20)
@@ -51,7 +58,7 @@ namespace JKTurnos.Controllers
                         + " " + t.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")
                 });
 
-            return Json(turnos, JsonRequestBehavior.AllowGet);
+            return Json(turnos);
         }
 
         [HttpPost]
@@ -85,6 +92,7 @@ namespace JKTurnos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Admin)]
         public ActionResult Anular(int id, string motivo)
         {
             try

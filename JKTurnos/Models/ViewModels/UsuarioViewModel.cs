@@ -21,6 +21,8 @@ namespace JKTurnos.Models.ViewModels
         [EmailAddress(ErrorMessage = "El email no es valido")]
         public string Email { get; set; }
 
+        // H-1: en creacion es obligatorio (se valida en el servicio igualmente).
+        [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres.")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "El rol es obligatorio")]

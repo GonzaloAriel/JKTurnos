@@ -163,6 +163,7 @@
     <Compile Include="Controllers\AdminGlobalDashboardController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PagosController.cs" />
     <Compile Include="Controllers\AvataresController.cs" />
@@ -189,6 +190,7 @@
     </Compile>
     <Compile Include="Infrastructure\ITenantProvider.cs" />
     <Compile Include="Infrastructure\PasswordHasher.cs" />
+    <Compile Include="Infrastructure\PasswordPolicy.cs" />
     <Compile Include="Infrastructure\TenantProvider.cs" />
     <Compile Include="Migrations\202608182313336_Inicial.cs" />
     <Compile Include="Migrations\202608182313336_Inicial.Designer.cs">
@@ -251,6 +253,7 @@
     <Compile Include="Models\Entities\BloqueoRecurso.cs" />
     <Compile Include="Models\Entities\Cliente.cs" />
     <Compile Include="Models\Entities\ConfiguracionTenant.cs" />
+    <Compile Include="Models\Entities\HorarioAtencion.cs" />
     <Compile Include="Models\Entities\EstadoTurno.cs" />
     <Compile Include="Models\Entities\EstadosTurnoBase.cs" />
     <Compile Include="Models\Entities\Pago.cs" />
@@ -316,6 +319,7 @@
     <Compile Include="Services\NotificacionService.cs" />
     <Compile Include="Services\NotificacionSistemaService.cs" />
     <Compile Include="Services\ConfiguracionService.cs" />
+    <Compile Include="Services\HorarioAtencionHelper.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\RecordatorioService.cs" />
     <Compile Include="Services\BusquedaService.cs" />
@@ -326,6 +330,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ck.txt" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -363,10 +368,17 @@
     <Content Include="Content\jk-layout.css" />
     <Content Include="Content\jk-sidebar.css" />
     <Content Include="Content\jk-topbar.css" />
+    <Content Include="err.txt" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Img\Loguin\maseta.png" />
+    <Content Include="Img\Loguin\Sol.png" />
+    <Content Include="lp.html" />
     <Content Include="Migrations\Scripts\20260828_AddIconoEstadoTurno.sql" />
+    <Content Include="out.txt" />
+    <Content Include="ph.txt" />
+    <Content Include="pr.html" />
     <Content Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -399,6 +411,7 @@
     <Content Include="Scripts\jk-pagos.js" />
     <Content Include="Scripts\jk-dashboard.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="tmp_len.txt" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -416,6 +429,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Vidriera\Index.cshtml" />
+    <Content Include="Views\Vidriera\NoDisponible.cshtml" />
     <Content Include="Views\VidrieraAdmin\Index.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Clientes\Index.cshtml" />
@@ -470,9 +484,10 @@
     <Content Include="Views\Auditoria\Index.cshtml" />
     <Content Include="Views\Busqueda\Index.cshtml" />
     <Content Include="Views\Tenants\Create.cshtml" />
-    <Content Include="Views\Tenants\Delete.cshtml" />
+    <Content Include="Views\Tenants\Desactivar.cshtml" />
     <Content Include="Views\Tenants\Edit.cshtml" />
     <Content Include="Views\Tenants\Index.cshtml" />
+    <Content Include="Views\Tenants\Reactivar.cshtml" />
     <Content Include="Views\Turnos\Agenda.cshtml" />
     <Content Include="Views\Turnos\Create.cshtml" />
     <Content Include="Views\Turnos\Delete.cshtml" />
@@ -509,7 +524,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Img\Loguin\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

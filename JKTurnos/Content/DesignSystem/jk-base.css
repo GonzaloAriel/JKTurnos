@@ -32,6 +32,14 @@ a {
     text-decoration: none;
 }
 
+/* Evita que Bootstrap ponga los enlaces en azul al hacer hover/focus
+   (a:hover de bootstrap-reboot tiene mas especificidad que la variante
+   del boton). Los botones conservan su propio color en hover. */
+a:hover,
+a:focus {
+    color: inherit;
+}
+
 button {
     font-family: inherit;
     cursor: pointer;

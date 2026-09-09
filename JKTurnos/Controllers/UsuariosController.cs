@@ -27,7 +27,7 @@ namespace JKTurnos.Controllers
                 model.Tenants = _tenantService.GetAll()
                     .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Nombre });
 
-                model.Roles = new[] { Roles.Admin, Roles.User, Roles.AdminGlobal }
+                model.Roles = new[] { Roles.Admin, Roles.User }
                     .Select(r => new SelectListItem { Value = r, Text = r });
             }
             else
@@ -105,6 +105,13 @@ namespace JKTurnos.Controllers
 
             if (user == null)
                 return HttpNotFound();
+
+            // L-3: separacion de deberes. Un AdminGlobal no puede editar a otro.
+            if (IsAdminGlobal && user.Role == Roles.AdminGlobal)
+            {
+                TempData["Error"] = "No puede modificar un Administrador Global.";
+                return RedirectToAction("Index");
+            }
 
             var model = new UsuarioViewModel
             {
@@ -223,7 +230,7 @@ namespace JKTurnos.Controllers
                 return HttpNotFound();
 
             if (id == UserId)
-                ModelState.AddModelError("", "Usa 'Cambiar mi contrasena' para modificar tu propia contrasena.");
+                ModelState.AddModelError("", "Usa 'Cambiar mi contraseña' para modificar tu propia contraseña.");
 
             if (string.IsNullOrWhiteSpace(password))
                 ModelState.AddModelError("password", "El password es obligatorio.");
@@ -258,12 +265,12 @@ namespace JKTurnos.Controllers
         public ActionResult MiPassword(string passwordActual, string nuevoPassword, string confirmar)
         {
             if (string.IsNullOrWhiteSpace(passwordActual))
-                ModelState.AddModelError("passwordActual", "La contrasena actual es obligatoria.");
+                ModelState.AddModelError("passwordActual", "La contraseña actual es obligatoria.");
 
             if (string.IsNullOrWhiteSpace(nuevoPassword))
-                ModelState.AddModelError("nuevoPassword", "El nuevo password es obligatorio.");
+                ModelState.AddModelError("nuevoPassword", "La nueva contraseña es obligatorio.");
             else if (nuevoPassword != confirmar)
-                ModelState.AddModelError("confirmar", "Los passwords no coinciden.");
+                ModelState.AddModelError("confirmar", "Las contraseñas no coinciden.");
 
             if (!ModelState.IsValid)
                 return View();

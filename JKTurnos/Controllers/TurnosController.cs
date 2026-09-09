@@ -293,13 +293,18 @@ namespace JKTurnos.Controllers
             var dayNames = new[] { "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab" };
             var monthNames = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
 
+            var configService = new ConfiguracionService();
+
             var model = new AgendaViewModel
             {
                 Fecha = fechaSeleccionada,
                 Vista = vistaNormalizada,
                 Recursos = _recursoService.GetAll(),
                 OpenRecursoId = openRecursoId,
-                DiasLaborales = new ConfiguracionService().GetDiasLaborales()
+                DiasLaborales = configService.GetDiasLaborales(),
+                // D-050 / M-01: horario por dia para pintar celdas fuera de
+                // horario como no clickeables en la grilla (no crea turno).
+                HorarioAtencion = configService.GetHorarioAtencionPorDia()
             };
 
             if (vistaNormalizada == "semana")
@@ -344,8 +349,12 @@ namespace JKTurnos.Controllers
         }
 
         // GET: Turnos
-        public ActionResult Index(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null, string[] estados = null)
+        public ActionResult Index(string busqueda = null, DateTime? fechaInicio = null, DateTime? fechaFin = null, string[] estados = null, bool incluirEliminados = false)
         {
+            // Ver eliminados es exclusivo del Admin del tenant.
+            if (!IsAdmin)
+                incluirEliminados = false;
+
             // D-045: filtro por estados con default Pendiente + En curso (los turnos
             // activos). Si el usuario no eligio estados, se muestran los operativos.
             var estadosFiltro = (estados != null && estados.Length > 0)
@@ -358,13 +367,14 @@ namespace JKTurnos.Controllers
                 EstadosTurnoBase.EnCurso
             };
 
-            var turnos = _turnoService.GetFiltrados(busqueda, fechaInicio, fechaFin, estadosElegidos);
+            var turnos = _turnoService.GetFiltrados(busqueda, fechaInicio, fechaFin, estadosElegidos, incluirEliminados);
 
             ViewBag.Busqueda = busqueda;
             ViewBag.FechaInicio = fechaInicio;
             ViewBag.FechaFin = fechaFin;
             ViewBag.Estados = EstadosTurnoBase.Todos;
             ViewBag.EstadosElegidos = estadosElegidos;
+            ViewBag.IncluirEliminados = incluirEliminados;
 
             return View(turnos);
         }

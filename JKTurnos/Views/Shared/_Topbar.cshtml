@@ -21,6 +21,7 @@
                    autocomplete="off"
                    aria-label="Busqueda global"
                    data-buscar-global-url="@Url.Action("Buscar", "Busqueda")" />
+            @Html.AntiForgeryToken()
         </form>
         <div class="jk-autocomplete dropdown-menu" id="jk-search-global-results" aria-hidden="true"></div>
     </div>
@@ -74,15 +75,44 @@
                 </div>
             </div>
         }
-        <div class="jk-topbar-user">
-            <div class="jk-avatar">
-                @{
-                    string name = User.Identity.Name;
-                    string initial = !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "?";
-                }
-                @initial
+        <div class="jk-topbar-user" id="topbar-user-menu">
+            <button type="button"
+                    class="jk-topbar-user-toggle"
+                    id="topbar-user-toggle"
+                    aria-label="Menu de usuario"
+                    aria-expanded="false"
+                    aria-controls="topbar-user-panel">
+                <span class="jk-avatar">
+                    @{
+                        string name = User.Identity.Name;
+                        string initial = !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "?";
+                    }
+                    @initial
+                </span>
+                <span class="jk-topbar-username">@(name ?? "Usuario")</span>
+                <i class="bi bi-chevron-down jk-topbar-user-caret"></i>
+            </button>
+            <div class="jk-user-panel" id="topbar-user-panel" aria-hidden="true">
+                <div class="jk-user-panel-header">
+                    <span class="jk-user-panel-name">@(name ?? "Usuario")</span>
+                </div>
+                <div class="jk-user-panel-menu">
+                    <a href="@Url.Action("Index", "Ayuda")" class="jk-user-panel-item">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a>
+                    <form action="@Url.Action("Logout", "Account")"
+                          method="post"
+                          class="jk-user-panel-form"
+                          data-jk-logout-form>
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="jk-user-panel-item jk-user-panel-logout">
+                            <i class="bi bi-box-arrow-left"></i>
+                            <span>Cerrar Sesion</span>
+                        </button>
+                    </form>
+                </div>
             </div>
-            <span class="jk-topbar-username">@(name ?? "Usuario")</span>
         </div>
     </div>
 </header>

@@ -43,8 +43,10 @@
             if (!container) return;
             var toast = document.createElement('div');
             toast.className = 'jk-toast jk-toast-' + type;
-            toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-                + '"></i> ' + message;
+            var icon = document.createElement('i');
+            icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+            toast.appendChild(icon);
+            toast.appendChild(document.createTextNode(' ' + message));
             container.appendChild(toast);
             setTimeout(function () { toast.remove(); }, 4000);
         }
@@ -469,8 +471,10 @@
         if (!container) return;
         var toast = document.createElement('div');
         toast.className = 'jk-toast jk-toast-' + type;
-        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-            + '"></i> ' + message;
+        var icon = document.createElement('i');
+        icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+        toast.appendChild(icon);
+        toast.appendChild(document.createTextNode(' ' + message));
         container.appendChild(toast);
         setTimeout(function () { toast.remove(); }, 4000);
     }
@@ -555,6 +559,53 @@
             }
         }
 
+        // D-050 / M-01: el horario del negocio es informativo y no bloqueante
+        // para el Alta manual, PERO la grilla no ofrece celdas fuera de horario:
+        // clickear fuera de los rangos configurados no abre el Quick Create.
+        function parseTimeHM(str) {
+            if (!str) return null;
+            var p = str.split(':');
+            if (p.length !== 2) return null;
+            var h = parseInt(p[0], 10);
+            var m = parseInt(p[1], 10);
+            if (isNaN(h) || isNaN(m)) return null;
+            return h * 60 + m;
+        }
+
+        function enHorarioDia(hora, horarioDia) {
+            // hora: "HH:mm". horarioDia: "08:00-13:00;17:00-20:00" ("" = dia no atiende).
+            if (!hora || !horarioDia) return false;
+            var t = parseTimeHM(hora);
+            if (t === null) return false;
+            var partes = horarioDia.split(';');
+            for (var i = 0; i < partes.length; i++) {
+                var seg = partes[i].split('-');
+                if (seg.length !== 2) continue;
+                var ini = parseTimeHM(seg[0]);
+                var fin = parseTimeHM(seg[1]);
+                if (ini === null || fin === null) continue;
+                if (t >= ini && t < fin) return true;
+            }
+            return false;
+        }
+
+        // Hora "HH:mm" a partir del punto de click en el cuerpo del dia (semanal).
+        function horaDeClickEnSemana(weekBody, clientY) {
+            var start = weekBody.getAttribute('data-agenda-time-start');
+            if (!start) return null;
+            var sp = start.split(':');
+            var startMin = parseInt(sp[0], 10) * 60 + parseInt(sp[1], 10);
+            var pxPerMin = parseFloat(weekBody.getAttribute('data-agenda-px-per-min') || '0.8');
+            var rect = weekBody.getBoundingClientRect();
+            var relMin = (clientY - rect.top) / pxPerMin;
+            var mins = Math.round((startMin + relMin) / 5) * 5;
+            var maxMin = startMin + parseInt(weekBody.getAttribute('data-agenda-span-min') || '690', 10) - 5;
+            mins = Math.min(Math.max(mins, startMin), maxMin);
+            var hh = Math.floor(mins / 60);
+            var mm = mins % 60;
+            return ('0' + hh).slice(-2) + ':' + ('0' + mm).slice(-2);
+        }
+
         agenda.addEventListener('click', function (e) {
             if (dragJustEnded) { dragJustEnded = false; return; }
 
@@ -566,6 +617,7 @@
 
             var cell = e.target.closest('.jk-agenda-cell');
             if (cell) {
+                if (cell.getAttribute('data-outside-hours') === 'true') return;
                 openQuickCreate(cell.getAttribute('data-hour'), cell.getAttribute('data-recurso-id'));
                 return;
             }
@@ -578,7 +630,9 @@
 
             var weekBody = e.target.closest('.jk-agenda-week-day-body');
             if (weekBody) {
-                openQuickCreate('09:00', '', weekBody.getAttribute('data-agenda-fecha'));
+                var hora = horaDeClickEnSemana(weekBody, e.clientY);
+                if (!enHorarioDia(hora, weekBody.getAttribute('data-horario-dia'))) return;
+                openQuickCreate(hora, '', weekBody.getAttribute('data-agenda-fecha'));
             }
         });
 
@@ -588,6 +642,7 @@
                     var cell = e.target.closest('.jk-agenda-cell');
                     if (cell) {
                         e.preventDefault();
+                        if (cell.getAttribute('data-outside-hours') === 'true') return;
                         openQuickCreate(cell.getAttribute('data-hour'), cell.getAttribute('data-recurso-id'));
                     }
                 }
@@ -1052,44 +1107,5 @@
             }
         });
     }
-
-    /*
-     * Mobile accordion animation (_AgendaMobile)
-     * Los acordeones por Recurso usan <details>/<summary> nativos, que no
-     * animan el despliegue por si solos. Este enhacement agrega un despliegue
-     * suave tipo acordeon/pergamino: al abrir crece la altura del cuerpo desde
-     * 0 hasta su alto natural; al cerrar se colapsa. El cuerpo mantiene su
-     * comportamiento nativo sin JS (falta de soporte de `toggle` = sin animacion,
-     * pero el acordeon sigue funcionando igual).
-     */
-    function initMobileAccordion() {
-        var resources = document.querySelectorAll('.jk-agenda-mobile-resource');
-
-        resources.forEach(function (details) {
-            var body = details.querySelector('.jk-agenda-mobile-resource-body');
-            if (!body) return;
-
-            body.style.transition = 'height var(--jk-transition-slow, 0.3s ease), opacity var(--jk-transition, 0.2s ease)';
-            body.style.overflow = 'hidden';
-
-            details.addEventListener('toggle', function () {
-                if (details.open) {
-                    body.style.height = '0px';
-                    body.style.opacity = '0';
-                    void body.offsetHeight;
-                    body.style.height = body.scrollHeight + 'px';
-                    body.style.opacity = '1';
-                    setTimeout(function () { body.style.height = 'auto'; }, 320);
-                } else {
-                    body.style.height = body.scrollHeight + 'px';
-                    void body.offsetHeight;
-                    body.style.height = '0px';
-                    body.style.opacity = '0';
-                }
-            });
-        });
-    }
-
-    initMobileAccordion();
 
 })();

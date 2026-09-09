@@ -68,7 +68,13 @@
                             : "-";
 
                         <tr>
-                            <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @item.Fecha.ToString("dd/MM/yyyy HH:mm")
+                                @if (!item.IsActive)
+                                {
+                                    <span class="jk-badge jk-badge-neutral">Anulado</span>
+                                }
+                            </td>
                             <td>
                                 @(item.Turno.Cliente != null ? item.Turno.Cliente.Nombre : "Sin cliente")
                                 @if (item.Turno.Recurso != null)
@@ -82,8 +88,14 @@
                             <td>
                                 <div class="jk-flex jk-gap-4">
                                     @VerTurnoLink(item)
-                                    @EditarButton(item)
-                                    @AnularButton(item)
+                                    @if (item.IsActive)
+                                    {
+                                        @EditarButton(item)
+                                        if (!User.IsInRole(JKTurnos.Models.Entities.Roles.User))
+                                        {
+                                            @AnularButton(item)
+                                        }
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -103,7 +115,13 @@
             <div class="jk-card jk-card-compact">
                 <div class="jk-flex-between">
                     <strong>@(item.Turno.Cliente != null ? item.Turno.Cliente.Nombre : "Sin cliente")</strong>
-                    <strong>$ @item.Monto.ToString("0.00")</strong>
+                    <strong>
+                        $ @item.Monto.ToString("0.00")
+                        @if (!item.IsActive)
+                        {
+                            <span class="jk-badge jk-badge-neutral">Anulado</span>
+                        }
+                    </strong>
                 </div>
                 <div class="jk-mt-8 jk-small">
                     <i class="bi bi-calendar-event"></i> @item.Fecha.ToString("dd/MM/yyyy HH:mm")
@@ -118,8 +136,14 @@
                 <div class="jk-small jk-mt-4">Responsable: @responsable</div>
                 <div class="jk-flex jk-gap-4 jk-mt-8">
                     @VerTurnoLink(item)
-                    @EditarButton(item)
-                    @AnularButton(item)
+                    @if (item.IsActive)
+                    {
+                        @EditarButton(item)
+                        if (!User.IsInRole(JKTurnos.Models.Entities.Roles.User))
+                        {
+                            @AnularButton(item)
+                        }
+                    }
                 </div>
             </div>
         }
@@ -220,11 +244,25 @@
                 { "FinLabel", "Hasta" }
                          })
 
+        @if (ViewBag.EsAdmin == true)
+        {
+            var verAnulados = (bool)(ViewBag.IncluirEliminados ?? false);
+            <div class="jk-filter-group" title="Mostrar los pagos anulados">
+                <span class="jk-filter-label"><i class="bi bi-eye-slash"></i> Incluir</span>
+                <div class="jk-checkbox-group">
+                    <label class="jk-checkbox-item">
+                        <input type="checkbox" name="incluirEliminados" value="true" @(verAnulados ? "checked" : "") />
+                        <span class="jk-checkbox-label">Anulados</span>
+                    </label>
+                </div>
+            </div>
+        }
+
         <button type="submit" class="jk-btn jk-btn-primary">
             <i class="bi bi-search"></i> Buscar
         </button>
 
-        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-primary">
             <i class="bi bi-arrow-counterclockwise"></i> Limpiar
         </a>
         <br />

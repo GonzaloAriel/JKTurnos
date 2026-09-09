@@ -15,8 +15,16 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
+                        var itemEliminado = !item.IsActive;
+
                         <tr>
-                            <td>@item.Nombre</td>
+                            <td>
+                                @item.Nombre
+                                @if (itemEliminado)
+                                {
+                                    <span class="jk-badge jk-badge-neutral">Eliminado</span>
+                                }
+                            </td>
                             <td>@item.DuracionMinutos min</td>
                             <td class="jk-hide-tablet">$ @item.Precio.ToString("N2")</td>
                             <td>
@@ -25,7 +33,10 @@
                                         { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                                         { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                                         { "ItemName", item.Nombre },
-                                        { "Compact", false }
+                                        { "Compact", false },
+                                        { "ShowEdit", !User.IsInRole(JKTurnos.Models.Entities.Roles.User) && !itemEliminado },
+                                        { "ShowDelete", !User.IsInRole(JKTurnos.Models.Entities.Roles.User) && !itemEliminado },
+                                        { "RestoreUrl", itemEliminado ? Url.Action("Restaurar", new { id = item.Id }) : null }
                                     })
                             </td>
                         </tr>
@@ -38,15 +49,26 @@
     <div class="jk-show-mobile jk-flex jk-flex-col jk-gap-12">
         @foreach (var item in Model)
         {
+            var itemEliminado = !item.IsActive;
+
             <div class="jk-card jk-card-compact">
                 <div class="jk-flex-between">
-                    <strong>@item.Nombre</strong>
+                    <strong>
+                        @item.Nombre
+                        @if (itemEliminado)
+                        {
+                            <span class="jk-badge jk-badge-neutral">Eliminado</span>
+                        }
+                    </strong>
                     @Html.Partial("~/Views/Shared/Components/_TableActions.cshtml",
                         new ViewDataDictionary {
                             { "EditUrl", Url.Action("Edit", new { id = item.Id }) },
                             { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                             { "ItemName", item.Nombre },
-                            { "Compact", true }
+                            { "Compact", true },
+                            { "ShowEdit", !User.IsInRole(JKTurnos.Models.Entities.Roles.User) && !itemEliminado },
+                            { "ShowDelete", !User.IsInRole(JKTurnos.Models.Entities.Roles.User) && !itemEliminado },
+                            { "RestoreUrl", itemEliminado ? Url.Action("Restaurar", new { id = item.Id }) : null }
                         })
                 </div>
                 <div class="jk-mt-8 jk-small">
@@ -98,11 +120,25 @@
                 { "Placeholder", "Buscar por nombre o descripcion..." }
             })
 
+        @if (ViewBag.EsAdmin == true)
+        {
+            var verEliminados = (bool)(ViewBag.IncluirEliminados ?? false);
+            <div class="jk-filter-group" title="Mostrar los servicios dados de baja">
+                <span class="jk-filter-label"><i class="bi bi-eye-slash"></i> Incluir</span>
+                <div class="jk-checkbox-group">
+                    <label class="jk-checkbox-item">
+                        <input type="checkbox" name="incluirEliminados" value="true" @(verEliminados ? "checked" : "") />
+                        <span class="jk-checkbox-label">Eliminados</span>
+                    </label>
+                </div>
+            </div>
+        }
+
         <button type="submit" class="jk-btn jk-btn-primary">
             <i class="bi bi-search"></i> Buscar
         </button>
 
-        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-primary">
             <i class="bi bi-arrow-counterclockwise"></i> Limpiar
         </a>
     </form>

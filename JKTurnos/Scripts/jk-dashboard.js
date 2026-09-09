@@ -24,8 +24,10 @@
         if (!container) return;
         var toast = document.createElement('div');
         toast.className = 'jk-toast jk-toast-' + type;
-        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-            + '"></i> ' + message;
+        var icon = document.createElement('i');
+        icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+        toast.appendChild(icon);
+        toast.appendChild(document.createTextNode(' ' + message));
         container.appendChild(toast);
         setTimeout(function () { toast.remove(); }, 4000);
     }

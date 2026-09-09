@@ -363,6 +363,7 @@ namespace JKTurnos.Services
                 EmailTemplate = NotificacionService.DefaultEmailTemplate,
                 SmtpHabilitado = false,
                 DiasLaborales = "1,2,3,4,5,6",
+                HorarioAtencion = HorarioAtencionHelper.DefaultJson(),
                 IsActive = true,
                 CreatedAt = DateTime.Now
             });

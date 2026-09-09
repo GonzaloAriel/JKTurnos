@@ -55,25 +55,27 @@ namespace JKTurnos.Services
                     .OrderBy(s => s.Nombre)
                     .ToList();
 
-                // 5. Franja real de la jornada (M-01): HoraApertura/HoraCierre con
-                // fallback 08:00-19:30 (valor historico D-012). Se muestra como el
-                // "rango de horarios" y acota los slots libres de la semana.
-                var apertura = config != null && config.HoraApertura.HasValue
-                    ? config.HoraApertura.Value
-                    : TimeSpan.FromHours(8);
-                var cierre = config != null && config.HoraCierre.HasValue
-                    ? config.HoraCierre.Value
-                    : TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+                // 5. Horario efectivo por dia (D-050): la vidriera expone los limites de la
+                    // semana (min Inicio / max Fin) como "rango de horarios", con
+                    // fallback 08:00-19:30 (valor historico D-012).
+                    TimeSpan? apertura;
+                    TimeSpan? cierre;
+                    HorarioAtencionHelper.LimitesSemana(
+                        HorarioAtencionHelper.Resolver(config),
+                        out apertura, out cierre);
 
-                if (cierre <= apertura)
-                {
-                    apertura = TimeSpan.FromHours(8);
-                    cierre = TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
-                }
+                    var aperturaFinal = apertura ?? TimeSpan.FromHours(8);
+                    var cierreFinal = cierre ?? TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+
+                    if (cierreFinal <= aperturaFinal)
+                    {
+                        aperturaFinal = TimeSpan.FromHours(8);
+                        cierreFinal = TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
+                    }
 
                 // 6. Armar viewmodel publico.
                 var disponibles = vidriera.MostrarDisponibilidad
-                    ? AgruparEnPantallas(GetDisponibilidadSemanalInContext(ctx, tenantId, apertura, cierre))
+                    ? AgruparEnPantallas(GetDisponibilidadSemanalInContext(ctx, tenantId, HorarioAtencionHelper.Resolver(config)))
                     : new List<VidrieraPantallaVM>();
 
                 return new VidrieraPublicaViewModel
@@ -92,8 +94,8 @@ namespace JKTurnos.Services
                     Telefono = config?.Telefono,
                     Email = config?.Email,
                     Direccion = config?.Direccion,
-                    JornadaDesde = apertura,
-                    JornadaHasta = cierre,
+                    JornadaDesde = aperturaFinal,
+                    JornadaHasta = cierreFinal,
                     MostrarPrecios = vidriera.MostrarPrecios,
                     MostrarDisponibilidad = vidriera.MostrarDisponibilidad,
                     MostrarServicios = vidriera.MostrarServicios,
@@ -120,9 +122,9 @@ namespace JKTurnos.Services
 
         /// <summary>
         /// D-047 / M-13 (Vidriera, posta semanal): MATRIZ de disponibilidad para los
-        /// proximos 7 dias (hoy + 6), POR RECURSO, dentro de la jornada REAL del
-        /// tenant (HoraApertura/HoraCierre, M-01; fallback 08:00-19:30). Franjas de
-        /// 30 min. Regla de ocupacion igual a TurnoService.ValidarDisponibilidad: una
+        /// proximos 7 dias (hoy + 6), POR RECURSO, dentro del horario de atencion del
+        /// tenant (D-050: rangos por dia; fallback default Lun-Sab 08:00-19:30).
+        /// Franjas de 30 min. Regla de ocupacion igual a TurnoService.ValidarDisponibilidad: una
         /// franja esta ocupada si se solapa con un turno NO Cancelado (D-040) O con un
         /// BloqueoRecurso activo (D-046/M-01, mismo criterio Solapa). Aislamiento por
         /// TenantId (solo consulta el tenant del slug). Los dias/hojas pasadas no
@@ -134,19 +136,8 @@ namespace JKTurnos.Services
             {
                 var config = ctx.ConfiguracionesTenant
                     .FirstOrDefault(c => c.TenantId == tenantId && c.IsActive);
-                var apertura = config != null && config.HoraApertura.HasValue
-                    ? config.HoraApertura.Value
-                    : TimeSpan.FromHours(8);
-                var cierre = config != null && config.HoraCierre.HasValue
-                    ? config.HoraCierre.Value
-                    : TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
-                if (cierre <= apertura)
-                {
-                    apertura = TimeSpan.FromHours(8);
-                    cierre = TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30));
-                }
 
-                var servicios = GetDisponibilidadSemanalInContext(ctx, tenantId, apertura, cierre);
+                var servicios = GetDisponibilidadSemanalInContext(ctx, tenantId, HorarioAtencionHelper.Resolver(config));
                 return AgruparEnPantallas(servicios);
             }
         }
@@ -172,7 +163,7 @@ namespace JKTurnos.Services
         }
 
         private List<VidrieraDisponibilidadSemanalVM> GetDisponibilidadSemanalInContext(
-            JKContext ctx, int tenantId, TimeSpan apertura, TimeSpan cierre)
+            JKContext ctx, int tenantId, Dictionary<DayOfWeek, List<RangoAtencion>> horario)
         {
             // Filas = SERVICIO. Los servicios agregan la disponibilidad de TODOS
             // sus recursos asociados (RecursoServicio): un slot es libre si algun
@@ -184,11 +175,6 @@ namespace JKTurnos.Services
 
             if (servicios.Count == 0)
                 return new List<VidrieraDisponibilidadSemanalVM>();
-
-            // Dias laborables del tenant: solo se renderizan estos dias en la vidriera.
-            var configVidriera = ctx.ConfiguracionesTenant
-                .FirstOrDefault(c => c.TenantId == tenantId && c.IsActive);
-            var diasLaborales = ParsearDiasLaborales(configVidriera?.DiasLaborales);
 
             var recursosActivos = ctx.Recursos
                 .Where(r => r.TenantId == tenantId && r.IsActive)
@@ -254,8 +240,9 @@ namespace JKTurnos.Services
                 {
                     var dia = hoy.AddDays(i);
 
-                    // Solo procesar dias laborables del tenant.
-                    if (!diasLaborales.Contains(dia.DayOfWeek))
+                    // Solo procesar dias en que se atiende (con al menos un rango).
+                    List<RangoAtencion> rangosDia;
+                    if (!horario.TryGetValue(dia.DayOfWeek, out rangosDia) || rangosDia.Count == 0)
                         continue;
 
                     bool esHoy = i == 0;
@@ -274,35 +261,45 @@ namespace JKTurnos.Services
                         bloqueosPorRecurso.TryGetValue(rec.Id, out bloqueosRec);
                         bloqueosRec = bloqueosRec ?? new List<BloqueoRecurso>();
 
-                        var franjaStart = dia.Add(apertura);
-                        var franjaFin = dia.Add(cierre);
-
-                        while (franjaStart < franjaFin)
+                        // Cada rango del dia aporta sus franjas de 30 min (turno partido).
+                        foreach (var rango in rangosDia)
                         {
-                            var slotEnd = franjaStart.AddMinutes(30);
-                            var slotRel = franjaStart - dia.Date;
+                            TimeSpan tIni, tFin;
+                            if (!TimeSpan.TryParse(rango.Inicio, out tIni)
+                                || !TimeSpan.TryParse(rango.Fin, out tFin)
+                                || tFin <= tIni)
+                                continue;
 
-                            // Slot pasado (hoy): no se ofrece.
-                            bool pasado = slotEnd <= DateTime.Now;
+                            var franjaStart = dia.Add(tIni);
+                            var franjaFin = dia.Add(tFin);
 
-                            if (!pasado)
+                            while (franjaStart < franjaFin)
                             {
-                                bool ocupadaPorTurno = turnosRec.Any(t => t.FechaHoraInicio < slotEnd && t.FechaHoraFin > franjaStart);
-                                bool ocupadaPorBloqueo = false;
-                                foreach (var b in bloqueosRec)
+                                var slotEnd = franjaStart.AddMinutes(30);
+                                var slotRel = franjaStart - dia.Date;
+
+                                // Slot pasado (hoy): no se ofrece.
+                                bool pasado = slotEnd <= DateTime.Now;
+
+                                if (!pasado)
                                 {
-                                    if (BloqueoSolapaSlot(b, dia, franjaStart, slotEnd))
+                                    bool ocupadaPorTurno = turnosRec.Any(t => t.FechaHoraInicio < slotEnd && t.FechaHoraFin > franjaStart);
+                                    bool ocupadaPorBloqueo = false;
+                                    foreach (var b in bloqueosRec)
                                     {
-                                        ocupadaPorBloqueo = true;
-                                        break;
+                                        if (BloqueoSolapaSlot(b, dia, franjaStart, slotEnd))
+                                        {
+                                            ocupadaPorBloqueo = true;
+                                            break;
+                                        }
                                     }
+
+                                    if (!ocupadaPorTurno && !ocupadaPorBloqueo)
+                                        libres.Add(slotRel);
                                 }
 
-                                if (!ocupadaPorTurno && !ocupadaPorBloqueo)
-                                    libres.Add(slotRel);
+                                franjaStart = slotEnd;
                             }
-
-                            franjaStart = slotEnd;
                         }
                     }
 
@@ -567,32 +564,6 @@ namespace JKTurnos.Services
                 YaExiste = true,
                 UrlPublica = GetUrlPublica(v.Slug)
             };
-        }
-
-        // Parsea "1,2,3,4,5,6" a HashSet<DayOfWeek>. Default Lun-Sab.
-        private HashSet<DayOfWeek> ParsearDiasLaborales(string valor)
-        {
-            var defaultDias = new HashSet<DayOfWeek>
-            {
-                DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
-                DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday
-            };
-
-            if (string.IsNullOrWhiteSpace(valor))
-                return defaultDias;
-
-            var resultado = new HashSet<DayOfWeek>();
-            foreach (var parte in valor.Split(','))
-            {
-                int num;
-                if (int.TryParse(parte.Trim(), out num) && num >= 1 && num <= 7)
-                {
-                    var dow = num == 7 ? DayOfWeek.Sunday : (DayOfWeek)num;
-                    resultado.Add(dow);
-                }
-            }
-
-            return resultado.Count > 0 ? resultado : defaultDias;
         }
     }
 }

@@ -37,7 +37,14 @@
 
         clearTimeout(timer);
         timer = setTimeout(function () {
-            fetch(url + '?termino=' + encodeURIComponent(termino))
+            var token = register.querySelector('input[name="__RequestVerificationToken"]');
+            var body = '__RequestVerificationToken=' + encodeURIComponent(token ? token.value : '') +
+                       '&termino=' + encodeURIComponent(termino);
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: body
+            })
                 .then(function (res) { return res.json(); })
                 .then(function (items) {
                     list.innerHTML = '';
@@ -99,8 +106,10 @@
         if (!container) return;
         var toast = document.createElement('div');
         toast.className = 'jk-toast jk-toast-' + type;
-        toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-            + '"></i> ' + message;
+        var icon = document.createElement('i');
+        icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+        toast.appendChild(icon);
+        toast.appendChild(document.createTextNode(' ' + message));
         container.appendChild(toast);
         setTimeout(function () { toast.remove(); }, 4000);
     }

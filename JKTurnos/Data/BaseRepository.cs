@@ -37,6 +37,14 @@ public class BaseRepository<TEntity>
             .FirstOrDefault(x => x.Id == id);
     }
 
+    // Incluye registros dados de baja (IsActive = false) dentro del tenant.
+    // Solo lo usa el Admin del tenant para ver los eliminados/anulados.
+    public IQueryable<TEntity> GetAllIncluyendoInactivos()
+    {
+        return _context.Set<TEntity>()
+            .Where(x => x.TenantId == TenantId);
+    }
+
     public void Add(TEntity entity)
     {
         entity.TenantId = TenantId;
@@ -70,7 +78,28 @@ public class BaseRepository<TEntity>
         }
         else
         {
-            _context.Entry(entity).State = EntityState.Modified;
+            // M-10: fail-closed: recargar la entidad persistida para validar tenant
+            // y preservar TenantId/IsActive/CreatedAt (evita attach de entidad foranea
+            // con TenantId alterable).
+            var persistida = _context.Set<TEntity>()
+                .FirstOrDefault(e => e.Id == entity.Id);
+
+            if (persistida == null)
+                throw new System.InvalidOperationException("Registro no encontrado.");
+
+            if (persistida.TenantId != TenantId)
+                throw new System.UnauthorizedAccessException("No tiene permisos para modificar este registro.");
+
+            var createdAt = persistida.CreatedAt;
+            var tenantId = persistida.TenantId;
+
+            _context.Entry(persistida).CurrentValues.SetValues(entity);
+
+            persistida.CreatedAt = createdAt;
+            persistida.TenantId = tenantId;
+            persistida.UpdatedAt = DateTime.Now;
+
+            _context.Entry(persistida).State = EntityState.Modified;
         }
 
         _context.SaveChanges();
@@ -103,7 +132,26 @@ public class BaseRepository<TEntity>
             }
             else
             {
-                _context.Entry(entity).State = EntityState.Modified;
+                // M-10: mismo guard fail-closed que Update.
+                var persistida = _context.Set<TEntity>()
+                    .FirstOrDefault(e => e.Id == entity.Id);
+
+                if (persistida == null)
+                    throw new System.InvalidOperationException("Registro no encontrado.");
+
+                if (persistida.TenantId != TenantId)
+                    throw new System.UnauthorizedAccessException("No tiene permisos para modificar este registro.");
+
+                var createdAt = persistida.CreatedAt;
+                var tenantId = persistida.TenantId;
+
+                _context.Entry(persistida).CurrentValues.SetValues(entity);
+
+                persistida.CreatedAt = createdAt;
+                persistida.TenantId = tenantId;
+                persistida.UpdatedAt = DateTime.Now;
+
+                _context.Entry(persistida).State = EntityState.Modified;
             }
         }
 
@@ -118,6 +166,20 @@ public class BaseRepository<TEntity>
             return;
 
         entity.IsActive = false;
+        entity.UpdatedAt = DateTime.Now;
+
+        _context.SaveChanges();
+    }
+
+    public void Restore(int id)
+    {
+        var entity = GetAllIncluyendoInactivos()
+            .FirstOrDefault(x => x.Id == id);
+
+        if (entity == null)
+            return;
+
+        entity.IsActive = true;
         entity.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();

@@ -19,7 +19,12 @@ namespace JKTurnos
                 new CookieAuthenticationOptions
                 {
                     AuthenticationType = "ApplicationCookie",
-                    LoginPath = new PathString("/Account/Login")
+                    LoginPath = new PathString("/Account/Login"),
+                    CookieHttpOnly = true,
+                    CookieSecure = CookieSecureOption.Always,
+                    CookieSameSite = SameSiteMode.Lax,
+                    ExpireTimeSpan = System.TimeSpan.FromHours(8),
+                    SlidingExpiration = true
                 });
         }
     }

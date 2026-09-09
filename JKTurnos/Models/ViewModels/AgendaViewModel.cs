@@ -21,5 +21,10 @@ namespace JKTurnos.Models.ViewModels
 
         // Dias laborables del tenant (para filtrar columnas en vista semanal).
         public HashSet<DayOfWeek> DiasLaborales { get; set; }
+
+        // D-050 / M-01 (evolucion): horario de atencion efectivo por dia (JSON ->
+        // legacy -> default). Claves = dias con al menos un rango. La grilla lo usa
+        // para marcar celdas fuera de horario como no clickeables (sin crear turno).
+        public Dictionary<DayOfWeek, List<RangoAtencion>> HorarioAtencion { get; set; }
     }
 }

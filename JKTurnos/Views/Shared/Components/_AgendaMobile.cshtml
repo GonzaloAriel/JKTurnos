@@ -53,6 +53,60 @@
         }
     }
 
+    // D-050 / M-01: rangos de atencion del dia. Los horarios libres solo se
+    // ofrecen dentro de estos rangos (la franja fuera de horario se trata
+    // como ocupada a los efectos de "agregar turno").
+    List<RangoAtencion> rangosDia = null;
+    if (Model.HorarioAtencion != null)
+    {
+        Model.HorarioAtencion.TryGetValue(fecha.DayOfWeek, out rangosDia);
+    }
+
+    // El rango visible de horarios libres abarca tambien el horario de atencion
+    // del dia (para que las franjas EN horario puedan ofrecerse).
+    if (rangosDia != null)
+    {
+        foreach (var r in rangosDia)
+        {
+            TimeSpan ini, fin;
+if (!TimeSpan.TryParse(r.Inicio, out ini) || !TimeSpan.TryParse(r.Fin, out fin))
+                {
+                    continue;
+                }
+
+            var iniAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day, ini.Hours, ini.Minutes >= 30 ? 30 : 0, 0);
+            if (iniAjustado < gridInicio)
+            {
+                gridInicio = iniAjustado;
+            }
+
+            int finMin = fin.Minutes > 30 ? 60 : (fin.Minutes > 0 ? 30 : 0);
+            var finAjustado = new DateTime(fecha.Year, fecha.Month, fecha.Day, fin.Hours, 0, 0).AddMinutes(finMin);
+            if (finAjustado > gridFin)
+            {
+                gridFin = finAjustado;
+            }
+        }
+    }
+
+    Func<DateTime, bool> EnHorario = (fs) =>
+    {
+        if (rangosDia == null || rangosDia.Count == 0)
+            return false;
+        var fe = fs.AddMinutes(30);
+        foreach (var r in rangosDia)
+        {
+            TimeSpan ini, fin;
+if (!TimeSpan.TryParse(r.Inicio, out ini) || !TimeSpan.TryParse(r.Fin, out fin))
+                {
+                    continue;
+                }
+            if (fs.TimeOfDay < fin && fe.TimeOfDay > ini)
+                return true;
+        }
+        return false;
+    };
+
     int index = 0;
 }
 
@@ -106,7 +160,8 @@ else
             while (franjaStart < gridFin)
             {
                 var franjaEnd = franjaStart.AddMinutes(30);
-                bool ocupada = turnosRec.Any(t => t.FechaHoraInicio < franjaEnd && t.FechaHoraFin > franjaStart)
+                bool ocupada = !EnHorario(franjaStart)
+                    || turnosRec.Any(t => t.FechaHoraInicio < franjaEnd && t.FechaHoraFin > franjaStart)
                     || bloqueosRec.Any(b => FranjaBloqueada(b, franjaStart, franjaEnd));
                 if (!ocupada)
                 {

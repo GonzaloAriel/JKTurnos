@@ -22,9 +22,11 @@ namespace JKTurnos.Services
                         .ToList();
         }
 
-        public List<Cliente> GetFiltrados(string busqueda = null)
+        public List<Cliente> GetFiltrados(string busqueda = null, bool incluirEliminados = false)
         {
-            var query = _repo.GetAll();
+            var query = incluirEliminados
+                ? _repo.GetAllIncluyendoInactivos()
+                : _repo.GetAll();
 
             if (!string.IsNullOrWhiteSpace(busqueda))
             {
@@ -85,6 +87,24 @@ namespace JKTurnos.Services
                 AuditService.A_Eliminar,
                 AuditService.E_Cliente,
                 cliente != null ? "Elimino el cliente " + cliente.Nombre : "Elimino el cliente #" + id,
+                id);
+        }
+
+        // Restaura un cliente dado de baja (IsActive = true). Solo Admin.
+        public void Restaurar(int id)
+        {
+            var cliente = _repo.GetAllIncluyendoInactivos()
+                .FirstOrDefault(x => x.Id == id);
+
+            if (cliente == null)
+                throw new ArgumentException("Cliente no encontrado.");
+
+            _repo.Restore(id);
+
+            new AuditService().Registrar(
+                AuditService.A_Restaurar,
+                AuditService.E_Cliente,
+                "Restauro el cliente " + cliente.Nombre,
                 id);
         }
 

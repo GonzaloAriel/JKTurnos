@@ -33,6 +33,11 @@ namespace JKTurnos.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // M-09: EF6 no soporta Global Query Filters (a diferencia de EF Core).
+            // El aislamiento multi-tenant depende de que cada consulta pase por
+            // BaseRepository (filtra TenantId+IsActive) o filtre TenantId explicitamente.
+            // NUNCA consultar JKContext.Set<T>() directamente sin filtrar por TenantId.
+
             modelBuilder.Entity<Turno>()
                 .HasRequired(t => t.Recurso)
                 .WithMany()

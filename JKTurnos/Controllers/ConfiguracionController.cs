@@ -37,12 +37,8 @@ namespace JKTurnos.Controllers
         {
             var config = _service.GetConfiguracion() ?? new ConfiguracionTenant();
             config.SmtpPassword = null; // nunca se re-renderiza la password almacenada
-
-            // D-046 / M-01 (Concepto B): default 08:00 - 19:30 (no se persiste hasta guardar).
-            if (!config.HoraApertura.HasValue)
-                config.HoraApertura = TimeSpan.Parse("08:00");
-            if (!config.HoraCierre.HasValue)
-                config.HoraCierre = TimeSpan.Parse("19:30");
+            // El horario por dia (D-050) se resuelve en la vista: JSON, si no legacy,
+            // si no default Lun-Sab 08:00-19:30 (se persiste recien al guardar).
 
             ViewBag.Avatares = new AvatarPlataformaService().GetAll();
             return View(config);

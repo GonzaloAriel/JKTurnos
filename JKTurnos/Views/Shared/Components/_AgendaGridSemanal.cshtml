@@ -69,6 +69,36 @@
         }
     }
 
+    // El eje de tiempo de la semana abarca tambien el horario de atencion de
+    // todos los dias (para que el click dentro de horario sea posible).
+    if (Model.HorarioAtencion != null)
+    {
+        foreach (var kv in Model.HorarioAtencion)
+        {
+            foreach (var r in kv.Value)
+            {
+                TimeSpan ini, fin;
+                if (!TimeSpan.TryParse(r.Inicio, out ini) || !TimeSpan.TryParse(r.Fin, out fin))
+                {
+                    continue;
+                }
+
+                var iniD = new DateTime(lunes.Year, lunes.Month, lunes.Day, ini.Hours, ini.Minutes >= 30 ? 30 : 0, 0);
+                if (iniD < semanaInicio)
+                {
+                    semanaInicio = iniD;
+                }
+
+                int finMin = fin.Minutes > 30 ? 60 : (fin.Minutes > 0 ? 30 : 0);
+                var finD = new DateTime(lunes.Year, lunes.Month, lunes.Day, fin.Hours, 0, 0).AddMinutes(finMin);
+                if (finD > semanaFin)
+                {
+                    semanaFin = finD;
+                }
+            }
+        }
+    }
+
     int bodyHeight = Math.Max(1, (int)((semanaFin - semanaInicio).TotalHours * pxPorHora));
     int spanMinutos = (int)(semanaFin - semanaInicio).TotalMinutes;
     string pxPorMinutoTexto = pxPorMinuto.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
@@ -82,6 +112,31 @@
             .OrderBy(t => t.FechaHoraInicio)
             .ToList();
     }
+
+    // D-050 / M-01: texto compacto de los rangos del dia (ej: "08:00-13:00;17:00-20:00")
+    // para que el click en el cuerpo del dia verifique que la hora caiga dentro.
+    Func<DayOfWeek, string> HorarioDiaTexto = (dow) =>
+    {
+        var partes = new List<string>();
+        List<RangoAtencion> rangos;
+        if (Model.HorarioAtencion != null && Model.HorarioAtencion.TryGetValue(dow, out rangos))
+        {
+            foreach (var r in rangos)
+            {
+                TimeSpan ini, fin;
+                if (!TimeSpan.TryParse(r.Inicio, out ini) || !TimeSpan.TryParse(r.Fin, out fin))
+                {
+                    continue;
+                }
+                if (fin <= ini)
+                {
+                    continue;
+                }
+                partes.Add(ini.ToString(@"hh\:mm") + "-" + fin.ToString(@"hh\:mm"));
+            }
+        }
+        return string.Join(";", partes);
+    };
 }
 
 <div class="jk-agenda-week" role="grid" aria-label="Grilla semanal" style="grid-template-columns: repeat(@diasLabIdx.Count, minmax(160px, 1fr));">
@@ -135,7 +190,7 @@
                 <span class="jk-agenda-week-day-number">@dia.Day</span>
             </a>
 
-            <div class="jk-agenda-week-day-body" style="height: @(bodyHeight)px;" data-agenda-fecha="@fechaStr" data-agenda-time-start="@semanaInicio.ToString("HH:mm")" data-agenda-px-per-min="@pxPorMinutoTexto" data-agenda-span-min="@spanMinutos">
+            <div class="jk-agenda-week-day-body" style="height: @(bodyHeight)px;" data-agenda-fecha="@fechaStr" data-agenda-time-start="@semanaInicio.ToString("HH:mm")" data-agenda-px-per-min="@pxPorMinutoTexto" data-agenda-span-min="@spanMinutos" data-horario-dia="@HorarioDiaTexto(dia.DayOfWeek)">
                 @if (n == 0)
                 {
                     <span class="jk-agenda-week-day-empty">Sin turnos</span>

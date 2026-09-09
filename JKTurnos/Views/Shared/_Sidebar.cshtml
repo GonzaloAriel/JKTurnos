@@ -35,16 +35,6 @@
                 <i class="bi bi-house-door"></i>
                 <span>Command Center</span>
             </a>
-            @if (User.IsInRole(RolesConst.Admin))
-            {
-                <a href="@Url.Action("Index", "Dashboard")"
-                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "active" : "")"
-                   data-sidebar-item
-                   @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "aria-current=\"page\"" : "")>
-                    <i class="bi bi-graph-up-arrow"></i>
-                    <span>Dashboard</span>
-                </a>
-            }
             <a href="@Url.Action("Agenda", "Turnos")"
                class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Turnos" && ViewContext.RouteData.Values["action"].ToString() == "Agenda" ? "active" : "")"
                data-sidebar-item
@@ -91,16 +81,6 @@
                 <i class="bi bi-cash-coin"></i>
                 <span>Pagos</span>
             </a>
-            @if (User.IsInRole(RolesConst.Admin))
-            {
-                <a href="@Url.Action("Index", "Usuarios")"
-                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "active" : "")"
-                   data-sidebar-item
-                   @(ViewContext.RouteData.Values["controller"].ToString() == "Usuarios" ? "aria-current=\"page\"" : "")>
-                    <i class="bi bi-person-gear"></i>
-                    <span>Usuarios</span>
-                </a>
-            }
         </div>
         }
 
@@ -157,19 +137,33 @@
                     <i class="bi bi-gear"></i>
                     <span>Negocio</span>
                 </a>
-                <a href="@Url.Action("Index", "Auditoria")"
-                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Auditoria" ? "active" : "")"
-                   data-sidebar-item
-                   @(ViewContext.RouteData.Values["controller"].ToString() == "Auditoria" ? "aria-current=\"page\"" : "")>
-                    <i class="bi bi-journal-text"></i>
-                    <span>Auditoria</span>
-                </a>
                 <a href="@Url.Action("Index", "VidrieraAdmin")"
                    class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "VidrieraAdmin" ? "active" : "")"
                    data-sidebar-item
                    @(ViewContext.RouteData.Values["controller"].ToString() == "VidrieraAdmin" ? "aria-current=\"page\"" : "")>
                     <i class="bi bi-globe2"></i>
                     <span>Vidriera</span>
+                </a>
+            </div>
+        }
+
+        @if (User.IsInRole(RolesConst.Admin))
+        {
+            <div class="jk-nav-group">
+                <span class="jk-nav-label">Analisis</span>
+                <a href="@Url.Action("Index", "Dashboard")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="@Url.Action("Index", "Auditoria")"
+                   class="jk-nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Auditoria" ? "active" : "")"
+                   data-sidebar-item
+                   @(ViewContext.RouteData.Values["controller"].ToString() == "Auditoria" ? "aria-current=\"page\"" : "")>
+                    <i class="bi bi-journal-text"></i>
+                    <span>Auditoria</span>
                 </a>
             </div>
         }
@@ -184,11 +178,11 @@
             <i class="bi bi-chevron-left"></i>
             <span>Colapsar</span>
         </button>
-        @if (User.IsInRole(RolesConst.AdminGlobal) || User.IsInRole(RolesConst.Admin))
+        @if (User.IsInRole(RolesConst.AdminGlobal))
         {
             <a href="@Url.Action("MiPassword", "Usuarios")" class="jk-nav-item" data-sidebar-item>
                 <i class="bi bi-key"></i>
-                <span>Cambiar contrasena</span>
+                <span>Cambiar contraseña</span>
             </a>
         }
         <a href="@Url.Action("Index", "Ayuda")"
@@ -198,9 +192,15 @@
             <i class="bi bi-question-circle"></i>
             <span>Ayuda</span>
         </a>
-        <a href="@Url.Action("Logout", "Account")" class="jk-nav-item jk-nav-item-logout" data-sidebar-item>
-            <i class="bi bi-box-arrow-left"></i>
-            <span>Cerrar Sesion</span>
-        </a>
+        <form action="@Url.Action("Logout", "Account")"
+              method="post"
+              data-sidebar-item
+              data-jk-logout-form>
+            @Html.AntiForgeryToken()
+            <button type="submit" class="jk-nav-item jk-nav-item-logout">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Cerrar Sesion</span>
+            </button>
+        </form>
     </div>
 </nav>

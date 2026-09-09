@@ -26,5 +26,25 @@ namespace JKTurnos
                 new MigrateDatabaseToLatestVersion<JKContext, Configuration>()
             );
         }
+
+        // SECURITY: headers defensivos para todas las respuestas (M-3/M-4/M-5).
+        protected void Application_PreSendRequestHeaders()
+        {
+            var response = Response;
+            if (response == null || response.Headers == null)
+                return;
+
+            response.Headers["X-Content-Type-Options"] = "nosniff";
+            response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+            response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+            response.AddHeader("X-XSS-Protection", "1; mode=block");
+
+            // M-12: HSTS solo sobre HTTPS (Forzar HTTPS en hosting).
+            var req = HttpContext.Current != null ? HttpContext.Current.Request : null;
+            if (req != null && req.IsSecureConnection)
+            {
+                response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+            }
+        }
     }
 }

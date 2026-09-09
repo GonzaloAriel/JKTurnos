@@ -346,6 +346,17 @@
     border-top: 1px solid var(--jk-border);
 }
 
+/* D-050 / M-01: celda fuera del horario de atencion del dia. Se ve pero no
+   abre el Quick Create (no se crea turno clickeando ahi). */
+.jk-agenda-cell-closed {
+    cursor: not-allowed;
+    background-color: var(--jk-bg);
+}
+
+.jk-agenda-cell-closed:hover {
+    background-color: var(--jk-bg);
+}
+
 /* ===== TIME BLOCKS ===== */
 
 .jk-agenda-time-block {
@@ -589,7 +600,6 @@
     .jk-agenda-mobile-resource-chevron {
         font-size: var(--jk-text-sm);
         color: var(--jk-text-tertiary);
-        transition: transform var(--jk-transition-fast);
     }
 
     .jk-agenda-mobile-resource[open] .jk-agenda-mobile-resource-chevron {

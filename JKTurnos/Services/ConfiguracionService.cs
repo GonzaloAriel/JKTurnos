@@ -25,77 +25,65 @@ namespace JKTurnos.Services
             return _configRepo.GetAll().FirstOrDefault();
         }
 
-        // D-046 / M-01 (Concepto B): minutos de la Franja Formal (HoraCierre - HoraApertura).
-        // Informativo y no bloqueante. Si no esta configurada (o es invalida) cae a
-        // 08:00 - 19:30 = 690 min (valor historico del KPI de ocupacion).
-        public int GetMinutosJornada()
+        // D-050 / M-01 (Concepto B): minutos de atencion de UN DIA = suma de los
+        // rangos del horario para ese dia (per-dia, soporta turno partido). El KPI
+        // de ocupacion usa el denominador correcto del dia (un Sabado con franja
+        // corta no penaliza). Informativo y no bloqueante.
+        public int GetMinutosJornada(DateTime? fecha = null)
         {
             var config = GetConfiguracion();
 
-            if (config == null || !config.HoraApertura.HasValue || !config.HoraCierre.HasValue)
-                return 690;
+            if (fecha.HasValue)
+            {
+                var horario = HorarioAtencionHelper.Resolver(config);
+                var minutos = HorarioAtencionHelper.MinutosDelDia(horario, fecha.Value.DayOfWeek);
+                if (minutos > 0)
+                    return minutos;
+            }
 
-            var dif = config.HoraCierre.Value - config.HoraApertura.Value;
-
-            if (dif <= TimeSpan.Zero)
-                return 690;
-
-            return (int)dif.TotalMinutes;
+            return GetMinutosJornadaLegacy(config);
         }
 
-        // Dias laborables: parsea el string "1,2,3,4,5,6" a un HashSet<DayOfWeek>.
-        // Si es null o vacio, retorna Lun-Sab como default.
+        // Fallback historico: HoraCierre - HoraApertura (legacy). 08:00 - 19:30 = 690.
+        private static int GetMinutosJornadaLegacy(ConfiguracionTenant config)
+        {
+            if (config != null && config.HoraApertura.HasValue && config.HoraCierre.HasValue)
+            {
+                var dif = config.HoraCierre.Value - config.HoraApertura.Value;
+                if (dif > TimeSpan.Zero)
+                    return (int)dif.TotalMinutes;
+            }
+
+            return 690;
+        }
+
+        // Dias en los que el negocio atiende: horario efectivo (JSON -> legacy ->
+        // default Lun-Sab). Un dia "con horario" es aquel con al menos un rango.
         public HashSet<DayOfWeek> GetDiasLaborales()
         {
             var config = GetConfiguracion();
-            return ParsearDiasLaborales(config?.DiasLaborales);
-        }
+            var horario = HorarioAtencionHelper.Resolver(config);
 
-        private HashSet<DayOfWeek> ParsearDiasLaborales(string valor)
-        {
-            var defaultDias = new HashSet<DayOfWeek>
-            {
-                DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
-                DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday
-            };
-
-            if (string.IsNullOrWhiteSpace(valor))
-                return defaultDias;
-
-            var resultado = new HashSet<DayOfWeek>();
-            foreach (var parte in valor.Split(','))
-            {
-                var trimmed = parte.Trim();
-                int num;
-                if (int.TryParse(trimmed, out num) && num >= 1 && num <= 7)
+            return horario.Count > 0
+                ? new HashSet<DayOfWeek>(horario.Keys)
+                : new HashSet<DayOfWeek>
                 {
-                    // 1=Lun=Monday..7=Dom=Sunday. Mapeo: (num % 7) + 1 == DayOfWeek value?
-                    // DayOfWeek: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
-                    // Nuestro:  1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun
-                    // Mapeo: nuestro 1 -> C# 1 (Mon), 7 -> 0 (Sun)
-                    var dow = num == 7 ? DayOfWeek.Sunday : (DayOfWeek)num;
-                    resultado.Add(dow);
-                }
-            }
-
-            return resultado.Count > 0 ? resultado : defaultDias;
+                    DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
+                    DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday
+                };
         }
 
-        private string FormatearDiasLaborales(HashSet<DayOfWeek> dias)
+        // Horario efectivo completo (JSON -> legacy -> default Lun-Sab 08:00-19:30).
+        public List<HorarioAtencionDia> GetHorarioAtencion()
         {
-            if (dias == null || dias.Count == 0)
-                return "1,2,3,4,5,6";
+            return HorarioAtencionHelper.ResolverLista(GetConfiguracion());
+        }
 
-            // Orden: Lun(1)..Dom(7)
-            var partes = new List<string>();
-            for (int i = 1; i <= 7; i++)
-            {
-                var dow = i == 7 ? DayOfWeek.Sunday : (DayOfWeek)i;
-                if (dias.Contains(dow))
-                    partes.Add(i.ToString());
-            }
-
-            return partes.Count > 0 ? string.Join(",", partes) : "1,2,3,4,5,6";
+        // Horario efectivo indexado por DayOfWeek (para la Agenda: celdas del
+        // dia que caen fuera de los rangos se pintan como no clickeables).
+        public Dictionary<DayOfWeek, List<RangoAtencion>> GetHorarioAtencionPorDia()
+        {
+            return HorarioAtencionHelper.Resolver(GetConfiguracion());
         }
 
         // Datos del negocio (forma DatosNegocio). No toca las notificaciones:
@@ -104,21 +92,11 @@ namespace JKTurnos.Services
         {
             model.NombreComercial = (model.NombreComercial ?? "").Trim();
 
-            // D-046 / M-01 (Concepto B): normaliza la Franja Formal. Si cae o esta
-            // incompleta se deja null (la logica usara 08:00 - 19:30 por defecto).
-            if (model.HoraApertura.HasValue && model.HoraCierre.HasValue)
-            {
-                if (model.HoraCierre.Value <= model.HoraApertura.Value)
-                {
-                    model.HoraApertura = null;
-                    model.HoraCierre = null;
-                }
-            }
-            else
-            {
-                model.HoraApertura = null;
-                model.HoraCierre = null;
-            }
+            // D-050 / M-01 (Concepto B): normaliza el horario por dia (JSON).
+            // "" (o invalido) se guarda como null: los lectores degradan a legacy
+            // (DiasLaborales+HoraApertura+HoraCierre) o a default Lun-Sab.
+            var horarioNormalizado = HorarioAtencionHelper.Normalizar(model.HorarioAtencion);
+            model.HorarioAtencion = string.IsNullOrWhiteSpace(horarioNormalizado) ? null : horarioNormalizado;
 
             var actual = _configRepo.GetAll().FirstOrDefault();
 
@@ -141,9 +119,7 @@ namespace JKTurnos.Services
                 AuditService.Campo("Direccion", actual.Direccion, model.Direccion),
                 AuditService.Campo("LogoUrl", actual.LogoUrl, model.LogoUrl),
                 AuditService.Campo("AvatarUrl", actual.AvatarUrl, model.AvatarUrl),
-                AuditService.Campo("HoraApertura", actual.HoraApertura?.ToString(@"hh\:mm"), model.HoraApertura?.ToString(@"hh\:mm")),
-                AuditService.Campo("HoraCierre", actual.HoraCierre?.ToString(@"hh\:mm"), model.HoraCierre?.ToString(@"hh\:mm")),
-                AuditService.Campo("DiasLaborales", actual.DiasLaborales, model.DiasLaborales));
+                AuditService.Campo("HorarioAtencion", actual.HorarioAtencion, model.HorarioAtencion));
 
             actual.NombreComercial = model.NombreComercial;
             actual.Telefono = model.Telefono;
@@ -151,9 +127,7 @@ namespace JKTurnos.Services
             actual.Direccion = model.Direccion;
             actual.LogoUrl = model.LogoUrl;
             actual.AvatarUrl = model.AvatarUrl;
-            actual.HoraApertura = model.HoraApertura;
-            actual.HoraCierre = model.HoraCierre;
-            actual.DiasLaborales = model.DiasLaborales;
+            actual.HorarioAtencion = model.HorarioAtencion;
             _configRepo.Update(actual);
 
             new AuditService().Registrar(

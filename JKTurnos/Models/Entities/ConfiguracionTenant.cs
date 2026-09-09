@@ -83,6 +83,14 @@ namespace JKTurnos.Models.Entities
         [StringLength(50)]
         public string DiasLaborales { get; set; }
 
+        // D-050 / M-01: horario de atencion POR DIA con multiples rangos (turno
+        // partido). JSON: [{"Dia":1,"Rangos":[{"Inicio":"08:00","Fin":"12:00"}]}]
+        // (1=Lun..7=Dom). Informativo y no bloqueante. Dia sin entrada = no se
+        // atiende. Si esta vacio se degrada a DiasLaborales+HoraApertura+HoraCierre
+        // (legacy) o a Lun-Sab 08:00-19:30 (default historico 690 min).
+        [Column(TypeName = "nvarchar(max)")]
+        public string HorarioAtencion { get; set; }
+
         [ForeignKey("TenantId")]
         public virtual Tenant Tenant { get; set; }
     }

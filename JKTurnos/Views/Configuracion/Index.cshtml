@@ -10,7 +10,7 @@
 @Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml")
 
 <!-- ===== SUSCRIPCION Y PAGOS ===== -->
-<div class="jk-card jk-mt-24">
+<div class="jk-card jk-card-accent jk-card-accent-warning jk-mt-24">
     <div class="jk-card-header">
         <h3 class="jk-card-title">Suscripcion y pagos</h3>
         <a href="@Url.Action("Suscripcion")" class="jk-btn jk-btn-sm jk-btn-ghost">
@@ -23,11 +23,11 @@
 </div>
 
 <!-- ===== DATOS DEL NEGOCIO ===== -->
-<div class="jk-card jk-mt-24">
+<div class="jk-card jk-card-accent jk-card-accent-accent jk-mt-24">
     <div class="jk-card-header">
         <h3 class="jk-card-title">Datos del negocio</h3>
         <a href="@Url.Action("DatosNegocio")" class="jk-btn jk-btn-sm jk-btn-ghost">
-            <i class="bi bi-pencil"></i> Editar
+            <i class="bi bi-arrow-right"></i> Ver seccion
         </a>
     </div>
 
@@ -63,7 +63,7 @@
 </div>
 
 <!-- ===== CONFIGURACION DE NOTIFICACIONES ===== -->
-<div class="jk-card jk-mt-24">
+<div class="jk-card jk-card-accent jk-card-accent-teal jk-mt-24">
     <div class="jk-card-header">
         <h3 class="jk-card-title">Configuracion de notificaciones</h3>
         <a href="@Url.Action("Notificaciones")" class="jk-btn jk-btn-sm jk-btn-ghost">
@@ -116,4 +116,30 @@
     {
         <p class="jk-small text-secondary jk-mb-0">Carga los datos del negocio para configurar los recordatorios.</p>
     }
+</div>
+
+<!-- ===== USUARIOS ===== -->
+<div class="jk-card jk-card-accent jk-card-accent-coral jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Usuarios</h3>
+        <a href="@Url.Action("Index", "Usuarios")" class="jk-btn jk-btn-sm jk-btn-ghost">
+            <i class="bi bi-arrow-right"></i> Ver seccion
+        </a>
+    </div>
+    <p class="jk-small text-secondary jk-mb-0">
+        Gestiona los usuarios de tu negocio, sus accesos y roles.
+    </p>
+</div>
+
+<!-- ===== CAMBIAR CONTRASEÑA ===== -->
+<div class="jk-card jk-card-accent jk-card-accent-danger jk-mt-24">
+    <div class="jk-card-header">
+        <h3 class="jk-card-title">Cambiar contraseña</h3>
+        <a href="@Url.Action("MiPassword", "Usuarios")" class="jk-btn jk-btn-sm jk-btn-ghost">
+            <i class="bi bi-arrow-right"></i> Ver seccion
+        </a>
+    </div>
+    <p class="jk-small text-secondary jk-mb-0">
+        Actualiza tu contraseña de acceso al sistema.
+    </p>
 </div>

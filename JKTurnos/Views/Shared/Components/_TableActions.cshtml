@@ -40,11 +40,19 @@
     // ShowDelete (default true): permite ocultar el boton Eliminar por rol
     // (ej. el usuario operador no elimina turnos, solo el Admin del tenant).
     bool showDelete = (bool)(ViewBag.ShowDelete ?? true);
+    // ShowEdit (default true): permite ocultar el boton Editar por rol.
+    // Mismo patron que ShowDelete para entidades editables solo por Admin.
+    bool showEdit = (bool)(ViewBag.ShowEdit ?? true);
     // ViewUrl (opcional): si se define, se muestra un
     // tercer boton "Ver" (soft-info, ojo) antes de Editar. Se usa en entidades
     // con ficha de detalle (ej. Clientes -> Details / historial).
     string viewUrl = ViewBag.ViewUrl;
     string viewLabel = ViewBag.ViewLabel ?? "Ver";
+    // RestoreUrl (opcional): para registros dados de baja (IsActive = false).
+    // Muestra un form POST (con anti-forgery) para restaurados; reemplaza
+    // Editar/Eliminar en la fila del registro eliminado.
+    string restoreUrl = ViewBag.RestoreUrl;
+    string restoreLabel = ViewBag.RestoreLabel ?? "Restaurar";
 }
 
 @if (string.IsNullOrEmpty(viewUrl) == false)
@@ -55,11 +63,14 @@
         @if (!compact) { <text>@viewLabel</text> }
     </a>
 }
-<a class="jk-btn jk-btn-sm jk-btn-soft-primary" href="@editUrl"
-   @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="Editar @itemName"</text> }>
-    <i class="bi bi-pencil"></i>
-    @if (!compact) { <text>@editLabel</text> }
-</a>
+@if (showEdit)
+{
+    <a class="jk-btn jk-btn-sm jk-btn-soft-primary" href="@editUrl"
+       @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="Editar @itemName"</text> }>
+        <i class="bi bi-pencil"></i>
+        @if (!compact) { <text>@editLabel</text> }
+    </a>
+}
 @if (showDelete)
 {
     <a class="jk-btn jk-btn-sm jk-btn-soft-danger" href="@deleteUrl"
@@ -67,4 +78,15 @@
         <i class="bi bi-@deleteIcon"></i>
         @if (!compact) { <text>@deleteLabel</text> }
     </a>
+}
+@if (!string.IsNullOrEmpty(restoreUrl))
+{
+    <form method="post" action="@restoreUrl" class="jk-inline-block">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="jk-btn jk-btn-sm jk-btn-soft-success"
+                @if (!string.IsNullOrEmpty(itemName)) { <text>aria-label="@restoreLabel @itemName"</text> }>
+            <i class="bi bi-arrow-counterclockwise"></i>
+            @if (!compact) { <text>@restoreLabel</text> }
+        </button>
+    </form>
 }

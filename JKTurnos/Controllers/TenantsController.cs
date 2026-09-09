@@ -69,7 +69,8 @@ namespace JKTurnos.Controllers
         // POST: Tenants/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Tenant model)
+        public ActionResult Edit(
+            [Bind(Exclude = "Id,CreatedAt,UpdatedAt,IsActive")] Tenant model)
         {
             if (!ModelState.IsValid)
                 return View(model);

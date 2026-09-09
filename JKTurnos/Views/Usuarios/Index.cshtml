@@ -54,7 +54,7 @@
                                         })
                                     if (item.Id != (int)ViewBag.CurrentUserId)
                                     {
-                                        <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("ResetPassword", new { id = item.Id })" aria-label="Resetear contrasena de @item.Nombre">
+                                        <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("ResetPassword", new { id = item.Id })" aria-label="Resetear contraseña de @item.Nombre">
                                             <i class="bi bi-key"></i> Resetear
                                         </a>
                                     }
@@ -78,7 +78,7 @@
                         {
                             if (item.Id != (int)ViewBag.CurrentUserId)
                             {
-                                <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("ResetPassword", new { id = item.Id })" aria-label="Resetear contrasena de @item.Nombre">
+                                <a class="jk-btn jk-btn-sm jk-btn-soft-info" href="@Url.Action("ResetPassword", new { id = item.Id })" aria-label="Resetear contraseña de @item.Nombre">
                                     <i class="bi bi-key"></i>
                                 </a>
                             }

@@ -39,8 +39,11 @@ namespace JKTurnos.Services
 
             AgregarProximoTurno(recordatorios, turnos, ahora);
             AgregarRecordatoriosDelDia(recordatorios, turnos, hoy);
+            AgregarSenasPendientes(recordatorios, turnos, hoy);
             AgregarTurnosPorAtender(recordatorios, turnos);
+            AgregarTurnosManana(recordatorios, turnos, hoy);
             AgregarSaldoPendiente(recordatorios, hoy);
+            AgregarTurnosVencidosSinAtender(recordatorios, hoy, ahora);
             AgregarClientesSinContacto(recordatorios, turnos, hoy);
 
             if (incluirConfiguracion)
@@ -189,6 +192,43 @@ namespace JKTurnos.Services
             }
         }
 
+        private void AgregarSenasPendientes(
+            List<RecordatorioSistema> recordatorios,
+            List<Turno> turnos,
+            DateTime hoy)
+        {
+            var conPago = new HashSet<int>(
+                _pagoService.GetPagosEnRango(hoy, hoy.AddDays(2))
+                    .Select(p => p.TurnoId));
+
+            var sinSena = turnos
+                .Where(t => t.FechaHoraFin > DateTime.Now &&
+                            (t.EstadoTurno == null || t.EstadoTurno.Codigo == EstadosTurnoBase.Pendiente) &&
+                            t.Cliente != null &&
+                            t.Servicio != null &&
+                            !conPago.Contains(t.Id))
+                .OrderBy(t => t.FechaHoraInicio)
+                .Take(3)
+                .ToList();
+
+            foreach (var t in sinSena)
+            {
+                recordatorios.Add(new RecordatorioSistema
+                {
+                    Titulo = "Sugerir seña o adelanto",
+                    Mensaje = "Recorda sugerir una seña o adelanto para " +
+                              t.Cliente.Nombre + " (" + t.Servicio.Nombre + ", " +
+                              t.FechaHoraInicio.ToString("dd/MM HH:mm") + ").",
+                    Icono = "bi-coin",
+                    IconoClase = "jk-notif-icon-accent",
+                    Clave = "senia:" + t.Id,
+                    Controlador = "Turnos",
+                    Accion = "Agenda",
+                    RouteValues = new { openTurnoId = t.Id }
+                });
+            }
+        }
+
         private static void AgregarTurnosPorAtender(
             List<RecordatorioSistema> recordatorios,
             List<Turno> turnos)
@@ -212,6 +252,35 @@ namespace JKTurnos.Services
                 Icono = "bi-hourglass-split",
                 IconoClase = "jk-notif-icon-warning",
                 Clave = "sinConfirmar:" + hoy.AddDays(1).ToString("yyyyMMdd"),
+                Controlador = "Turnos",
+                Accion = "Agenda",
+                RouteValues = new { }
+            });
+        }
+
+        private static void AgregarTurnosManana(
+            List<RecordatorioSistema> recordatorios,
+            List<Turno> turnos,
+            DateTime hoy)
+        {
+            var manana = hoy.AddDays(1);
+
+            var paraManana = turnos.Count(t =>
+                t.FechaHoraInicio.Date == manana &&
+                (t.EstadoTurno == null || t.EstadoTurno.Codigo != EstadosTurnoBase.Cancelado));
+
+            if (paraManana <= 0)
+                return;
+
+            var turnosTxt = paraManana == 1 ? "turno agendado" : "turnos agendados";
+
+            recordatorios.Add(new RecordatorioSistema
+            {
+                Titulo = "Turnos para manana",
+                Mensaje = "Manana tenes " + paraManana + " " + turnosTxt + ".",
+                Icono = "bi-calendar-event",
+                IconoClase = "jk-notif-icon-accent",
+                Clave = "manana:" + manana.ToString("yyyyMMdd"),
                 Controlador = "Turnos",
                 Accion = "Agenda",
                 RouteValues = new { }
@@ -262,6 +331,62 @@ namespace JKTurnos.Services
                 Clave = "saldo:" + inicioMes.ToString("yyyyMM"),
                 Controlador = "Pagos",
                 Accion = "Index",
+                RouteValues = new { }
+            });
+        }
+
+        private void AgregarTurnosVencidosSinAtender(
+            List<RecordatorioSistema> recordatorios,
+            DateTime hoy,
+            DateTime ahora)
+        {
+            var desde = hoy.AddDays(-180);
+
+            var vencidos = _turnoService.GetTurnosEnRango(desde, hoy)
+                .Where(t => t.FechaHoraFin < ahora &&
+                            t.EstadoTurno != null &&
+                            t.EstadoTurno.Codigo == EstadosTurnoBase.Pendiente &&
+                            t.Servicio != null)
+                .ToList();
+
+            if (vencidos.Count == 0)
+                return;
+
+            var acumuladoPorTurno = _pagoService.GetPagosEnRango(desde, hoy)
+                .GroupBy(p => p.TurnoId)
+                .ToDictionary(g => g.Key, g => g.Sum(p => p.Monto));
+
+            decimal total = 0m;
+            var sinCobrar = 0;
+
+            foreach (var t in vencidos)
+            {
+                var acumulado = acumuladoPorTurno.ContainsKey(t.Id) ? acumuladoPorTurno[t.Id] : 0m;
+                var pendiente = Math.Max(0, t.Servicio.Precio - acumulado);
+
+                if (pendiente > 0)
+                {
+                    total += pendiente;
+                    sinCobrar++;
+                }
+            }
+
+            if (sinCobrar <= 0)
+                return;
+
+            var turnosTxt = sinCobrar == 1
+                ? "turno quedo sin atender y sin cobrar"
+                : "turnos quedaron sin atender y sin cobrar";
+
+            recordatorios.Add(new RecordatorioSistema
+            {
+                Titulo = "Turnos vencidos sin cobrar",
+                Mensaje = sinCobrar + " " + turnosTxt + " ($" + total.ToString("0.##") + ").",
+                Icono = "bi-hourglass-bottom",
+                IconoClase = "jk-notif-icon-warning",
+                Clave = "vencidos:" + hoy.ToString("yyyyMMdd"),
+                Controlador = "Turnos",
+                Accion = "Agenda",
                 RouteValues = new { }
             });
         }

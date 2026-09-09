@@ -19,16 +19,23 @@
                     @foreach (var item in Model)
                     {
                         var codigo = item.EstadoTurno != null ? item.EstadoTurno.Codigo : null;
-                        var puedeIniciar = codigo == EstadosTurnoBase.Pendiente;
-                        var puedeFinalizar = codigo == EstadosTurnoBase.EnCurso;
-                        var puedeCancelar = codigo == EstadosTurnoBase.Pendiente || codigo == EstadosTurnoBase.EnCurso;
+                        var turnoEliminado = !item.IsActive;
+                        var puedeIniciar = !turnoEliminado && codigo == EstadosTurnoBase.Pendiente;
+                        var puedeFinalizar = !turnoEliminado && codigo == EstadosTurnoBase.EnCurso;
+                        var puedeCancelar = !turnoEliminado && (codigo == EstadosTurnoBase.Pendiente || codigo == EstadosTurnoBase.EnCurso);
 
                         <tr>
                             <td>@item.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</td>
                             <td>@(item.Servicio != null ? item.Servicio.Nombre : "Reservado")</td>
                             <td>@(item.Recurso != null ? item.Recurso.Nombre : "Sin recurso")</td>
-                            <td><span class="jk-badge">@(item.EstadoTurno != null ? item.EstadoTurno.Nombre : "Sin estado")</span></td>
+                            <td>
+                                <span class="jk-badge">@(item.EstadoTurno != null ? item.EstadoTurno.Nombre : "Sin estado")</span>
+                                @if (turnoEliminado)
+                                {
+                                    <span class="jk-badge jk-badge-neutral">Eliminado</span>
+                                }
+                            </td>
                             <td>
                                 <div class="jk-flex jk-gap-8 jk-flex-wrap">
                                     @if (puedeIniciar)
@@ -61,7 +68,8 @@
                                             { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                                             { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
                                             { "Compact", false },
-                                            { "ShowDelete", ViewBag.EsAdmin ?? false }
+                                            { "ShowEdit", !turnoEliminado },
+                                            { "ShowDelete", (ViewBag.EsAdmin ?? false) && !turnoEliminado }
                                         })
                                 </div>
                             </td>
@@ -76,13 +84,20 @@
         @foreach (var item in Model)
         {
             var codigo = item.EstadoTurno != null ? item.EstadoTurno.Codigo : null;
-            var puedeIniciar = codigo == EstadosTurnoBase.Pendiente;
-            var puedeFinalizar = codigo == EstadosTurnoBase.EnCurso;
-            var puedeCancelar = codigo == EstadosTurnoBase.Pendiente || codigo == EstadosTurnoBase.EnCurso;
+            var turnoEliminado = !item.IsActive;
+            var puedeIniciar = !turnoEliminado && codigo == EstadosTurnoBase.Pendiente;
+            var puedeFinalizar = !turnoEliminado && codigo == EstadosTurnoBase.EnCurso;
+            var puedeCancelar = !turnoEliminado && (codigo == EstadosTurnoBase.Pendiente || codigo == EstadosTurnoBase.EnCurso);
 
             <div class="jk-card jk-card-compact">
                 <div class="jk-flex-between">
-                    <strong>@(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")</strong>
+                    <strong>
+                        @(item.Cliente != null ? item.Cliente.Nombre : "Sin cliente")
+                        @if (turnoEliminado)
+                        {
+                            <span class="jk-badge jk-badge-neutral">Eliminado</span>
+                        }
+                    </strong>
                     <div class="jk-flex jk-gap-4">
 <a class="jk-btn jk-btn-sm jk-btn-soft-warning" href="@Url.Action("Index", "Pagos", new { turnoId = item.Id })" title="Ver pagos" aria-label="Ver pagos">
                                 <i class="bi bi-cash-coin"></i>
@@ -96,7 +111,8 @@
                                 { "DeleteUrl", Url.Action("Delete", new { id = item.Id }) },
                                 { "ItemName", "Turno " + item.FechaHoraInicio.ToString("dd/MM") },
                                 { "Compact", true },
-                                { "ShowDelete", ViewBag.EsAdmin ?? false }
+                                { "ShowEdit", !turnoEliminado },
+                                { "ShowDelete", (ViewBag.EsAdmin ?? false) && !turnoEliminado }
                             })
                     </div>
                 </div>
@@ -204,11 +220,25 @@
             </div>
         </div>
 
+        @if (ViewBag.EsAdmin == true)
+        {
+            var verEliminados = (bool)(ViewBag.IncluirEliminados ?? false);
+            <div class="jk-filter-group" title="Mostrar los turnos eliminados">
+                <span class="jk-filter-label"><i class="bi bi-eye-slash"></i> Incluir</span>
+                <div class="jk-checkbox-group">
+                    <label class="jk-checkbox-item">
+                        <input type="checkbox" name="incluirEliminados" value="true" @(verEliminados ? "checked" : "") />
+                        <span class="jk-checkbox-label">Eliminados</span>
+                    </label>
+                </div>
+            </div>
+        }
+
         <button type="submit" class="jk-btn jk-btn-primary">
             <i class="bi bi-search"></i> Buscar
         </button>
 
-        <a href="@Url.Action("Index")" class="jk-btn jk-btn-ghost">
+        <a href="@Url.Action("Index")" class="jk-btn jk-btn-primary">
             <i class="bi bi-arrow-counterclockwise"></i> Hoy
         </a>
     </form>
@@ -254,8 +284,10 @@
                 if (!container) return;
                 var toast = document.createElement('div');
                 toast.className = 'jk-toast jk-toast-' + type;
-                toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle')
-                    + '"></i> ' + message;
+                var icon = document.createElement('i');
+                icon.className = 'bi bi-' + (type === 'success' ? 'check-circle' : 'exclamation-circle');
+                toast.appendChild(icon);
+                toast.appendChild(document.createTextNode(' ' + message));
                 container.appendChild(toast);
                 setTimeout(function () { toast.remove(); }, 4000);
             }
