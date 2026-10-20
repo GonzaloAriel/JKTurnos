@@ -427,3 +427,18 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# SECURITY: artefactos de sesion / cookies capturadas y archivos temporales
+# de depuracion. NUNCA deben trackearse (contienen cookies validas).
+**/ck.txt
+**/ph.txt
+**/pr.html
+**/lp.html
+**/out.txt
+**/err.txt
+**/tmp_len.txt
+cookies*.txt
+**/*.modified
+
+# Archivos sueltos de captura sin extension en la raiz del repo
+/40

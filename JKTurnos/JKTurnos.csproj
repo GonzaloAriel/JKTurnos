@@ -330,7 +330,6 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ck.txt" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -368,17 +367,12 @@
     <Content Include="Content\jk-layout.css" />
     <Content Include="Content\jk-sidebar.css" />
     <Content Include="Content\jk-topbar.css" />
-    <Content Include="err.txt" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Img\Loguin\maseta.png" />
     <Content Include="Img\Loguin\Sol.png" />
-    <Content Include="lp.html" />
     <Content Include="Migrations\Scripts\20260828_AddIconoEstadoTurno.sql" />
-    <Content Include="out.txt" />
-    <Content Include="ph.txt" />
-    <Content Include="pr.html" />
     <Content Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -395,7 +389,6 @@
     <Content Include="AI\SESION_20260813_CONTEXTO.md" />
     <Content Include="Docs\16_DRAWER_TURNO_FUTURO.md" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
-    <Content Include="Scripts\jk-layout.js.modified" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -411,7 +404,6 @@
     <Content Include="Scripts\jk-pagos.js" />
     <Content Include="Scripts\jk-dashboard.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="tmp_len.txt" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
