@@ -37,7 +37,9 @@ namespace JKTurnos.Controllers
         // POST: Tenants/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Tenant model, string adminNombre = null, string adminEmail = null, string adminPassword = null)
+        public ActionResult Create(
+            [Bind(Exclude = "Id,CreatedAt,UpdatedAt,IsActive")] Tenant model,
+            string adminNombre = null, string adminEmail = null, string adminPassword = null)
         {
             if (!ModelState.IsValid)
                 return View(model);

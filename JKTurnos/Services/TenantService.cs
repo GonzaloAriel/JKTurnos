@@ -220,7 +220,9 @@ namespace JKTurnos.Services
                 if (string.IsNullOrWhiteSpace(adminPassword))
                     throw new InvalidOperationException("Debe indicar un password para el administrador.");
 
-                adminEmail = adminEmail.Trim();
+                PasswordPolicy.Validar(adminPassword);
+
+                adminEmail = adminEmail.Trim().ToLowerInvariant();
 
                 if (_userRepo.GetAll().Any(u => u.Email == adminEmail))
                     throw new InvalidOperationException("Ya existe un usuario con ese email.");

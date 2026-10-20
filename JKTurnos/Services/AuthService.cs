@@ -19,14 +19,19 @@ namespace JKTurnos.Services
         private static readonly ConcurrentDictionary<string, LockoutInfo> _lockouts
             = new ConcurrentDictionary<string, LockoutInfo>(StringComparer.OrdinalIgnoreCase);
 
-        private const int MaxFailedAttempts = 5;
-        private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
-
         private class LockoutInfo
         {
             public int FailedAttempts { get; set; }
             public DateTime? LockoutEnd { get; set; }
+            public DateTime LastAttempt { get; set; }
         }
+
+        private const int MaxFailedAttempts = 5;
+        private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
+
+        // Ventana tras la cual un registro de intentos sin lockout activo se
+        // considera obsoleto y se purga (evita crecimiento sin limite del dict).
+        private static readonly TimeSpan LimpiezaIntentosObsoletos = TimeSpan.FromMinutes(30);
 
         public AuthService()
         {
@@ -53,8 +58,13 @@ namespace JKTurnos.Services
                 _lockouts.TryRemove(email, out _);
             }
 
+            // Emails normalizados a minusculas al persistir. La busqueda usa
+            // SqlFunctions.Lower para no depender de la collation de SQL y tolerar
+            // filas legacy con mayusculas, sin traer toda la tabla a memoria.
+            var emailNormalizado = (email ?? "").Trim().ToLowerInvariant();
+
             var user = _context.Users
-                .FirstOrDefault(x => x.Email == email);
+                .FirstOrDefault(x => x.Email.ToLower() == emailNormalizado);
 
             if (user == null)
             {
@@ -66,6 +76,13 @@ namespace JKTurnos.Services
             if (!PasswordHasher.Verify(password, user.PasswordHash))
             {
                 RecordFailedAttempt(email);
+                new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
+                return null;
+            }
+
+            // Cuenta desactivada: un usuario dado de baja no puede iniciar sesion.
+            if (!user.IsActive)
+            {
                 new AuditService().RegistrarLogin(user.TenantId, user.Id, user.Nombre, user.Role, user.Email, false);
                 return null;
             }
@@ -100,15 +117,46 @@ namespace JKTurnos.Services
 
         private void RecordFailedAttempt(string email)
         {
+            // Limpieza oportunista: evita que el diccionario crezca sin limite
+            // con emails inexistentes (branda de memoria / DoS de baja severidad).
+            LimpiarLockoutsExpirados();
+
+            var ahora = DateTime.UtcNow;
+
             var info = _lockouts.AddOrUpdate(email,
-                new LockoutInfo { FailedAttempts = 1 },
+                new LockoutInfo { FailedAttempts = 1, LastAttempt = ahora },
                 (key, existing) =>
                 {
                     existing.FailedAttempts++;
+                    existing.LastAttempt = ahora;
                     if (existing.FailedAttempts >= MaxFailedAttempts)
-                        existing.LockoutEnd = DateTime.UtcNow.Add(LockoutDuration);
+                        existing.LockoutEnd = ahora.Add(LockoutDuration);
                     return existing;
                 });
+        }
+
+        // Purga entradas obsoletas: lockout ya vencido, o intentos sin lockout
+        // inactivos por mas de la ventana. Nunca toca intentos recientes (no
+        // resetea el contador de brute-force en curso).
+        private static void LimpiarLockoutsExpirados()
+        {
+            var ahora = DateTime.UtcNow;
+
+            foreach (var par in _lockouts)
+            {
+                var info = par.Value;
+
+                var expirado =
+                    (info.LockoutEnd.HasValue && ahora >= info.LockoutEnd.Value)
+                    || (!info.LockoutEnd.HasValue
+                        && ahora - info.LastAttempt >= LimpiezaIntentosObsoletos);
+
+                if (expirado)
+                {
+                    LockoutInfo _;
+                    _lockouts.TryRemove(par.Key, out _);
+                }
+            }
         }
 
         private void SignIn(User user)

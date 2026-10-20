@@ -91,7 +91,7 @@ namespace JKTurnos.Services
 
             PasswordPolicy.Validar(password);
 
-            user.Email = user.Email.Trim();
+            user.Email = user.Email.Trim().ToLowerInvariant();
 
             if (CurrentRole == Roles.Admin)
             {
@@ -139,7 +139,7 @@ namespace JKTurnos.Services
             var antesRol = existente.Role;
             var antesTenant = existente.TenantId;
 
-            user.Email = (user.Email ?? "").Trim();
+            user.Email = (user.Email ?? "").Trim().ToLowerInvariant();
 
             if (CurrentRole == Roles.Admin)
             {
